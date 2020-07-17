@@ -10,6 +10,7 @@
 		D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314455824C2209E0084DEC5 /* AppDelegate.swift */; };
 		D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D314455A24C220A00084DEC5 /* Assets.xcassets */; };
 		D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D314455C24C220A00084DEC5 /* MainMenu.xib */; };
+		D314456724C224650084DEC5 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314456624C224650084DEC5 /* Segment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		D314455D24C220A00084DEC5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		D314455F24C220A00084DEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D314456024C220A00084DEC5 /* AndersenFE_2020.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AndersenFE_2020.entitlements; sourceTree = "<group>"; };
+		D314456624C224650084DEC5 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				D314455824C2209E0084DEC5 /* AppDelegate.swift */,
+				D314456624C224650084DEC5 /* Segment.swift */,
 				D314455A24C220A00084DEC5 /* Assets.xcassets */,
 				D314455C24C220A00084DEC5 /* MainMenu.xib */,
 				D314455F24C220A00084DEC5 /* Info.plist */,
@@ -131,6 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */,
+				D314456724C224650084DEC5 /* Segment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

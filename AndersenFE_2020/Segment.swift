@@ -59,14 +59,31 @@ struct Segment {
         return result
     }
     
-    /// Function to split this segment into two segments, the bottom-most of which has the height and number of turns equal to the percentageNewBottom parameter. The new top segment will have the balance of the height and the turms.
+    /// Function to split this segment into two segments, the bottom-most of which has the height and number of turns equal to the percentageNewBottom parameter. The new top segment will have the balance of the height and the turms. Note that all of the turns of the new segments are set as active, regardless of the state of the turs in the current segment.
     ///  - Parameter percentNewBottom: The percentage of height and turns that the new bottom segment will have
     ///  - Returns: An array of two Segments
     func SplitSegment(percentNewBottom:Double) -> [Segment]
     {
         var result:[Segment] = []
         
-        return result
+        if percentNewBottom <= 0.0 || percentNewBottom >= 100.0
+        {
+            DLog("Percentage outside of allowed range - returnimng array of this segment")
+            return [self]
+        }
+        
+        let bottomTurns = self.totalTurns * percentNewBottom / 100.0
+        let topTurns = self.totalTurns - bottomTurns
+        
+        let selfDeltaZ = self.maxZ - self.minZ
+        let bottomDeltaZ = selfDeltaZ * percentNewBottom / 100.0
+        let topDeltaZ = selfDeltaZ - bottomDeltaZ
+        
+        let bottomSegment = Segment(type: self.type, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: bottomTurns, totalTurns: bottomTurns, minZ: self.minZ, maxZ: self.minZ + bottomDeltaZ)
+        
+        let topSegment = Segment(type: self.type, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: topTurns, totalTurns: topTurns, minZ: bottomSegment.maxZ, maxZ: bottomSegment.maxZ + topDeltaZ)
+        
+        return [bottomSegment, topSegment]
     }
     
     /// Convenience routine to see if the turns of this segment are currently active

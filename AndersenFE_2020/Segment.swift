@@ -63,9 +63,7 @@ struct Segment {
     ///  - Parameter percentNewBottom: The percentage of height and turns that the new bottom segment will have
     ///  - Returns: An array of two Segments
     func SplitSegment(percentNewBottom:Double) -> [Segment]
-    {
-        var result:[Segment] = []
-        
+    {        
         if percentNewBottom <= 0.0 || percentNewBottom >= 100.0
         {
             DLog("Percentage outside of allowed range - returnimng array of this segment")

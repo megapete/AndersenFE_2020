@@ -14,6 +14,7 @@
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
+		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
+		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				D314455824C2209E0084DEC5 /* AppDelegate.swift */,
 				D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */,
 				D3E307E024C242C100FDAA83 /* PCH_Defs.swift */,
+				F5ED558C24C32659002E7031 /* Terminal.swift */,
 				D314456624C224650084DEC5 /* Segment.swift */,
 				D3E307E324C2473A00FDAA83 /* Layer.swift */,
 				D314455A24C220A00084DEC5 /* Assets.xcassets */,
@@ -145,6 +148,7 @@
 				D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */,
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
+				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
 			);

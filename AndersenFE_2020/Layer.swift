@@ -31,4 +31,6 @@ struct Layer {
     let radialBuild:Double
     
     let innerRadius:Double
+    
+    let parentTerminal:Terminal
 }

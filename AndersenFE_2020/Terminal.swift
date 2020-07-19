@@ -8,7 +8,7 @@
 
 import Cocoa
 
-/// The Terminal class basically wraps the data in an Andersen Terminal
+/// The Terminal class basically wraps the data from the first page of the Excel document
 class Terminal: NSObject
 {
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
@@ -33,6 +33,9 @@ class Terminal: NSObject
     /// The connection to use for this Terminal
     let connection:TerminalConnection
     
+    /// The current direction for this Terminal
+    let currentDirection:Int
+    
     /// The Andersen-file Terminal number
     var andersenNumber:Int
     
@@ -43,12 +46,13 @@ class Terminal: NSObject
     /// - Parameter connection: The connection to use for this Terminal
     /// - Parameter termNum: The Andersen-file Terminal number
     /// - Returns: An initialized Terminal object
-    init(name:String, voltage:Double, VA:Double, connection:TerminalConnection, termNum:Int)
+    init(name:String, voltage:Double, VA:Double, connection:TerminalConnection, currDir:Int, termNum:Int)
     {
         self.name = name
         self.voltage = voltage
         self.VA = VA
         self.connection = connection
+        self.currentDirection = currDir
         self.andersenNumber = termNum
     }
 

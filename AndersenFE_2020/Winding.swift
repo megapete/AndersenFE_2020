@@ -37,6 +37,12 @@ struct Winding {
         }
     }
     
+    /// The number of turns in the Winding
+    let numTurns:(minTurns:Double, nomTurns:Double, maxTurns:Double)
+    
+    /// The nominal electric height of the Winding
+    let elecHt:Double
+    
     /// The number of axial sections in the Winding (what this means depends on the type)
     let numAxialSections:Int
     
@@ -128,7 +134,8 @@ struct Winding {
     /// The recommended ground clearance for this winding
     let groundClearance:Double
     
-
+    /// The Terminal to which this Winding belongs
+    let terminal:Terminal
     
     
 }

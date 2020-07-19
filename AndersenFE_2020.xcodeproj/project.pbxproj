@@ -16,6 +16,7 @@
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
 		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 		F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558E24C46BE5002E7031 /* Winding.swift */; };
+		F5ED559124C49074002E7031 /* Transformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED559024C49074002E7031 /* Transformer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
 		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 		F5ED558E24C46BE5002E7031 /* Winding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Winding.swift; sourceTree = "<group>"; };
+		F5ED559024C49074002E7031 /* Transformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				D314455824C2209E0084DEC5 /* AppDelegate.swift */,
 				D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */,
 				D3E307E024C242C100FDAA83 /* PCH_Defs.swift */,
+				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
 				F5ED558C24C32659002E7031 /* Terminal.swift */,
 				D314456624C224650084DEC5 /* Segment.swift */,
@@ -155,6 +158,7 @@
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
+				F5ED559124C49074002E7031 /* Transformer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,14 +8,19 @@
 
 import Cocoa
 
-class Terminal: NSObject {
-    
+/// The Terminal class basically wraps the data in an Andersen Terminal
+class Terminal: NSObject
+{
+    /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String
     
+    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts
     let voltage:Double
     
+    /// The total (1-ph or 3-ph) VA for the Terminal
     let VA:Double
     
+    /// Possible Terminal connections
     enum TerminalConnection {
         case single_phase
         case wye
@@ -25,10 +30,19 @@ class Terminal: NSObject {
         case zag
     }
     
+    /// The connection to use for this Terminal
     let connection:TerminalConnection
     
+    /// The Andersen-file Terminal number
     var andersenNumber:Int
     
+    /// Designated initializer for the Terminal class
+    /// - Parameter name: A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
+    /// - Parameter voltage: The line-line (line-neutral for single-phase) voltage of the terminal in volts
+    /// - Parameter VA: The total (1-ph or 3-ph) VA for the Terminal
+    /// - Parameter connection: The connection to use for this Terminal
+    /// - Parameter termNum: The Andersen-file Terminal number
+    /// - Returns: An initialized Terminal object
     init(name:String, voltage:Double, VA:Double, connection:TerminalConnection, termNum:Int)
     {
         self.name = name

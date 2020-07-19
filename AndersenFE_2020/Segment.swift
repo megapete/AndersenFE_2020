@@ -6,10 +6,14 @@
 //  Copyright © 2020 Peter Huber. All rights reserved.
 //
 
+
+
 import Foundation
 
+/// A Segment is a collection of turns (made up of a number of strands per turn and strands per layer) with a lower dimension of minZ and an upper dimension of maxZ
 struct Segment {
     
+    /// A Segment must conform to one of these types: nonTap, posTap, or negTap
     enum TapType {
         
         case nonTap
@@ -17,20 +21,29 @@ struct Segment {
         case negTap
     }
     
+    /// The TapType of the Segment
     let type:TapType
     
     // let num:Int
     
+    /// Strand Axial Dimension
     let strandA:Double
+    /// Strand Radial Dimension
     let strandR:Double
     
+    /// Number of strands across the Layer that this Segment belongs to
     let strandsPerLayer:Int
+    /// The number of strands that make up a turn
     let strandsPerTurn:Int
     
+    /// The number of active turns in the Segment (usually either 0 or totalTurns)
     let activeTurns:Double
+    /// The total number of turns in the Segment
     let totalTurns:Double
     
+    /// The lower dimension of the Segment
     let minZ:Double
+    /// The upper dimesion of the Segment
     let maxZ:Double
     
     /// Function to split this segment into a given number of "subsegments". It is the calling routines responsibility to delete this segment and insert the array of new segments into the the correct place. Note that when creating the new segments, this function sets the active turns to be equal to the total turns - ie: turning off turns is also the calling routines responsibilty

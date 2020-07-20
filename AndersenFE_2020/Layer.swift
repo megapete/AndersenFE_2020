@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// A Layer is a "solid" radial section, made up of Segments (ie: this is the "Andersen" definition of a "Layer")
+/// A Layer is a "solid" radial section, made up of Segments (ie: this is similar to the "Andersen" definition of a "Layer")
 struct Layer {
     
     /// Andersen-accepted conductor materials

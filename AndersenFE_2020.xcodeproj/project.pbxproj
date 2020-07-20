@@ -14,6 +14,8 @@
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
+		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
+		F5A0F06224C6231000C4CFE8 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */; };
 		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 		F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558E24C46BE5002E7031 /* Winding.swift */; };
 		F5ED559124C49074002E7031 /* Transformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED559024C49074002E7031 /* Transformer.swift */; };
@@ -30,6 +32,9 @@
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
+		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
+		F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
+		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
 		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 		F5ED558E24C46BE5002E7031 /* Winding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Winding.swift; sourceTree = "<group>"; };
 		F5ED559024C49074002E7031 /* Transformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformer.swift; sourceTree = "<group>"; };
@@ -40,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5A0F06224C6231000C4CFE8 /* libPCH_FLD12_Library.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,6 +57,7 @@
 			children = (
 				D314455724C2209E0084DEC5 /* AndersenFE_2020 */,
 				D314455624C2209E0084DEC5 /* Products */,
+				F5A0F06024C6231000C4CFE8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -66,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				D314455824C2209E0084DEC5 /* AppDelegate.swift */,
+				F5A0F05E24C6203800C4CFE8 /* AppController.swift */,
 				D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */,
 				D3E307E024C242C100FDAA83 /* PCH_Defs.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
@@ -77,8 +85,17 @@
 				D314455C24C220A00084DEC5 /* MainMenu.xib */,
 				D314455F24C220A00084DEC5 /* Info.plist */,
 				D314456024C220A00084DEC5 /* AndersenFE_2020.entitlements */,
+				F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */,
 			);
 			path = AndersenFE_2020;
+			sourceTree = "<group>";
+		};
+		F5A0F06024C6231000C4CFE8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -113,6 +130,7 @@
 				TargetAttributes = {
 					D314455424C2209E0084DEC5 = {
 						CreatedOnToolsVersion = 11.6;
+						LastSwiftMigration = 1160;
 					};
 				};
 			};
@@ -156,6 +174,7 @@
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
+				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
 				F5ED559124C49074002E7031 /* Transformer.swift in Sources */,
@@ -293,19 +312,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AndersenFE_2020/AndersenFE_2020.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = WPGZ62544B;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = /Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include;
 				INFOPLIST_FILE = AndersenFE_2020/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -313,19 +338,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AndersenFE_2020/AndersenFE_2020.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = WPGZ62544B;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = /Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include;
 				INFOPLIST_FILE = AndersenFE_2020/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

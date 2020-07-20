@@ -30,7 +30,7 @@ struct Winding {
     /// The winding is a double stack
     let isDoubleStack:Bool
     
-    /// The winding is a mulitstart
+    /// The winding is a multistart
     var isMultiStart:Bool {
         get {
             return self.wdgType == .multistart

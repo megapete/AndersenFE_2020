@@ -102,7 +102,7 @@ struct Transformer {
         self.numPhases = Int(lineElements[0])!
         self.frequency = Double(lineElements[1])!
         self.tempRise = Double(lineElements[2])!
-        self.core = (Double(lineElements[5])!, Double(lineElements[6])!)
+        self.core = (Double(lineElements[5])! * mmPerInch, Double(lineElements[6])! * mmPerInch)
         
         var assymetryFactor = 1.8
         var systemStrength = 0.0
@@ -176,7 +176,6 @@ struct Transformer {
         currIndex += 1
         
         let wdgDataStartIndex = currIndex
-        var scFactorIndex = 0
         
         for i in 0..<9
         {
@@ -199,7 +198,7 @@ struct Transformer {
                 
                 // electrical height
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let elecHtb = Double(lineElements[i])!
+                let elecHtb = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // check for spiral section
@@ -227,12 +226,12 @@ struct Transformer {
                 
                 // axial gaps
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let radialSpacerThickness = Double(lineElements[i])!
+                let radialSpacerThickness = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // radial spacer widths
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let radialSpacerWidth = Double(lineElements[i])!
+                let radialSpacerWidth = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // num Axial Columns
@@ -247,7 +246,7 @@ struct Transformer {
                 
                 // radial insulation (solid between layers)
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let insulationBetweenLayers = Double(lineElements[i])!
+                let insulationBetweenLayers = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // num Radial Ducts
@@ -257,7 +256,7 @@ struct Transformer {
                 
                 // radial duct thickness
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let radialDuctDimn = Double(lineElements[i])!
+                let radialDuctDimn = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // num Radial Columns
@@ -286,12 +285,12 @@ struct Transformer {
                 
                 // strand axial dimension
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let strandAxialDimn = Double(lineElements[i])!
+                let strandAxialDimn = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // strand radial dimension
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let strandRadialDimn = Double(lineElements[i])!
+                let strandRadialDimn = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // num strands per CTC
@@ -301,27 +300,27 @@ struct Transformer {
                 
                 // axial center gap
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let axialGapCenter = Double(lineElements[i])!
+                let axialGapCenter = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // axial lower gap
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let axialGapLower = Double(lineElements[i])!
+                let axialGapLower = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // axial upper gap
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let axialGapUpper = Double(lineElements[i])!
+                let axialGapUpper = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // bottom edge pack
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let bottomEdgePack = Double(lineElements[i])!
+                let bottomEdgePack = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // ID
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let windingID = Double(lineElements[i])!
+                let windingID = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // overbuild allowance
@@ -331,7 +330,7 @@ struct Transformer {
                 
                 // max ground clearance
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let groundClearance = Double(lineElements[i])!
+                let groundClearance = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 if i == 0
@@ -351,7 +350,7 @@ struct Transformer {
                 
                 // insulation between cables
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let internalTurnInsulation = Double(lineElements[i])!
+                let internalTurnInsulation = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // skip the next 3
@@ -359,16 +358,44 @@ struct Transformer {
                 
                 // strand insulatiom
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let strandInsulation = Double(lineElements[i])!
+                let strandInsulation = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // cable insulatiom
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let cableInsulation = Double(lineElements[i])!
+                let cableInsulation = Double(lineElements[i])! * mmPerInch
                 
+                // Algorithm to ascertain the winding type
+                var wdgType:Winding.WindingType = .disc
                 
+                if !isSpiral && (numAxialSections == 1 || numAxialSections == 2) && numRadialSections == 1
+                {
+                    wdgType = .sheet
+                }
+                else if isSpiral && numAxialSections == 1 && numRadialSections == 1
+                {
+                    wdgType = .helix
+                }
+                else if isSpiral && numAxialSections > 1 && numRadialSections > 1
+                {
+                    wdgType = .section
+                }
+                else if isSpiral && numRadialSections > 1
+                {
+                    wdgType = .layer
+                }
+                else if isMultistart
+                {
+                    wdgType = .multistart
+                }
                 
-                // let newWinding = Winding(wdgType: <#T##Winding.WindingType#>, isSprial: <#T##Bool#>, isDoubleStack: <#T##Bool#>, numTurns: <#T##(minTurns: Double, nomTurns: Double, maxTurns: Double)#>, elecHt: <#T##Double#>, numAxialSections: <#T##Int#>, radialSpacer: <#T##(thickness: Double, width: Double)#>, numAxialColumns: <#T##Int#>, numRadialSections: <#T##Int#>, radialInsulation: <#T##Double#>, ducts: <#T##(count: Int, dim: Double)#>, numRadialSupports: <#T##Int#>, turnDef: <#T##Winding.TurnDefinition#>, axialGaps: <#T##(center: Double, bottom: Double, top: Double)#>, bottomEdgePack: <#T##Double#>, coilID: <#T##Double#>, radialOverbuild: <#T##Double#>, groundClearance: <#T##Double#>, terminal: <#T##Terminal#>)
+                let internalRadialTurnIns = (wdgType == .helix && numRadialDucts > 0 ? radialDuctDimn * Double(numRadialDucts) : 0.0) * mmPerInch
+                
+                let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
+                
+                let newWinding = Winding(wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: (minTurns, nomTurns, maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: (radialSpacerThickness, radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: (numRadialDucts, radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: (axialGapCenter, axialGapLower, axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex]!)
+                
+                self.windings.append(newWinding)
             }
             
             currIndex = wdgDataStartIndex

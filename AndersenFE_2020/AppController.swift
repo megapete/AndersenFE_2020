@@ -8,6 +8,29 @@
 
 import Cocoa
 
-class AppController: NSObject {
+let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
 
+class AppController: NSObject {
+    
+    
+    @IBAction func handleOpenDesignFIle(_ sender: Any)
+    {
+        let openPanel = NSOpenPanel()
+        
+        openPanel.canChooseFiles = true
+        openPanel.canChooseDirectories = false
+        openPanel.title = "Design file"
+        openPanel.message = "Open a valid Excel-design-sheet-generated file"
+        
+        // If there was a previously successfully opened design file, set that file's directory as the default, otherwise go to the user's Documents folder
+        if let lastFile = UserDefaults.standard.url(forKey: LAST_OPENED_INPUT_FILE_KEY)
+        {
+            openPanel.directoryURL = lastFile.deletingLastPathComponent()
+        }
+        else
+        {
+            
+        }
+    }
+    
 }

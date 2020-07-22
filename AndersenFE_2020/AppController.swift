@@ -29,7 +29,7 @@ class AppController: NSObject {
         }
         else
         {
-            
+            openPanel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         }
     }
     

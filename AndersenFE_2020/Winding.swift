@@ -52,8 +52,12 @@ struct Winding:Codable {
     /// The number of axial sections in the Winding (what this means depends on the type)
     let numAxialSections:Int
     
+    struct RadialSpacer:Codable {
+        let thickness:Double
+        let width:Double
+    }
     /// The radial spacer dimensions (thickness is the gap between axial sections)
-    let radialSpacer:(thickness:Double, width:Double)
+    let radialSpacer:RadialSpacer
     
     /// The number of axial columns
     let numAxialColumns:Int
@@ -64,8 +68,13 @@ struct Winding:Codable {
     /// The solid insulation to use between radial sections
     let radialInsulation:Double
     
+    struct RadialDucts:Codable {
+        let count:Int
+        let dim:Double
+    }
+    
     /// The number of radial ducts in the Winding and their radial dimension
-    let ducts:(count:Int, dim:Double)
+    let ducts:RadialDucts
     
     /// The number of radial supports under (and within) the Winding
     let numRadialSupports:Int
@@ -125,8 +134,14 @@ struct Winding:Codable {
     /// The turn definition for this winding
     let turnDef:TurnDefinition
     
+    struct AxialGaps:Codable {
+        let center:Double
+        let bottom:Double
+        let top:Double
+    }
+    
     /// Axial gaps (usually for taps, or to balance taps on a different winding)
-    let axialGaps:(center:Double, bottom:Double, top:Double)
+    let axialGaps:AxialGaps
     
     /// The distance from the bottom yoke to the copper of this Winding
     let bottomEdgePack:Double

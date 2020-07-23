@@ -19,6 +19,38 @@ class AppController: NSObject {
     var undoStack:[Transformer] = []
     var redoStack:[Transformer] = []
     
+    @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
+    }
+    
+    @IBAction func handleSaveAFE2020File(_ sender: Any) {
+    }
+    
+    @IBAction func handleSaveAsAFE2020File(_ sender: Any) {
+    }
+    
+    @IBAction func handleOpenAFE2020File(_ sender: Any) {
+        
+        let openPanel = NSOpenPanel()
+        
+        openPanel.canChooseFiles = true
+        openPanel.canChooseDirectories = false
+        openPanel.title = "AndersenFE 2020 file"
+        openPanel.message = "Open a valid Andersenr 2020 file"
+        openPanel.allowsMultipleSelection = false
+        openPanel.allowedFileTypes = ["afe"]
+        
+        // If there was a previously successfully opened design file, set that file's directory as the default, otherwise go to the user's Documents folder
+        if let lastFile = UserDefaults.standard.url(forKey: LAST_OPENED_INPUT_FILE_KEY)
+        {
+            openPanel.directoryURL = lastFile.deletingLastPathComponent()
+        }
+        else
+        {
+            openPanel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        }
+    }
+    
+    
     @IBAction func handleOpenDesignFIle(_ sender: Any)
     {
         let openPanel = NSOpenPanel()
@@ -27,6 +59,7 @@ class AppController: NSObject {
         openPanel.canChooseDirectories = false
         openPanel.title = "Design file"
         openPanel.message = "Open a valid Excel-design-sheet-generated file"
+        openPanel.allowsMultipleSelection = false
         
         // If there was a previously successfully opened design file, set that file's directory as the default, otherwise go to the user's Documents folder
         if let lastFile = UserDefaults.standard.url(forKey: LAST_OPENED_INPUT_FILE_KEY)
@@ -45,6 +78,10 @@ class AppController: NSObject {
                 do {
                     
                     self.currentTxfo = try Transformer(designFile: fileURL)
+                    
+                    UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
+                    
+                    self.currentTxfoIsDirty = false
                 }
                 catch
                 {

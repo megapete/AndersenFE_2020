@@ -79,6 +79,11 @@
                                     <action selector="handleOpenDesignFIle:" target="6yZ-bT-Gps" id="gp0-Wx-x7S"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Open AFE2020 File…" keyEquivalent="o" id="x3Z-Bc-W20">
+                                <connections>
+                                    <action selector="handleOpenAFE2020File:" target="6yZ-bT-Gps" id="LkE-aN-pee"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Open Recent" id="tXI-mr-wws">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Open Recent" systemMenu="recentDocuments" id="oas-Oc-fiZ">
@@ -98,14 +103,19 @@
                                     <action selector="performClose:" target="-1" id="HmO-Ls-i7Q"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Save Andersen Input File…" keyEquivalent="s" id="pQd-DL-d0o">
+                                <connections>
+                                    <action selector="handleSaveAndersenInputFile:" target="6yZ-bT-Gps" id="676-BM-Zn8"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
                                 <connections>
-                                    <action selector="saveDocument:" target="-1" id="teZ-XB-qJY"/>
+                                    <action selector="handleSaveAFE2020File:" target="6yZ-bT-Gps" id="epT-uu-a0v"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
                                 <connections>
-                                    <action selector="saveDocumentAs:" target="-1" id="mDf-zr-I0C"/>
+                                    <action selector="handleSaveAsAFE2020File:" target="6yZ-bT-Gps" id="hv0-Xd-xWW"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Revert to Saved" keyEquivalent="r" id="KaW-ft-85H">

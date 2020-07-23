@@ -11,7 +11,7 @@ import Foundation
 let PCH_SupportedFileVersion = 4
 
 /// The Transformer struct is the encompassing Andersen-oriented data for the model. All of its fields are self-explanatory.
-struct Transformer {
+struct Transformer:Codable {
     
     let numPhases:Int
     
@@ -19,7 +19,11 @@ struct Transformer {
     
     let tempRise:Double
     
-    let core:(diameter:Double, windHt:Double)
+    struct Core:Codable {
+        let diameter:Double
+        let windHt:Double
+    }
+    let core:Core
     
     var scFactor:Double
     
@@ -102,7 +106,7 @@ struct Transformer {
         self.numPhases = Int(lineElements[0])!
         self.frequency = Double(lineElements[1])!
         self.tempRise = Double(lineElements[2])!
-        self.core = (Double(lineElements[5])! * mmPerInch, Double(lineElements[6])! * mmPerInch)
+        self.core = Core(diameter: Double(lineElements[5])! * mmPerInch, windHt: Double(lineElements[6])! * mmPerInch)
         
         var assymetryFactor = 1.8
         var systemStrength = 0.0
@@ -393,7 +397,7 @@ struct Transformer {
                 
                 let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
                 
-                let newWinding = Winding(wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: (radialSpacerThickness, radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: (numRadialDucts, radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: (axialGapCenter, axialGapLower, axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex]!)
+                let newWinding = Winding(wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex]!)
                 
                 self.windings.append(newWinding)
             }

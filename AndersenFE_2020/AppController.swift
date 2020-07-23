@@ -12,6 +12,12 @@ let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
 
 class AppController: NSObject {
     
+    var currentTxfo:Transformer? = nil
+    var currentTxfoIsDirty:Bool = false
+    
+    // My stab at Undo and Redo
+    var undoStack:[Transformer] = []
+    var redoStack:[Transformer] = []
     
     @IBAction func handleOpenDesignFIle(_ sender: Any)
     {
@@ -30,6 +36,28 @@ class AppController: NSObject {
         else
         {
             openPanel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        }
+        
+        if openPanel.runModal() == .OK
+        {
+            if let fileURL = openPanel.url
+            {
+                do {
+                    
+                    self.currentTxfo = try Transformer(designFile: fileURL)
+                }
+                catch
+                {
+                    let alert = NSAlert(error: error)
+                    let _ = alert.runModal()
+                    return
+                }
+            }
+            else
+            {
+                DLog("This shouldn't ever happen...")
+            }
+            
         }
     }
     

@@ -9,10 +9,10 @@
 import Foundation
 
 /// A Winding is essentialy an interface between the Excel-generated design model and the more "Andersen-friendly" model that this program uses.
-struct Winding {
+struct Winding:Codable {
     
     /// WindingType represents the different types of Windings that we can build
-    enum WindingType {
+    enum WindingType:Int, Codable {
         case disc
         case helix
         case sheet
@@ -37,8 +37,14 @@ struct Winding {
         }
     }
     
+    struct NumberOfTurns:Codable {
+        let minTurns:Double
+        let nomTurns:Double
+        let maxTurns:Double
+    }
+    
     /// The number of turns in the Winding
-    let numTurns:(minTurns:Double, nomTurns:Double, maxTurns:Double)
+    let numTurns:NumberOfTurns
     
     /// The nominal electric height of the Winding
     let elecHt:Double
@@ -65,14 +71,14 @@ struct Winding {
     let numRadialSupports:Int
     
     /// The different cable types that are used to compose a turn
-    enum CableType {
+    enum CableType:Int, Codable {
         case single
         case twin
         case CTC
     }
     
     /// A turn can be made up of any number of CableTypes
-    struct TurnDefinition
+    struct TurnDefinition:Codable
     {
         let strandA:Double
         let strandR:Double

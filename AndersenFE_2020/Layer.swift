@@ -9,10 +9,10 @@
 import Foundation
 
 /// A Layer is a "solid" radial section, made up of Segments (ie: this is similar to the "Andersen" definition of a "Layer")
-struct Layer {
+struct Layer:Codable {
     
     /// Andersen-accepted conductor materials
-    enum ConductorMaterial {
+    enum ConductorMaterial:Int, Codable {
         case copper
         case aluminum
     }

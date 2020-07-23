@@ -11,10 +11,10 @@
 import Foundation
 
 /// A Segment is a collection of turns (made up of a number of strands per turn and strands per layer) with a lower dimension of minZ and an upper dimension of maxZ
-struct Segment {
+struct Segment:Codable {
     
     /// A Segment must conform to one of these types: nonTap, posTap, or negTap
-    enum TapType {
+    enum TapType:Int, Codable {
         
         case nonTap
         case posTap

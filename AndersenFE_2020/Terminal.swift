@@ -6,10 +6,10 @@
 //  Copyright © 2020 Peter Huber. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /// The Terminal class basically wraps the data from the first page of the Excel document
-class Terminal: NSObject
+class Terminal: Codable
 {
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String
@@ -21,13 +21,13 @@ class Terminal: NSObject
     let VA:Double
     
     /// Possible Terminal connections
-    enum TerminalConnection {
-        case single_phase
-        case wye
-        case auto
-        case delta
-        case zig
-        case zag
+    enum TerminalConnection:Int, Codable {
+        case single_phase = 1
+        case wye = 2
+        case auto = 3
+        case delta = 4
+        case zig = 5
+        case zag = 6
     }
     
     /// The connection to use for this Terminal

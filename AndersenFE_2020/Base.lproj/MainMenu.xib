@@ -18,7 +18,12 @@
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target"/>
+        <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target">
+            <connections>
+                <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
+                <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
+            </connections>
+        </customObject>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
                 <menuItem title="AndersenFE_2020" id="1Xt-HY-uBw">
@@ -695,7 +700,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>

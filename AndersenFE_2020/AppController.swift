@@ -10,19 +10,39 @@ import Cocoa
 
 let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
 
-class AppController: NSObject {
+class AppController: NSObject, NSMenuItemValidation {
+    
     
     var currentTxfo:Transformer? = nil
+    var currentTxfoFile:URL?
     var currentTxfoIsDirty:Bool = false
     
     // My stab at Undo and Redo
     var undoStack:[Transformer] = []
     var redoStack:[Transformer] = []
     
+    // Menu outlets for turning them on/off
+    @IBOutlet weak var saveMenuItem: NSMenuItem!
+    @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
+    
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        
+        return true
+    }
+    
+    
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
     }
     
-    @IBAction func handleSaveAFE2020File(_ sender: Any) {
+    @IBAction func handleSaveAFE2020File(_ sender: Any){
+        
+        guard let fileURL = self.currentTxfoFile else {
+            
+            self.handleSaveAsAFE2020File(sender)
+            return
+        }
+        
+        
     }
     
     @IBAction func handleSaveAsAFE2020File(_ sender: Any) {
@@ -35,7 +55,7 @@ class AppController: NSObject {
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
         openPanel.title = "AndersenFE 2020 file"
-        openPanel.message = "Open a valid Andersenr 2020 file"
+        openPanel.message = "Open a valid AndersenFE 2020 file"
         openPanel.allowsMultipleSelection = false
         openPanel.allowedFileTypes = ["afe"]
         
@@ -81,7 +101,7 @@ class AppController: NSObject {
                     
                     UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
                     
-                    self.currentTxfoIsDirty = false
+                    self.currentTxfoIsDirty = true
                 }
                 catch
                 {

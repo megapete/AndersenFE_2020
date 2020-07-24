@@ -81,7 +81,8 @@ struct Transformer:Codable {
             throw error
         }
         
-        let lineArray:[String] = fileString.components(separatedBy: .newlines)
+        // Get the file as an array of lines and get rid of any null strings that are in there
+        let lineArray:[String] = fileString.components(separatedBy: .newlines).filter{$0 != ""}
         
         var currIndex = 0
         
@@ -121,6 +122,7 @@ struct Transformer:Codable {
             {
                 if voltage == 0.0
                 {
+                    currIndex += 1
                     terminals.append(nil)
                     continue
                 }
@@ -161,7 +163,7 @@ struct Transformer:Codable {
         var rowMap:[Int?] = []
         lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
         
-        for i in 0..<9
+        for i in 0..<8
         {
             if lineElements[i] == "FALSE"
             {
@@ -181,7 +183,7 @@ struct Transformer:Codable {
         
         let wdgDataStartIndex = currIndex
         
-        for i in 0..<9
+        for i in 0..<8
         {
             if let termIndex = rowMap[i]
             {
@@ -397,7 +399,7 @@ struct Transformer:Codable {
                 
                 let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
                 
-                let newWinding = Winding(wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex]!)
+                let newWinding = Winding(wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
                 
                 self.windings.append(newWinding)
             }

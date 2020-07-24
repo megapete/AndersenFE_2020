@@ -12,10 +12,11 @@ let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
 
 class AppController: NSObject, NSMenuItemValidation {
     
-    
+    // Currently-loaded transformer properties
     var currentTxfo:Transformer? = nil
-    var currentTxfoFile:URL?
+    var currentTxfoFile:URL? = nil
     var currentTxfoIsDirty:Bool = false
+    var lastSavedTxfoFile:URL? = nil
     
     // My stab at Undo and Redo
     var undoStack:[Transformer] = []
@@ -24,14 +25,28 @@ class AppController: NSObject, NSMenuItemValidation {
     // Menu outlets for turning them on/off
     @IBOutlet weak var saveMenuItem: NSMenuItem!
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
+    @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
+    
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        
+        if menuItem == self.saveMenuItem
+        {
+            return self.currentTxfoFile != nil && self.currentTxfoIsDirty
+        }
+        else if menuItem == self.closeTransformerMenuItem
+        {
+            return currentTxfo != nil
+        }
         
         return true
     }
     
     
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
+        
+        
+        
     }
     
     @IBAction func handleSaveAFE2020File(_ sender: Any){
@@ -42,10 +57,51 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        
+        self.doSaveAFE2020File(fileURL: fileURL)
     }
     
     @IBAction func handleSaveAsAFE2020File(_ sender: Any) {
+        
+        let saveAsPanel = NSSavePanel()
+        saveAsPanel.title = "AndersenFE 2020 file"
+        saveAsPanel.message = "Save AndersenFE 2020 file"
+        saveAsPanel.allowedFileTypes = ["afe"]
+        
+        if saveAsPanel.runModal() == .OK
+        {
+            if let fileURL = saveAsPanel.url
+            {
+                self.doSaveAFE2020File(fileURL: fileURL)
+            }
+        }
+    }
+    
+    func doSaveAFE2020File(fileURL:URL)
+    {
+        guard let currTxfo = self.currentTxfo else {
+            
+            DLog("Current transformer is not defined")
+            return
+        }
+        let encoder = PropertyListEncoder()
+        
+        do {
+            
+            let fileData = try encoder.encode(currTxfo)
+            
+            if FileManager.default.fileExists(atPath: fileURL.path)
+            {
+                try FileManager.default.removeItem(at: fileURL)
+            }
+            
+            FileManager.default.createFile(atPath: fileURL.path, contents: fileData, attributes: nil)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
     }
     
     @IBAction func handleOpenAFE2020File(_ sender: Any) {
@@ -97,10 +153,13 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 do {
                     
+                    // create the current Transformer from the Excel design file
                     self.currentTxfo = try Transformer(designFile: fileURL)
                     
+                    // if we make it here, we have successfully opened the file, so save it as the "last successfully opened file"
                     UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
                     
+                    // a design file was opened, set the current Transformer as dirty to make sure that the user is prompted to save it as an AndersenFE-2020 file
                     self.currentTxfoIsDirty = true
                 }
                 catch

@@ -129,9 +129,31 @@ struct Transformer:Codable {
                 
                 let VA = Double(lineElements[1])! * 1000.0
                 
+                var termName = ""
+                
+                let newTermNum = Int(lineElements[3])!
+                let currDir = Int(lineElements[4])!
+                
                 let connString = lineElements[2]
                 var connection:Terminal.TerminalConnection = .wye
-            
+                
+                if currIndex == 1
+                {
+                    termName = "HV"
+                }
+                else if currIndex == 2
+                {
+                    termName = "LV"
+                }
+                else if newTermNum > 2
+                {
+                    termName = "TV"
+                }
+                else if newTermNum != 0
+                {
+                    termName = "RV"
+                }
+                
                 if connString == "D"
                 {
                     connection = .delta
@@ -139,16 +161,25 @@ struct Transformer:Codable {
                 else if connString == "ZIG"
                 {
                     connection = .zig
+                    termName = "ZIG"
                 }
                 else if connString == "ZAG"
                 {
                     connection = .zag
+                    termName = "ZAG"
+                }
+                else if connString == "AS" // auto series
+                {
+                    connection = .auto_series
+                    termName = "Auto-S"
+                }
+                else if connString == "AC" // auto common
+                {
+                    connection = .auto_common
+                    termName = "Auto-C"
                 }
                 
-                let newTermNum = Int(lineElements[3])!
-                let currDir = Int(lineElements[4])!
-                
-                let newTerm = Terminal(name: "", voltage: voltage, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
+                let newTerm = Terminal(name: termName, voltage: voltage, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
                 
                 terminals.append(newTerm)
             }

@@ -11,6 +11,8 @@
 		D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D314455A24C220A00084DEC5 /* Assets.xcassets */; };
 		D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D314455C24C220A00084DEC5 /* MainMenu.xib */; };
 		D314456724C224650084DEC5 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314456624C224650084DEC5 /* Segment.swift */; };
+		D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */; };
+		D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D38833E024CCC1C400A0C7A5 /* Preferences.xib */; };
 		D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */; };
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
@@ -30,6 +32,8 @@
 		D314455F24C220A00084DEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D314456024C220A00084DEC5 /* AndersenFE_2020.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AndersenFE_2020.entitlements; sourceTree = "<group>"; };
 		D314456624C224650084DEC5 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
+		D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDialog.swift; sourceTree = "<group>"; };
+		D38833E024CCC1C400A0C7A5 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_BaseClass_DialogBox.swift; path = "../../../../Dropbox/MyProjects/Base Classes/PCH_BaseClass_DialogBox.swift"; sourceTree = "<group>"; };
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
@@ -79,6 +83,8 @@
 				D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */,
 				D3E307E024C242C100FDAA83 /* PCH_Defs.swift */,
 				D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */,
+				D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */,
+				D38833E024CCC1C400A0C7A5 /* Preferences.xib */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
 				F5ED558C24C32659002E7031 /* Terminal.swift */,
@@ -161,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */,
+				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -180,6 +187,7 @@
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
+				D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
 				F5ED559124C49074002E7031 /* Transformer.swift in Sources */,
 			);

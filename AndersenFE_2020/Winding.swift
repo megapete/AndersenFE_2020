@@ -43,6 +43,13 @@ struct Winding:Codable {
         let maxTurns:Double
     }
     
+    /// The winding has embedded taps
+    var hasTaps:Bool {
+        get {
+            return self.numTurns.maxTurns != self.numTurns.nomTurns || self.numTurns.minTurns != self.numTurns.nomTurns
+        }
+    }
+    
     /// The number of turns in the Winding
     let numTurns:NumberOfTurns
     
@@ -158,5 +165,6 @@ struct Winding:Codable {
     /// The Terminal to which this Winding belongs
     let terminal:Terminal
     
-    
+    /// The Layers that make up this winding
+    var layers:[Layer] = []
 }

@@ -8,7 +8,13 @@
 
 import Cocoa
 
+// Keys into User Defaults
+// Key so that the user doesn't have to go searching for the last folder he opened
 let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
+// Key (Bool) to decide if windings with radial ducts should be split into separate Andersen layers
+let MODEL_RADIAL_DUCTS_KEY = "PCH_AFE2020_ModelRadialDucts"
+
+// Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
 
 class AppController: NSObject, NSMenuItemValidation {
@@ -43,6 +49,16 @@ class AppController: NSObject, NSMenuItemValidation {
         
         return true
     }
+    
+    @IBAction func handlePreferences(_ sender: Any) {
+        
+        let prefDlog = PreferencesDialog()
+        
+        let _ = prefDlog.runModal()
+        
+        
+    }
+    
     
     
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {

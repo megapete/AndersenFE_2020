@@ -22,6 +22,7 @@
         <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
+                <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
             </connections>
@@ -83,7 +84,7 @@
                             </menuItem>
                             <menuItem title="Open Design FIle…" keyEquivalent="o" id="IAo-SY-fd9">
                                 <connections>
-                                    <action selector="handleOpenDesignFIle:" target="6yZ-bT-Gps" id="gp0-Wx-x7S"/>
+                                    <action selector="handleOpenDesignFile:" target="6yZ-bT-Gps" id="gp0-Wx-x7S"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Open AFE2020 File…" keyEquivalent="o" id="x3Z-Bc-W20">
@@ -707,6 +708,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
+            <point key="canvasLocation" x="142" y="-120"/>
         </window>
     </objects>
 </document>

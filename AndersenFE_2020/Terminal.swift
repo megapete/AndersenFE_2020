@@ -24,10 +24,11 @@ class Terminal: Codable
     enum TerminalConnection:Int, Codable {
         case single_phase = 1
         case wye = 2
-        case auto = 3
-        case delta = 4
-        case zig = 5
-        case zag = 6
+        case delta = 3
+        case auto_common = 4
+        case auto_series = 5
+        case zig = 6
+        case zag = 7
     }
     
     /// The connection to use for this Terminal

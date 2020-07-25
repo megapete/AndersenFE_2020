@@ -24,8 +24,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func application(_ sender:NSApplication, openFile filename:String) -> Bool
     {
+        let fixedFileName = (filename as NSString).expandingTildeInPath
         
-        return false
+        let url = URL(fileURLWithPath: fixedFileName, isDirectory: false)
+        
+        return appController.doOpen(fileURL: url)
     }
 
 

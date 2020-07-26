@@ -23,24 +23,33 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model radial ducts" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3IM-Yv-lI3">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="label" size="13"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="handleRadialDucts:" target="-2" id="pHx-bV-UFm"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GBE-JY-ur9">
                     <rect key="frame" x="18" y="216" width="302" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model windings with terminal number '0'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MY8-z2-jyM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="label" size="13"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="handleZeroTerms:" target="-2" id="SsI-Qz-Mvm"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="45U-TY-VS6">
                     <rect key="frame" x="18" y="196" width="303" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model in-winding taps for layer windings" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NmJ-Mu-1xQ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="label" size="13"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="handleInWindingTaps:" target="-2" id="Gp4-zK-UAA"/>
+                    </connections>
                 </button>
             </subviews>
             <point key="canvasLocation" x="139" y="154"/>

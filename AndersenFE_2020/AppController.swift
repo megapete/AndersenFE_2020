@@ -9,10 +9,14 @@
 import Cocoa
 
 // Keys into User Defaults
-// Key so that the user doesn't have to go searching for the last folder he opened
+// Key (String) so that the user doesn't have to go searching for the last folder he opened
 let LAST_OPENED_INPUT_FILE_KEY = "PCH_AFE2020_LastInputFile"
 // Key (Bool) to decide if windings with radial ducts should be split into separate Andersen layers
 let MODEL_RADIAL_DUCTS_KEY = "PCH_AFE2020_ModelRadialDucts"
+// Key (Bool) to decide if terminals with number 0 should be modeled
+let MODEL_ZERO_TERMINALS_KEY = "PCH_AFE2020_ModelZeroTerminals"
+// Key (Bool) to decide if internal taps on layer windings should be modeled
+let MODEL_INTERNAL_LAYER_TAPS_KEY = "PCH_AFE2020_ModelInternalLayerTaps"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -34,7 +38,25 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
+    // Preference switches
+    var modelRadialDucts = false
+    var model0Terminals = false
+    var modelInternalLayerTaps = false
+    
     @IBOutlet weak var mainWindow: NSWindow!
+    
+    // set up our preference switches
+    override func awakeFromNib() {
+        
+        self.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
+        self.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
+        self.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+    }
+    
+    func updateModel()
+    {
+        DLog("Updating transformer model...")
+    }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
@@ -52,14 +74,38 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handlePreferences(_ sender: Any) {
         
-        let prefDlog = PreferencesDialog()
+        let prefDlog = PreferencesDialog(modelRadialDucts: self.modelRadialDucts, modelZeroTerms: self.model0Terminals, modelLayerTaps: self.modelInternalLayerTaps)
         
         let _ = prefDlog.runModal()
         
+        var txfoNeedsUpdate = false
         
+        if prefDlog.modelRadialDucts != self.modelRadialDucts
+        {
+            self.modelRadialDucts = !self.modelRadialDucts
+            UserDefaults.standard.set(self.modelRadialDucts, forKey: MODEL_RADIAL_DUCTS_KEY)
+            txfoNeedsUpdate = true
+        }
+        
+        if prefDlog.modelZeroTerms != self.model0Terminals
+        {
+            self.model0Terminals = !self.model0Terminals
+            UserDefaults.standard.set(self.model0Terminals, forKey: MODEL_ZERO_TERMINALS_KEY)
+            txfoNeedsUpdate = true
+        }
+        
+        if prefDlog.modelLayerTaps != self.modelInternalLayerTaps
+        {
+            self.modelInternalLayerTaps = !self.modelInternalLayerTaps
+            UserDefaults.standard.set(self.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+            txfoNeedsUpdate = true
+        }
+        
+        if txfoNeedsUpdate
+        {
+            self.updateModel()
+        }
     }
-    
-    
     
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         

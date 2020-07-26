@@ -167,4 +167,19 @@ struct Winding:Codable {
     
     /// The Layers that make up this winding
     var layers:[Layer] = []
+    
+    func InitializeLayers(preferences:PCH_AFE2020_Prefs, windingCenter:Double)
+    {
+        if !preferences.model0Terminals && self.terminal.andersenNumber == 0
+        {
+            return
+        }
+        
+        let minLayerZ = windingCenter - self.elecHt / 2.0
+        let maxLayerZ = minLayerZ + self.elecHt
+        
+        var numLayers = (preferences.modelRadialDucts ? self.ducts.count + 1 : 1)
+        
+        let turnsPerLayer = self.numTurns.maxTurns / Double(numLayers)
+    }
 }

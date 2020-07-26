@@ -13,24 +13,29 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var noRadialDuctsCheckbox: NSButton!
     @IBOutlet weak var noZeroTerminalsCheckbox: NSButton!
     @IBOutlet weak var noLayerWindingTapsCheckBox: NSButton!
+    @IBOutlet weak var upperLowerGapSymmetric: NSButtonCell!
     
     var modelRadialDucts:Bool
     var modelZeroTerms:Bool
     var modelLayerTaps:Bool
+    var upperLowerGapsAreSymmetric:Bool
     
-    init(modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool) {
+    init(modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool) {
         
         self.modelRadialDucts = modelRadialDucts
         self.modelZeroTerms = modelZeroTerms
         self.modelLayerTaps = modelLayerTaps
+        self.upperLowerGapsAreSymmetric = upperLowerGapsAreSymmetric
         
         super.init(viewNibFileName: "Preferences", windowTitle: "Preferences", hideCancel: true)
     }
     
     override func awakeFromNib() {
-        self.noRadialDuctsCheckbox.state = (modelRadialDucts ? .off : .on)
-        self.noZeroTerminalsCheckbox.state = (modelZeroTerms ? .off : .on)
-        self.noLayerWindingTapsCheckBox.state = (modelLayerTaps ? .off : .on)
+        
+        self.noRadialDuctsCheckbox.state = (self.modelRadialDucts ? .off : .on)
+        self.noZeroTerminalsCheckbox.state = (self.modelZeroTerms ? .off : .on)
+        self.noLayerWindingTapsCheckBox.state = (self.modelLayerTaps ? .off : .on)
+        self.upperLowerGapSymmetric.state = (self.upperLowerGapsAreSymmetric ? .on : .off)
     }
     
     @IBAction func handleRadialDucts(_ sender: Any) {
@@ -46,6 +51,12 @@ class PreferencesDialog: PCH_DialogBox {
     @IBAction func handleInWindingTaps(_ sender: Any) {
         
         self.modelLayerTaps = self.noLayerWindingTapsCheckBox.state != .on
+    }
+    
+    @IBAction func handleUpperLowerGaps(_ sender: Any) {
+        
+        self.upperLowerGapsAreSymmetric = self.upperLowerGapSymmetric.state == .on
+        
     }
     
 }

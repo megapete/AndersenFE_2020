@@ -17,16 +17,19 @@ let MODEL_RADIAL_DUCTS_KEY = "PCH_AFE2020_ModelRadialDucts"
 let MODEL_ZERO_TERMINALS_KEY = "PCH_AFE2020_ModelZeroTerminals"
 // Key (Bool) to decide if internal taps on layer windings should be modeled
 let MODEL_INTERNAL_LAYER_TAPS_KEY = "PCH_AFE2020_ModelInternalLayerTaps"
+// Key (Bool) to decide if upper and lower axial gaps are symmetric about the axial center
+let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGapsSymmetrical"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
 
 // Struct for preferences
-struct Prefs {
+struct PCH_AFE2020_Prefs {
     
     var modelRadialDucts:Bool
     var model0Terminals:Bool
     var modelInternalLayerTaps:Bool
+    var upperLowerAxialGapsAreSymmetrical:Bool
 }
 
 class AppController: NSObject, NSMenuItemValidation {
@@ -47,20 +50,27 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
     // Preferences
-    var preferences = Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false)
+    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true)
     
     @IBOutlet weak var mainWindow: NSWindow!
     
     // set up our preference switches
     override func awakeFromNib() {
         
+        // The default (original) values for these Bools is false anyway, so it doesn't matter if they don't exist
         self.preferences.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
         self.preferences.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
         self.preferences.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+        
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY) != nil
+        {
+            self.preferences.upperLowerAxialGapsAreSymmetrical = UserDefaults.standard.bool(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
+        }
     }
     
-    func updateModel(newTransformer:Transformer)
-    {
+    func updateModel(newTransformer:Transformer) {
+        
         DLog("Updating transformer model...")
         
         // push old transformer (if any) onto the undo stack
@@ -88,30 +98,35 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handlePreferences(_ sender: Any) {
         
-        let prefDlog = PreferencesDialog(modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps)
+        let alert = NSAlert()
+        alert.messageText = "Note: Making changes to the preferences will reset the model to the initially loaded model (but using the new preferences)."
+        alert.alertStyle = .informational
+        let _ = alert.runModal()
+        
+        let prefDlog = PreferencesDialog(modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical)
         
         let _ = prefDlog.runModal()
         
         var txfoNeedsUpdate = false
         
-        if prefDlog.modelRadialDucts != self.modelRadialDucts
+        if prefDlog.modelRadialDucts != self.preferences.modelRadialDucts
         {
-            self.modelRadialDucts = !self.modelRadialDucts
-            UserDefaults.standard.set(self.modelRadialDucts, forKey: MODEL_RADIAL_DUCTS_KEY)
+            self.preferences.modelRadialDucts = !self.preferences.modelRadialDucts
+            UserDefaults.standard.set(self.preferences.modelRadialDucts, forKey: MODEL_RADIAL_DUCTS_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.modelZeroTerms != self.model0Terminals
+        if prefDlog.modelZeroTerms != self.preferences.model0Terminals
         {
-            self.model0Terminals = !self.model0Terminals
-            UserDefaults.standard.set(self.model0Terminals, forKey: MODEL_ZERO_TERMINALS_KEY)
+            self.preferences.model0Terminals = !self.preferences.model0Terminals
+            UserDefaults.standard.set(self.preferences.model0Terminals, forKey: MODEL_ZERO_TERMINALS_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.modelLayerTaps != self.modelInternalLayerTaps
+        if prefDlog.modelLayerTaps != self.preferences.modelInternalLayerTaps
         {
-            self.modelInternalLayerTaps = !self.modelInternalLayerTaps
-            UserDefaults.standard.set(self.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+            self.preferences.modelInternalLayerTaps = !self.preferences.modelInternalLayerTaps
+            UserDefaults.standard.set(self.preferences.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
             txfoNeedsUpdate = true
         }
         
@@ -119,7 +134,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             if let newTransfromer = self.currentTxfo
             {
-                
+                newTransfromer.InitializeWindings(preferences: self.preferences)
                 self.updateModel(newTransformer: newTransfromer)
             }
             

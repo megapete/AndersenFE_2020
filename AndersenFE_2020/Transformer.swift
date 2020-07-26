@@ -68,11 +68,28 @@ struct Transformer:Codable {
         }
     }
     
-    func InitializeWindings()
+    func GetWindingsCenter() -> Double
+    {
+        // we'll generalize and set the center of all the windings to the one with the greatest Z (sort of assumes that the designer knows what he's doing).
+        
+        var result = 0.0
+        for nextWdg in self.windings
+        {
+            let nextCenter = nextWdg.bottomEdgePack + nextWdg.elecHt / 2.0
+            
+            result = max(result, nextCenter)
+        }
+        
+        return result
+    }
+    
+    func InitializeWindings(preferences:PCH_AFE2020_Prefs)
     {
         for var nextWdg in self.windings
         {
             nextWdg.layers.removeAll()
+            
+            nextWdg.InitializeLayers(preferences:preferences, windingCenter: GetWindingsCenter())
         }
     }
     
@@ -413,7 +430,7 @@ struct Transformer:Codable {
                 // Algorithm to ascertain the winding type
                 var wdgType:Winding.WindingType = .disc
                 
-                if !isSpiral && (numAxialSections == 1 || numAxialSections == 2) && numRadialSections == 1
+                if !isSpiral && numAxialSections <= 4 && numRadialSections == 1
                 {
                     wdgType = .sheet
                 }

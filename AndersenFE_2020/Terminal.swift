@@ -9,7 +9,7 @@
 import Foundation
 
 /// The Terminal class basically wraps the data from the first page of the Excel document
-class Terminal: Codable
+struct Terminal: Codable
 {
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String

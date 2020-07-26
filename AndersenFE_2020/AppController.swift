@@ -21,6 +21,14 @@ let MODEL_INTERNAL_LAYER_TAPS_KEY = "PCH_AFE2020_ModelInternalLayerTaps"
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
 
+// Struct for preferences
+struct Prefs {
+    
+    var modelRadialDucts:Bool
+    var model0Terminals:Bool
+    var modelInternalLayerTaps:Bool
+}
+
 class AppController: NSObject, NSMenuItemValidation {
     
     // Currently-loaded transformer properties
@@ -38,24 +46,30 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
-    // Preference switches
-    var modelRadialDucts = false
-    var model0Terminals = false
-    var modelInternalLayerTaps = false
+    // Preferences
+    var preferences = Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false)
     
     @IBOutlet weak var mainWindow: NSWindow!
     
     // set up our preference switches
     override func awakeFromNib() {
         
-        self.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
-        self.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
-        self.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+        self.preferences.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
+        self.preferences.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
+        self.preferences.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
     }
     
-    func updateModel()
+    func updateModel(newTransformer:Transformer)
     {
         DLog("Updating transformer model...")
+        
+        // push old transformer (if any) onto the undo stack
+        if let oldTransformer = self.currentTxfo
+        {
+            undoStack.insert(oldTransformer, at: 0)
+        }
+        
+        self.currentTxfo = newTransformer
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -74,7 +88,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handlePreferences(_ sender: Any) {
         
-        let prefDlog = PreferencesDialog(modelRadialDucts: self.modelRadialDucts, modelZeroTerms: self.model0Terminals, modelLayerTaps: self.modelInternalLayerTaps)
+        let prefDlog = PreferencesDialog(modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps)
         
         let _ = prefDlog.runModal()
         
@@ -103,7 +117,12 @@ class AppController: NSObject, NSMenuItemValidation {
         
         if txfoNeedsUpdate
         {
-            self.updateModel()
+            if let newTransfromer = self.currentTxfo
+            {
+                
+                self.updateModel(newTransformer: newTransfromer)
+            }
+            
         }
     }
     

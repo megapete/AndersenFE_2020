@@ -68,6 +68,14 @@ struct Transformer:Codable {
         }
     }
     
+    func InitializeWindings()
+    {
+        for var nextWdg in self.windings
+        {
+            nextWdg.layers.removeAll()
+        }
+    }
+    
     init(designFile:URL) throws
     {
         var fileString = ""

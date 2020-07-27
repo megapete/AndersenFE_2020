@@ -24,12 +24,19 @@ let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGa
 let AFE2020_EXTENSION = "afe2020"
 
 // Struct for preferences
-struct PCH_AFE2020_Prefs {
+struct PCH_AFE2020_Prefs:Codable {
     
     var modelRadialDucts:Bool
     var model0Terminals:Bool
     var modelInternalLayerTaps:Bool
     var upperLowerAxialGapsAreSymmetrical:Bool
+}
+
+// Struct to save transformers to disk
+struct PCH_AFE2020_Save_Struct:Codable {
+    
+    let prefs:PCH_AFE2020_Prefs
+    let transformer:Transformer
 }
 
 class AppController: NSObject, NSMenuItemValidation {
@@ -41,8 +48,8 @@ class AppController: NSObject, NSMenuItemValidation {
     var lastSavedTxfoFile:URL? = nil
     
     // My stab at Undo and Redo
-    var undoStack:[Transformer] = []
-    var redoStack:[Transformer] = []
+    var undoStack:[PCH_AFE2020_Save_Struct] = []
+    var redoStack:[PCH_AFE2020_Save_Struct] = []
     
     // Menu outlets for turning them on/off
     @IBOutlet weak var saveMenuItem: NSMenuItem!
@@ -76,7 +83,7 @@ class AppController: NSObject, NSMenuItemValidation {
         // push old transformer (if any) onto the undo stack
         if let oldTransformer = self.currentTxfo
         {
-            undoStack.insert(oldTransformer, at: 0)
+            undoStack.insert(PCH_AFE2020_Save_Struct(prefs: self.preferences, transformer: oldTransformer), at: 0)
         }
         
         self.currentTxfo = newTransformer
@@ -187,7 +194,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
         do {
             
-            let fileData = try encoder.encode(currTxfo)
+            let fileData = try encoder.encode(PCH_AFE2020_Save_Struct(prefs: self.preferences, transformer: currTxfo))
             
             if FileManager.default.fileExists(atPath: fileURL.path)
             {
@@ -297,7 +304,11 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 let decoder = PropertyListDecoder()
                 
-                self.currentTxfo = try decoder.decode(Transformer.self, from: fileData)
+                let saveStruct:PCH_AFE2020_Save_Struct = try decoder.decode(PCH_AFE2020_Save_Struct.self, from: fileData)
+                
+                self.currentTxfo = saveStruct.transformer
+                
+                self.preferences = saveStruct.prefs
                 
                 self.currentTxfoIsDirty = false
                 

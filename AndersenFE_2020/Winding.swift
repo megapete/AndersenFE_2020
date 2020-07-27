@@ -38,9 +38,17 @@ struct Winding:Codable {
     }
     
     struct NumberOfTurns:Codable {
+        
         let minTurns:Double
         let nomTurns:Double
         let maxTurns:Double
+        
+        func puPerTap(numSections:Int = 4) -> Double
+        {
+            let turnsPerSection = (self.maxTurns - self.minTurns) / Double(numSections)
+            
+            return turnsPerSection / nomTurns
+        }
     }
     
     /// The winding has embedded taps
@@ -207,6 +215,7 @@ struct Winding:Codable {
         enum errorType
         {
             case UnimplementedFeature
+            case IllegalDesignIssue
         }
         
         let info:String
@@ -218,7 +227,11 @@ struct Winding:Codable {
             {
                 if self.type == .UnimplementedFeature
                 {
-                    return "This feature has not been implemented: \(info)"
+                    return "This feature has not been implemented: \(self.info)"
+                }
+                else if self.type == .IllegalDesignIssue
+                {
+                    return "An illegal design issue has been discovered: \(self.info)"
                 }
                 
                 return "An unknown error occurred."
@@ -257,50 +270,95 @@ struct Winding:Codable {
         // initialize an empty "default" list of turns per segment
         var segmentTurns:[Double] = []
         
-        if numSegsPerLayer == 1 // no axial gaps
-        {
-            zList.append((minLayerZ, maxLayerZ))
+        if wdgType != .multistart && !self.hasTaps || ((self.wdgType == .layer || self.wdgType == .section) && !preferences.modelInternalLayerTaps) {
             
-            segmentTurns = [turnsPerLayer]
-        }
-        else if numSegsPerLayer == 2 // one axial gap in the center of the winding
-        {
-            let bottomZmax = windingCenter - self.axialGaps.center / 2.0
-            let topZmin = bottomZmax + self.axialGaps.center
-            
-            zList.append((minLayerZ, bottomZmax))
-            zList.append((topZmin, maxLayerZ))
-            
-            segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
-        }
-        else if numSegsPerLayer == 3 // two axial gaps, each 1/4 of the length from the winding ends
-        {
-            if (self.axialGaps.center > 0.0) {
+            if numSegsPerLayer == 1 // no axial gaps
+            {
+                zList.append((minLayerZ, maxLayerZ))
                 
-                throw LayerError(info: "Only top OR bottom axial gap", type: .UnimplementedFeature)
+                segmentTurns = [turnsPerLayer]
+            }
+            else if numSegsPerLayer == 2 // one axial gap in the center of the winding
+            {
+                let bottomZmax = windingCenter - self.axialGaps.center / 2.0
+                let topZmin = bottomZmax + self.axialGaps.center
+                
+                zList.append((minLayerZ, bottomZmax))
+                zList.append((topZmin, maxLayerZ))
+                
+                segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+            }
+            else if numSegsPerLayer == 3 // two axial gaps, each 1/4 of the length from the winding ends
+            {
+                if (self.axialGaps.center > 0.0) {
+                    
+                    throw LayerError(info: "Only top OR bottom axial gap", type: .UnimplementedFeature)
+                }
+                
+                let bottomGapCenter = windingCenter - elecHt / 4.0
+                let topGapCenter = bottomGapCenter + elecHt / 2.0
+                
+                zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+                zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, topGapCenter - self.axialGaps.top / 2.0))
+                zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+                
+                segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 2.0, turnsPerLayer / 4.0]
+            }
+            else if numSegsPerLayer == 4
+            {
+                let bottomGapCenter = windingCenter - elecHt / 4.0
+                let topGapCenter = bottomGapCenter + elecHt / 2.0
+                
+                zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+                zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, windingCenter - self.axialGaps.center / 2.0))
+                zList.append((windingCenter + self.axialGaps.center / 2.0, topGapCenter - self.axialGaps.top / 2.0))
+                zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+                
+                segmentTurns = Array(repeating: turnsPerLayer / 4.0, count: 4)
             }
             
-            let bottomGapCenter = windingCenter - elecHt / 4.0
-            let topGapCenter = bottomGapCenter + elecHt / 2.0
-            
-            zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
-            zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, topGapCenter - self.axialGaps.top / 2.0))
-            zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
-            
-            segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 2.0, turnsPerLayer / 4.0]
         }
-        else if numSegsPerLayer == 4
+        else if self.wdgType == .disc
         {
-            let bottomGapCenter = windingCenter - elecHt / 4.0
-            let topGapCenter = bottomGapCenter + elecHt / 2.0
+            // more complicated, there are offload taps in there
             
-            zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
-            zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, windingCenter - self.axialGaps.center / 2.0))
-            zList.append((windingCenter + self.axialGaps.center / 2.0, topGapCenter - self.axialGaps.top / 2.0))
-            zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+            let gapCount = self.axialGaps.count(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)
             
-            segmentTurns = Array(repeating: turnsPerLayer / 4.0, count: 4)
+            // first make sure that there are a sufficient number of axial gaps for the taps
+            if (self.isDoubleStack && gapCount < 2) || (gapCount < 1)
+            {
+                throw LayerError(info: "Offload taps require an axial re-entrant gap at each tapping break.", type: .IllegalDesignIssue)
+            }
+            
+            if self.isDoubleStack
+            {
+                
+            }
+            else
+            {
+                
+            }
         }
+        else if self.wdgType == .multistart
+        {
+            if self.hasTaps
+            {
+                throw LayerError(info: "Multistart windings can not have offload taps!", type: .IllegalDesignIssue)
+            }
+        }
+        else
+        {
+            var wdgString = "helical"
+            if wdgType == .section
+            {
+                wdgString = "section"
+            }
+            else if wdgType == .sheet
+            {
+                wdgString = "sheet"
+            }
         
+            throw LayerError(info: "Taps for \(wdgString)-type windings", type: .UnimplementedFeature)
+        }
     }
 }

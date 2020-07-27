@@ -6,7 +6,7 @@
 //  Copyright © 2020 Peter Huber. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 
 let PCH_SupportedFileVersion = 4
 
@@ -89,7 +89,16 @@ struct Transformer:Codable {
         {
             nextWdg.layers.removeAll()
             
-            nextWdg.InitializeLayers(preferences:preferences, windingCenter: GetWindingsCenter())
+            do {
+                
+                try nextWdg.InitializeLayers(preferences:preferences, windingCenter: GetWindingsCenter())
+            }
+            catch
+            {
+                let alert = NSAlert(error: error)
+                let _ = alert.runModal()
+                return
+            }
         }
     }
     

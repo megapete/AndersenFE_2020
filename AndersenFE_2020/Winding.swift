@@ -141,10 +141,43 @@ struct Winding:Codable {
     /// The turn definition for this winding
     let turnDef:TurnDefinition
     
-    struct AxialGaps:Codable {
+    struct AxialGaps:Codable{
+        
         let center:Double
         let bottom:Double
         let top:Double
+        
+        func count(assumeSymmetry:Bool) -> Int
+        {
+            var result = 0
+            
+            if self.center > 0.0
+            {
+                result += 1
+            }
+            
+            if assumeSymmetry
+            {
+                if (self.bottom > 0.0 || self.top > 0.0)
+                {
+                    result += 2
+                }
+            }
+            else
+            {
+                if self.bottom > 0.0
+                {
+                    result += 1
+                }
+                
+                if self.top > 0.0
+                {
+                    result += 1
+                }
+            }
+            
+            return result
+        }
     }
     
     /// Axial gaps (usually for taps, or to balance taps on a different winding)
@@ -168,18 +201,106 @@ struct Winding:Codable {
     /// The Layers that make up this winding
     var layers:[Layer] = []
     
-    func InitializeLayers(preferences:PCH_AFE2020_Prefs, windingCenter:Double)
+    /// Errors that can be thrown by the Layer creation and modification routines
+    struct LayerError:Error
     {
+        enum errorType
+        {
+            case UnimplementedFeature
+        }
+        
+        let info:String
+        let type:errorType
+        
+        var localizedDescription: String
+        {
+            get
+            {
+                if self.type == .UnimplementedFeature
+                {
+                    return "This feature has not been implemented: \(info)"
+                }
+                
+                return "An unknown error occurred."
+            }
+        }
+    }
+    
+    func InitializeLayers(preferences:PCH_AFE2020_Prefs, windingCenter:Double) throws {
+        
+        //
+        guard !preferences.modelInternalLayerTaps else {
+            
+            throw LayerError(info: "Embedded layer taps", type: .UnimplementedFeature)
+        }
+        
+        // The calling routine should know better than to call this routine with a terminal number of 0, but just in case...
         if !preferences.model0Terminals && self.terminal.andersenNumber == 0
         {
             return
         }
         
+        // start with the simple Z-values for the segments
         let minLayerZ = windingCenter - self.elecHt / 2.0
         let maxLayerZ = minLayerZ + self.elecHt
         
+        // number of layers to model depends on whether we're modeling ducts
         var numLayers = (preferences.modelRadialDucts ? self.ducts.count + 1 : 1)
         
         let turnsPerLayer = self.numTurns.maxTurns / Double(numLayers)
+        
+        let assumeGapSymmetry = preferences.upperLowerAxialGapsAreSymmetrical
+        let numSegsPerLayer = 1 + self.axialGaps.count(assumeSymmetry: assumeGapSymmetry)
+        
+        // initialize an empty "default" list of Z-values
+        var zList:[(min:Double, max:Double)] = []
+        // initialize an empty "default" list of turns per segment
+        var segmentTurns:[Double] = []
+        
+        if numSegsPerLayer == 1 // no axial gaps
+        {
+            zList.append((minLayerZ, maxLayerZ))
+            
+            segmentTurns = [turnsPerLayer]
+        }
+        else if numSegsPerLayer == 2 // one axial gap in the center of the winding
+        {
+            let bottomZmax = windingCenter - self.axialGaps.center / 2.0
+            let topZmin = bottomZmax + self.axialGaps.center
+            
+            zList.append((minLayerZ, bottomZmax))
+            zList.append((topZmin, maxLayerZ))
+            
+            segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+        }
+        else if numSegsPerLayer == 3 // two axial gaps, each 1/4 of the length from the winding ends
+        {
+            if (self.axialGaps.center > 0.0) {
+                
+                throw LayerError(info: "Only top OR bottom axial gap", type: .UnimplementedFeature)
+            }
+            
+            let bottomGapCenter = windingCenter - elecHt / 4.0
+            let topGapCenter = bottomGapCenter + elecHt / 2.0
+            
+            zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+            zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, topGapCenter - self.axialGaps.top / 2.0))
+            zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+            
+            segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 2.0, turnsPerLayer / 4.0]
+        }
+        else if numSegsPerLayer == 4
+        {
+            let bottomGapCenter = windingCenter - elecHt / 4.0
+            let topGapCenter = bottomGapCenter + elecHt / 2.0
+            
+            zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+            zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, windingCenter - self.axialGaps.center / 2.0))
+            zList.append((windingCenter + self.axialGaps.center / 2.0, topGapCenter - self.axialGaps.top / 2.0))
+            zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+            
+            segmentTurns = Array(repeating: turnsPerLayer / 4.0, count: 4)
+        }
+        
     }
 }

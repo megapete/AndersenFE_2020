@@ -347,6 +347,8 @@ struct Winding:Codable {
             if self.isDoubleStack
             {
                 let tapSectionTurns = self.numTurns.nomTurns / 2.0 * self.numTurns.puPerTap()
+                let nonTapSectionTurns = self.numTurns.maxTurns / 2.0 - 4.0 * tapSectionTurns
+                
                 let tapSectionZ = (self.elecHt - self.axialGaps.overallGapZ(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)) / 2.0 * self.numTurns.puPerTap()
                 
                 let tapCenter1 = windingCenter - elecHt / 4.0
@@ -366,26 +368,65 @@ struct Winding:Codable {
                 
                 // coil bottom to tap F
                 zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
                 currentBottomZ = currentTopZ
                 currentTopZ += tapSectionZ
                 // tap F to tap D
                 zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
                 currentBottomZ = currentTopZ
                 currentTopZ += tapSectionZ
                 // tap D to tap B
                 zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
                 
                 currentBottomZ = currentTopZ + useBottomGap
                 currentTopZ += currentBottomZ + tapSectionZ
                 // tap A to tap C
                 zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
                 currentBottomZ = currentTopZ
                 currentTopZ += tapSectionZ
                 // tap C to tap E
                 zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
                 currentBottomZ = currentTopZ
                 currentTopZ = windingCenter - self.axialGaps.center / 2.0
                 // tap E to coil center (minus half of the center gap, if any)
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
+                
+                // coil center (plus half the center gap, if any) to tap E
+                currentBottomZ = windingCenter + self.axialGaps.center / 2.0
+                currentTopZ = tapCenter2 - useTopGap / 2.0 - 2.0 * tapSectionZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
+                // tap E to tap C
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                // tap C to tap A
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                
+                // tap B to tap D
+                currentBottomZ = currentTopZ + useTopGap
+                currentTopZ = currentBottomZ + tapSectionZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                // tap D to tap F
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                // tap F to coil top
+                currentBottomZ = currentTopZ
+                currentTopZ = maxLayerZ
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
                 
             }
             else

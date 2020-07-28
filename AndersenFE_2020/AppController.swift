@@ -23,7 +23,9 @@ let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGa
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
 
-// Struct for preferences
+// Struct for preferences. Preferences are handled as follows:
+// 1) The currently-saved user preferences are used when opening an Excel-generated file. These preferences are applied to each Winding in the model (and saved as a property of each separate winding).
+// 2) The user can selectively change the preferences for any winding as he likes.
 struct PCH_AFE2020_Prefs:Codable {
     
     var modelRadialDucts:Bool
@@ -34,8 +36,7 @@ struct PCH_AFE2020_Prefs:Codable {
 
 // Struct to save transformers to disk (this may grow with time)
 struct PCH_AFE2020_Save_Struct:Codable {
-    
-    // let prefs:PCH_AFE2020_Prefs
+
     let transformer:Transformer
 }
 

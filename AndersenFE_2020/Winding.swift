@@ -432,7 +432,45 @@ struct Winding:Codable {
             else
             {
                 let tapSectionTurns = self.numTurns.nomTurns * self.numTurns.puPerTap()
+                let nonTapSectionTurns = self.numTurns.maxTurns - 4.0 * tapSectionTurns
+                
                 let tapSectionZ = (self.elecHt - self.axialGaps.overallGapZ(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)) * self.numTurns.puPerTap()
+                
+                let tapCenter1 = windingCenter
+                
+                var currentBottomZ = minLayerZ
+                var currentTopZ = tapCenter1 - self.axialGaps.center / 2.0 - 2.0 * tapSectionZ
+                
+                // coil bottom to tap F
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap F to tap D
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap D to tap B
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                
+                currentBottomZ = currentTopZ + self.axialGaps.center
+                currentTopZ += currentBottomZ + tapSectionZ
+                // tap A to tap C
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap C to tap E
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(tapSectionTurns)
+                currentBottomZ = currentTopZ
+                currentTopZ = maxLayerZ
+                // tap E to coil center (minus half of the center gap, if any)
+                zList.append((currentBottomZ, currentTopZ))
+                segmentTurns.append(nonTapSectionTurns)
+
             }
         }
         else if self.wdgType == .multistart

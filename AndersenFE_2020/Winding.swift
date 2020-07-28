@@ -155,6 +155,20 @@ struct Winding:Codable {
         let bottom:Double
         let top:Double
         
+        func overallGapZ(assumeSymmetry:Bool) -> Double
+        {
+            var useTop = self.top
+            var useBottom = self.bottom
+            
+            if assumeSymmetry
+            {
+                useTop = max(self.top, self.bottom)
+                useBottom = useTop
+            }
+            
+            return self.center + useTop + useBottom
+        }
+        
         func count(assumeSymmetry:Bool) -> Int
         {
             var result = 0
@@ -320,7 +334,7 @@ struct Winding:Codable {
         }
         else if self.wdgType == .disc
         {
-            // more complicated, there are offload taps in there
+            // more complicated, there are offload taps in there (NOTE: we assume that there are 4 tap steps)
             
             let gapCount = self.axialGaps.count(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)
             
@@ -332,11 +346,52 @@ struct Winding:Codable {
             
             if self.isDoubleStack
             {
+                let tapSectionTurns = self.numTurns.nomTurns / 2.0 * self.numTurns.puPerTap()
+                let tapSectionZ = (self.elecHt - self.axialGaps.overallGapZ(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)) / 2.0 * self.numTurns.puPerTap()
+                
+                let tapCenter1 = windingCenter - elecHt / 4.0
+                let tapCenter2 = windingCenter + elecHt / 4.0
+                
+                var useTopGap = self.axialGaps.top
+                var useBottomGap = self.axialGaps.bottom
+                
+                if preferences.upperLowerAxialGapsAreSymmetrical
+                {
+                    useTopGap = max(useTopGap, useBottomGap)
+                    useBottomGap = useTopGap
+                }
+                
+                var currentBottomZ = minLayerZ
+                var currentTopZ = tapCenter1 - useBottomGap / 2.0 - 2.0 * tapSectionZ
+                
+                // coil bottom to tap F
+                zList.append((currentBottomZ, currentTopZ))
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap F to tap D
+                zList.append((currentBottomZ, currentTopZ))
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap D to tap B
+                zList.append((currentBottomZ, currentTopZ))
+                
+                currentBottomZ = currentTopZ + useBottomGap
+                currentTopZ += currentBottomZ + tapSectionZ
+                // tap A to tap C
+                zList.append((currentBottomZ, currentTopZ))
+                currentBottomZ = currentTopZ
+                currentTopZ += tapSectionZ
+                // tap C to tap E
+                zList.append((currentBottomZ, currentTopZ))
+                currentBottomZ = currentTopZ
+                currentTopZ = windingCenter - self.axialGaps.center / 2.0
+                // tap E to coil center (minus half of the center gap, if any)
                 
             }
             else
             {
-                
+                let tapSectionTurns = self.numTurns.nomTurns * self.numTurns.puPerTap()
+                let tapSectionZ = (self.elecHt - self.axialGaps.overallGapZ(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)) * self.numTurns.puPerTap()
             }
         }
         else if self.wdgType == .multistart

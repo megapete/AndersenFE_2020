@@ -21,6 +21,9 @@ struct Winding:Codable {
         case multistart
     }
     
+    /// Each winding has its own "preferences", which can be changed by the user
+    var preferences:PCH_AFE2020_Prefs
+    
     /// The type of winding
     var wdgType:WindingType
     
@@ -253,9 +256,10 @@ struct Winding:Codable {
         }
     }
     
-    func InitializeLayers(preferences:PCH_AFE2020_Prefs, windingCenter:Double) throws {
+    func InitializeLayers(windingCenter:Double) throws {
         
-        //
+        let preferences = self.preferences
+        
         guard !preferences.modelInternalLayerTaps else {
             
             throw LayerError(info: "Embedded layer taps", type: .UnimplementedFeature)

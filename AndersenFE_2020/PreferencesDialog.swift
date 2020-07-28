@@ -14,14 +14,17 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var noZeroTerminalsCheckbox: NSButton!
     @IBOutlet weak var noLayerWindingTapsCheckBox: NSButton!
     @IBOutlet weak var upperLowerGapSymmetric: NSButtonCell!
+    @IBOutlet weak var prefScopeLabel: NSTextField!
     
     var modelRadialDucts:Bool
     var modelZeroTerms:Bool
     var modelLayerTaps:Bool
     var upperLowerGapsAreSymmetric:Bool
+    var scopeLabel:String
     
-    init(modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool) {
+    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool) {
         
+        self.scopeLabel = scopeLabel
         self.modelRadialDucts = modelRadialDucts
         self.modelZeroTerms = modelZeroTerms
         self.modelLayerTaps = modelLayerTaps
@@ -32,6 +35,7 @@ class PreferencesDialog: PCH_DialogBox {
     
     override func awakeFromNib() {
         
+        self.prefScopeLabel.stringValue = self.scopeLabel
         self.noRadialDuctsCheckbox.state = (self.modelRadialDucts ? .off : .on)
         self.noZeroTerminalsCheckbox.state = (self.modelZeroTerms ? .off : .on)
         self.noLayerWindingTapsCheckBox.state = (self.modelLayerTaps ? .off : .on)

@@ -32,10 +32,10 @@ struct PCH_AFE2020_Prefs:Codable {
     var upperLowerAxialGapsAreSymmetrical:Bool
 }
 
-// Struct to save transformers to disk
+// Struct to save transformers to disk (this may grow with time)
 struct PCH_AFE2020_Save_Struct:Codable {
     
-    let prefs:PCH_AFE2020_Prefs
+    // let prefs:PCH_AFE2020_Prefs
     let transformer:Transformer
 }
 
@@ -83,7 +83,7 @@ class AppController: NSObject, NSMenuItemValidation {
         // push old transformer (if any) onto the undo stack
         if let oldTransformer = self.currentTxfo
         {
-            undoStack.insert(PCH_AFE2020_Save_Struct(prefs: self.preferences, transformer: oldTransformer), at: 0)
+            undoStack.insert(PCH_AFE2020_Save_Struct(transformer: oldTransformer), at: 0)
         }
         
         self.currentTxfo = newTransformer
@@ -103,14 +103,14 @@ class AppController: NSObject, NSMenuItemValidation {
         return true
     }
     
-    @IBAction func handlePreferences(_ sender: Any) {
+    @IBAction func handleGlobalPreferences(_ sender: Any) {
         
         let alert = NSAlert()
         alert.messageText = "Note: Making changes to the preferences will reset the model to the initially loaded model (but using the new preferences)."
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical)
         
         let _ = prefDlog.runModal()
         
@@ -141,7 +141,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             if let newTransfromer = self.currentTxfo
             {
-                newTransfromer.InitializeWindings(preferences: self.preferences)
+                newTransfromer.InitializeWindings()
                 self.updateModel(newTransformer: newTransfromer)
             }
             
@@ -194,7 +194,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
         do {
             
-            let fileData = try encoder.encode(PCH_AFE2020_Save_Struct(prefs: self.preferences, transformer: currTxfo))
+            let fileData = try encoder.encode(PCH_AFE2020_Save_Struct(transformer: currTxfo))
             
             if FileManager.default.fileExists(atPath: fileURL.path)
             {
@@ -308,7 +308,6 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 self.currentTxfo = saveStruct.transformer
                 
-                self.preferences = saveStruct.prefs
                 
                 self.currentTxfoIsDirty = false
                 
@@ -332,7 +331,7 @@ class AppController: NSObject, NSMenuItemValidation {
             do {
                 
                 // create the current Transformer from the Excel design file
-                self.currentTxfo = try Transformer(designFile: fileURL)
+                self.currentTxfo = try Transformer(designFile: fileURL, prefs: self.preferences)
                 
                 // if we make it here, we have successfully opened the file, so save it as the "last successfully opened file"
                 UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)

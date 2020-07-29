@@ -64,6 +64,7 @@ class AppController: NSObject, NSMenuItemValidation {
     var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true)
     
     @IBOutlet weak var mainWindow: NSWindow!
+    @IBOutlet weak var txfoView: TransformerView!
     
     // set up our preference switches
     override func awakeFromNib() {
@@ -84,6 +85,9 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             self.preferences.multiStartElecHtIsToCenter = UserDefaults.standard.bool(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
         }
+        
+        // Set up things for the views
+        SegmentPath.bkGroundColor = mainWindow.backgroundColor
         
     }
     

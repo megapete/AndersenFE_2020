@@ -19,6 +19,7 @@
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5A0F06224C6231000C4CFE8 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */; };
+		F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */; };
 		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 		F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558E24C46BE5002E7031 /* Winding.swift */; };
 		F5ED559124C49074002E7031 /* Transformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED559024C49074002E7031 /* Transformer.swift */; };
@@ -41,6 +42,7 @@
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
+		F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformerView.swift; sourceTree = "<group>"; };
 		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 		F5ED558E24C46BE5002E7031 /* Winding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Winding.swift; sourceTree = "<group>"; };
 		F5ED559024C49074002E7031 /* Transformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformer.swift; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 				D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */,
 				D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */,
 				D38833E024CCC1C400A0C7A5 /* Preferences.xib */,
+				F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
 				F5ED558C24C32659002E7031 /* Terminal.swift */,
@@ -181,6 +184,7 @@
 			files = (
 				F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */,
 				D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */,
+				F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */,
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,
 				D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,

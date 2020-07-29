@@ -25,6 +25,7 @@
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
+                <outlet property="txfoView" destination="FgI-7N-22l" id="Gpd-xR-ByX"/>
             </connections>
         </customObject>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
@@ -706,13 +707,38 @@
         <window title="AndersenFE_2020" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="480" height="360"/>
+            <rect key="contentRect" x="335" y="390" width="861" height="720"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
+                <rect key="frame" x="0.0" y="0.0" width="861" height="720"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <splitView fixedFrame="YES" arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="39j-QG-eD5">
+                        <rect key="frame" x="0.0" y="0.0" width="861" height="720"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <customView fixedFrame="YES" id="FgI-7N-22l" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="575" height="720"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </customView>
+                            <customView fixedFrame="YES" id="VHp-aJ-QOo">
+                                <rect key="frame" x="585" y="0.0" width="142" height="720"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </customView>
+                            <customView fixedFrame="YES" id="JKq-ah-7fY">
+                                <rect key="frame" x="737" y="0.0" width="124" height="720"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </customView>
+                        </subviews>
+                        <holdingPriorities>
+                            <real value="250"/>
+                            <real value="250"/>
+                            <real value="250"/>
+                        </holdingPriorities>
+                    </splitView>
+                </subviews>
             </view>
-            <point key="canvasLocation" x="142" y="-120"/>
+            <point key="canvasLocation" x="163.5" y="-246"/>
         </window>
     </objects>
 </document>

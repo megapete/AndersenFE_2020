@@ -157,6 +157,20 @@ struct Winding:Codable {
             
             return (cableDim.axial * Double(numCablesAxial) + internalAxialInsulation * Double(numCablesAxial - 1), cableDim.radial * Double(numCablesRadial) + internalRadialInsulation * Double(numCablesRadial - 1))
         }
+        
+        func NumStrandsPerTurn() -> Int
+        {
+            let strandsPerCable = (self.type == .single ? 1 : (self.type == .twin ? 2 : numStrands))
+            
+            return strandsPerCable * self.numCablesRadial * self.numCablesAxial
+        }
+        
+        func NumStrandsRadially() -> Int
+        {
+            let radialPerCable = (self.type == .single ? 1 : (self.type == .twin ? 2 : (numStrands + 1 ) / 2))
+            
+            return radialPerCable * numCablesRadial
+        }
     }
     
     /// The turn definition for this winding
@@ -287,6 +301,18 @@ struct Winding:Codable {
         
         // number of layers to model depends on whether we're modeling ducts
         let numLayers = (preferences.modelRadialDucts ? self.ducts.count + 1 : 1)
+        
+        // initialize the radial turns for a layer (or multi-start) winding
+        var numTurnsRadiallyPerLayer = Double(self.numRadialSections) / Double(numLayers)
+        if self.wdgType == .disc || self.wdgType == .sheet
+        {
+            numTurnsRadiallyPerLayer = self.numTurns.maxTurns / Double(self.numAxialSections) / Double(numLayers)
+        }
+        else if self.wdgType == .helix
+        {
+            numTurnsRadiallyPerLayer = 1.0 / Double(numLayers)
+        }
+        
         
         let turnsPerLayer = self.numTurns.maxTurns / Double(numLayers)
         
@@ -531,6 +557,33 @@ struct Winding:Codable {
             }
         
             throw LayerError(info: "Taps for \(wdgString)-type windings", type: .UnimplementedFeature)
+        }
+        
+        var nextIR = self.coilID / 2.0
+        let copperRadialBuild = numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim)
+        
+        var layerSegments:[Segment] = []
+        let strandsRadiallyPerLayer:Int = Int(ceil(numTurnsRadiallyPerLayer)) * self.turnDef.NumStrandsRadially()
+        
+        var zIndex = 0
+        for zPair in zList
+        {
+            let newSegment = Segment(strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
+            
+            layerSegments.append(newSegment)
+            
+            zIndex += 1
+        }
+        
+        self.layers.removeAll()
+        
+        for _ in 0..<numLayers
+        {
+            let newLayer = Layer(segments: layerSegments, numSpacerBlocks: self.numAxialColumns, spacerBlockWidth: self.radialSpacer.width, material: .copper, currentDirection: self.terminal.currentDirection, numberParallelGroups: (self.isDoubleStack ? 2 : 1), radialBuild: copperRadialBuild, innerRadius: nextIR, parentTerminal: self.terminal)
+            
+            self.layers.append(newLayer)
+            
+            nextIR += copperRadialBuild + self.ducts.dim
         }
     }
 }

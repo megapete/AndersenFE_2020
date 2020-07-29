@@ -13,6 +13,7 @@ import Foundation
 /// A Segment is a collection of turns (made up of a number of strands per turn and strands per layer) with a lower dimension of minZ and an upper dimension of maxZ
 struct Segment:Codable {
     
+    /*
     /// A Segment must conform to one of these types: nonTap, posTap, or negTap
     enum TapType:Int, Codable {
         
@@ -23,7 +24,7 @@ struct Segment:Codable {
     
     /// The TapType of the Segment
     let type:TapType
-    
+    */
     // let num:Int
     
     /// Strand Axial Dimension
@@ -62,7 +63,7 @@ struct Segment:Codable {
         
         while result.count < numSegs
         {
-            let newSegment = Segment(type: self.type, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
+            let newSegment = Segment(/*type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
             
             result.append(newSegment)
             
@@ -90,9 +91,9 @@ struct Segment:Codable {
         let bottomDeltaZ = selfDeltaZ * percentNewBottom / 100.0
         let topDeltaZ = selfDeltaZ - bottomDeltaZ
         
-        let bottomSegment = Segment(type: self.type, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: bottomTurns, totalTurns: bottomTurns, minZ: self.minZ, maxZ: self.minZ + bottomDeltaZ)
+        let bottomSegment = Segment(/* type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: bottomTurns, totalTurns: bottomTurns, minZ: self.minZ, maxZ: self.minZ + bottomDeltaZ)
         
-        let topSegment = Segment(type: self.type, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: topTurns, totalTurns: topTurns, minZ: bottomSegment.maxZ, maxZ: bottomSegment.maxZ + topDeltaZ)
+        let topSegment = Segment(/* type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: topTurns, totalTurns: topTurns, minZ: bottomSegment.maxZ, maxZ: bottomSegment.maxZ + topDeltaZ)
         
         return [bottomSegment, topSegment]
     }

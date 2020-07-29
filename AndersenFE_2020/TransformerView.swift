@@ -32,6 +32,7 @@ struct SegmentPath {
         if isActive
         {
             self.fill(alpha: nonActiveAlpha)
+            self.isActive = false
         }
     }
     

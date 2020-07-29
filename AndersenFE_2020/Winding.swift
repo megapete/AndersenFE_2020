@@ -40,6 +40,16 @@ struct Winding:Codable {
         }
     }
     
+    /// Set if the winding is a regulating winding (ie: regulatingWindingLoops is non-nil)
+    var isRegulating:Bool {
+        get {
+            return self.regulatingWindingLoops != nil
+        }
+    }
+    
+    /// For regulating windings, define the number of loops (this value is nil for other winding types)
+    var regulatingWindingLoops:Int? = nil
+    
     struct NumberOfTurns:Codable {
         
         let minTurns:Double
@@ -256,7 +266,7 @@ struct Winding:Codable {
         }
     }
     
-    func InitializeLayers(windingCenter:Double) throws {
+    mutating func InitializeLayers(windingCenter:Double) throws {
         
         let preferences = self.preferences
         
@@ -276,7 +286,7 @@ struct Winding:Codable {
         let maxLayerZ = minLayerZ + self.elecHt
         
         // number of layers to model depends on whether we're modeling ducts
-        var numLayers = (preferences.modelRadialDucts ? self.ducts.count + 1 : 1)
+        let numLayers = (preferences.modelRadialDucts ? self.ducts.count + 1 : 1)
         
         let turnsPerLayer = self.numTurns.maxTurns / Double(numLayers)
         
@@ -484,7 +494,29 @@ struct Winding:Codable {
                 throw LayerError(info: "Multistart windings can not have offload taps!", type: .IllegalDesignIssue)
             }
             
+            // Take a stab at the helix dimension by assuming that the number of 'loops' is equal to the number of axial cables.
+            // This means that multi-start windings default to regulating windings
+            // This can always be changed later by the user.
+            let loops = Double(self.turnDef.numCablesAxial)
+            self.regulatingWindingLoops = self.turnDef.numCablesAxial
             
+            let helixAddition = self.preferences.multiStartElecHtIsToCenter ? self.turnDef.Dimensions().axial : 0.0
+            
+            let oneStartAxialDimn = self.turnDef.Dimensions().axial / loops
+            
+            var currentBottomZ = minLayerZ - helixAddition / 2.0
+            
+            for _ in 0..<Int(self.numTurns.maxTurns)
+            {
+                for _ in 0..<self.turnDef.numCablesAxial
+                {
+                    zList.append((currentBottomZ, currentBottomZ + oneStartAxialDimn))
+                    currentBottomZ += oneStartAxialDimn
+                }
+            }
+            
+            // I'm not sure this is the way that this whole thing will actually work for regulating windings, but we'll use it for now...
+            segmentTurns = Array(repeating: 1.0, count: self.turnDef.numCablesAxial * Int(self.numTurns.maxTurns))
         }
         else
         {

@@ -19,6 +19,8 @@ let MODEL_ZERO_TERMINALS_KEY = "PCH_AFE2020_ModelZeroTerminals"
 let MODEL_INTERNAL_LAYER_TAPS_KEY = "PCH_AFE2020_ModelInternalLayerTaps"
 // Key (Bool) to decide if upper and lower axial gaps are symmetric about the axial center
 let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGapsSymmetrical"
+// Key to indicate whether multistart windings electrical height is to the centers of the the conductor stack
+let MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY = "PCH_AFE2020_MultiStartElecHeightIsToCenter"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -32,6 +34,7 @@ struct PCH_AFE2020_Prefs:Codable {
     var model0Terminals:Bool
     var modelInternalLayerTaps:Bool
     var upperLowerAxialGapsAreSymmetrical:Bool
+    var multiStartElecHtIsToCenter:Bool
 }
 
 // Struct to save transformers to disk (this may grow with time)
@@ -58,7 +61,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
     // Preferences
-    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true)
+    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true)
     
     @IBOutlet weak var mainWindow: NSWindow!
     
@@ -75,6 +78,13 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             self.preferences.upperLowerAxialGapsAreSymmetrical = UserDefaults.standard.bool(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
         }
+        
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY) != nil
+        {
+            self.preferences.multiStartElecHtIsToCenter = UserDefaults.standard.bool(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
+        }
+        
     }
     
     func updateModel(newTransformer:Transformer) {
@@ -111,7 +121,7 @@ class AppController: NSObject, NSMenuItemValidation {
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter)
         
         let _ = prefDlog.runModal()
         
@@ -136,6 +146,18 @@ class AppController: NSObject, NSMenuItemValidation {
             self.preferences.modelInternalLayerTaps = !self.preferences.modelInternalLayerTaps
             UserDefaults.standard.set(self.preferences.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
             txfoNeedsUpdate = true
+        }
+        
+        if prefDlog.upperLowerGapsAreSymmetric != self.preferences.upperLowerAxialGapsAreSymmetrical
+        {
+            self.preferences.upperLowerAxialGapsAreSymmetrical = !self.preferences.upperLowerAxialGapsAreSymmetrical
+            UserDefaults.standard.set(self.preferences.upperLowerAxialGapsAreSymmetrical, forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
+        }
+        
+        if prefDlog.multiStartElecHtIsToCenters != self.preferences.multiStartElecHtIsToCenter
+        {
+            self.preferences.multiStartElecHtIsToCenter = !self.preferences.multiStartElecHtIsToCenter
+            UserDefaults.standard.set(self.preferences.multiStartElecHtIsToCenter, forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
         }
         
         if txfoNeedsUpdate

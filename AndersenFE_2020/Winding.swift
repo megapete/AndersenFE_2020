@@ -483,6 +483,8 @@ struct Winding:Codable {
             {
                 throw LayerError(info: "Multistart windings can not have offload taps!", type: .IllegalDesignIssue)
             }
+            
+            
         }
         else
         {

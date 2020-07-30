@@ -9,7 +9,7 @@
 import Foundation
 
 /// A Winding is essentialy an interface between the Excel-generated design model and the more "Andersen-friendly" model that this program uses.
-struct Winding:Codable {
+class Winding:Codable {
     
     /// WindingType represents the different types of Windings that we can build
     enum WindingType:Int, Codable {
@@ -28,7 +28,7 @@ struct Winding:Codable {
     var wdgType:WindingType
     
     /// The winding is a spiral
-    let isSprial:Bool
+    let isSpiral:Bool
     
     /// The winding is a double stack
     let isDoubleStack:Bool
@@ -280,7 +280,31 @@ struct Winding:Codable {
         }
     }
     
-    mutating func InitializeLayers(windingCenter:Double) throws {
+    init(preferences: PCH_AFE2020_Prefs, wdgType: WindingType, isSpiral:Bool, isDoubleStack:Bool, numTurns:NumberOfTurns, elecHt:Double, numAxialSections:Int, radialSpacer:RadialSpacer, numAxialColumns:Int, numRadialSections:Int, radialInsulation:Double, ducts:RadialDucts, numRadialSupports:Int, turnDef:TurnDefinition, axialGaps:AxialGaps, bottomEdgePack:Double, coilID:Double, radialOverbuild:Double, groundClearance:Double, terminal:Terminal)
+    {
+        self.preferences = preferences
+        self.wdgType = wdgType
+        self.isSpiral = isSpiral
+        self.isDoubleStack = isDoubleStack
+        self.numTurns = numTurns
+        self.elecHt = elecHt
+        self.numAxialSections = numAxialSections
+        self.radialSpacer = radialSpacer
+        self.numAxialColumns = numAxialColumns
+        self.numRadialSections = numRadialSections
+        self.radialInsulation = radialInsulation
+        self.ducts = ducts
+        self.numRadialSupports = numRadialSupports
+        self.turnDef = turnDef
+        self.axialGaps = axialGaps
+        self.bottomEdgePack = bottomEdgePack
+        self.coilID = coilID
+        self.radialOverbuild = radialOverbuild
+        self.groundClearance = groundClearance
+        self.terminal = terminal
+    }
+    
+    func InitializeLayers(windingCenter:Double) throws {
         
         let preferences = self.preferences
         

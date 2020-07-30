@@ -11,7 +11,7 @@ import Cocoa
 let PCH_SupportedFileVersion = 4
 
 /// The Transformer struct is the encompassing Andersen-oriented data for the model. All of its fields are self-explanatory.
-struct Transformer:Codable {
+class Transformer:Codable {
     
     let numPhases:Int
     
@@ -85,13 +85,14 @@ struct Transformer:Codable {
     
     func InitializeWindings()
     {
-        for var nextWdg in self.windings
+        for nextWdg in self.windings
         {
             nextWdg.layers.removeAll()
             
             do {
                 
                 try nextWdg.InitializeLayers(windingCenter: GetWindingsCenter())
+                DLog("Layer count: \(nextWdg.layers.count)")
             }
             catch
             {
@@ -464,7 +465,7 @@ struct Transformer:Codable {
                 
                 let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
                 
-                let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSprial: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
+                let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
                 
                 self.windings.append(newWinding)
             }
@@ -474,6 +475,8 @@ struct Transformer:Codable {
         
         self.scFactor = assymetryFactor
         self.systemGVA = systemStrength
+        
+        self.InitializeWindings()
         
     }
 }

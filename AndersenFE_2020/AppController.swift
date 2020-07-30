@@ -47,7 +47,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // Currently-loaded transformer properties
     var currentTxfo:Transformer? = nil
-    var currentTxfoFile:URL? = nil
+    var lastOpenedTxfoFile:URL? = nil
     var currentTxfoIsDirty:Bool = false
     var lastSavedTxfoFile:URL? = nil
     
@@ -91,7 +91,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
     }
     
-    func updateModel(newTransformer:Transformer) {
+    func updateCurrentTransformer(newTransformer:Transformer) {
         
         DLog("Updating transformer model...")
         
@@ -102,13 +102,14 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         self.currentTxfo = newTransformer
+        self.currentTxfoIsDirty = true
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
         if menuItem == self.saveMenuItem
         {
-            return self.currentTxfoFile != nil && self.currentTxfoIsDirty
+            return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
         else if menuItem == self.closeTransformerMenuItem
         {
@@ -166,24 +167,22 @@ class AppController: NSObject, NSMenuItemValidation {
         
         if txfoNeedsUpdate
         {
-            if let newTransfromer = self.currentTxfo
+            if let oldTransformer = self.currentTxfo
             {
-                newTransfromer.InitializeWindings()
-                self.updateModel(newTransformer: newTransfromer)
+                let newTransformer = oldTransformer.Copy()
+                newTransformer.InitializeWindings(prefs: self.preferences)
+                self.updateCurrentTransformer(newTransformer: newTransformer)
             }
-            
         }
     }
     
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         
-        
-        
     }
     
     @IBAction func handleSaveAFE2020File(_ sender: Any){
         
-        guard let fileURL = self.currentTxfoFile else {
+        guard let fileURL = self.lastOpenedTxfoFile else {
             
             self.handleSaveAsAFE2020File(sender)
             return
@@ -230,7 +229,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             FileManager.default.createFile(atPath: fileURL.path, contents: fileData, attributes: nil)
             
-            self.currentTxfoFile = fileURL
+            self.lastOpenedTxfoFile = fileURL
             self.currentTxfoIsDirty = false
             
             self.mainWindow.title = fileURL.deletingPathExtension().lastPathComponent
@@ -333,16 +332,18 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 let saveStruct:PCH_AFE2020_Save_Struct = try decoder.decode(PCH_AFE2020_Save_Struct.self, from: fileData)
                 
-                self.currentTxfo = saveStruct.transformer
+                let newTxfo = saveStruct.transformer
                 
-                
-                self.currentTxfoIsDirty = false
-                
-                self.currentTxfoFile = fileURL
+                self.lastOpenedTxfoFile = fileURL
                 
                 NSDocumentController.shared.noteNewRecentDocumentURL(fileURL)
                 
                 self.mainWindow.title = fileURL.deletingPathExtension().lastPathComponent
+                
+                self.updateCurrentTransformer(newTransformer: newTxfo)
+                
+                // the call to updateModel will have set the "dirty" flag to true, set it back to false
+                self.currentTxfoIsDirty = false
                 
                 return true
             }
@@ -358,19 +359,18 @@ class AppController: NSObject, NSMenuItemValidation {
             do {
                 
                 // create the current Transformer from the Excel design file
-                self.currentTxfo = try Transformer(designFile: fileURL, prefs: self.preferences)
+                let newTxfo = try Transformer(designFile: fileURL, prefs: self.preferences)
                 
                 // if we make it here, we have successfully opened the file, so save it as the "last successfully opened file"
                 UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
-                
-                // a design file was opened, set the current Transformer as dirty to make sure that the user is prompted to save it as an AndersenFE-2020 file
-                self.currentTxfoIsDirty = true
             
-                self.currentTxfoFile = nil
+                self.lastOpenedTxfoFile = nil
                 
                 NSDocumentController.shared.noteNewRecentDocumentURL(fileURL)
                 
                 self.mainWindow.title = fileURL.lastPathComponent
+                
+                self.updateCurrentTransformer(newTransformer: newTxfo)
                 
                 return true
             }

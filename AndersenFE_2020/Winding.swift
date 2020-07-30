@@ -280,6 +280,7 @@ class Winding:Codable {
         }
     }
     
+    /// Designated initializer for the class, does not set the 'layers' member (the calling routine must call InitializeLayers to come up with an array of default Layers)
     init(preferences: PCH_AFE2020_Prefs, wdgType: WindingType, isSpiral:Bool, isDoubleStack:Bool, numTurns:NumberOfTurns, elecHt:Double, numAxialSections:Int, radialSpacer:RadialSpacer, numAxialColumns:Int, numRadialSections:Int, radialInsulation:Double, ducts:RadialDucts, numRadialSupports:Int, turnDef:TurnDefinition, axialGaps:AxialGaps, bottomEdgePack:Double, coilID:Double, radialOverbuild:Double, groundClearance:Double, terminal:Terminal)
     {
         self.preferences = preferences
@@ -304,6 +305,17 @@ class Winding:Codable {
         self.terminal = terminal
     }
     
+    /// Convenience initializer that copies an existing Winding, including the 'layers' array (designed to be used for implementing Undo). Use this instead of '='.
+    convenience init(srcWdg:Winding)
+    {
+        self.init(preferences: srcWdg.preferences, wdgType: srcWdg.wdgType, isSpiral:srcWdg.isSpiral, isDoubleStack:srcWdg.isDoubleStack, numTurns:srcWdg.numTurns, elecHt:srcWdg.elecHt, numAxialSections:srcWdg.numAxialSections, radialSpacer:srcWdg.radialSpacer, numAxialColumns:srcWdg.numAxialColumns, numRadialSections:srcWdg.numRadialSections, radialInsulation:srcWdg.radialInsulation, ducts:srcWdg.ducts, numRadialSupports:srcWdg.numRadialSupports, turnDef:srcWdg.turnDef, axialGaps:srcWdg.axialGaps, bottomEdgePack:srcWdg.bottomEdgePack, coilID:srcWdg.coilID, radialOverbuild:srcWdg.radialOverbuild, groundClearance:srcWdg.groundClearance, terminal:srcWdg.terminal)
+        
+        self.layers = srcWdg.layers
+    }
+    
+    /// Initialize the 'layers' array based on the data currently in this Winding's properties. The old 'layers' array will be cleared.
+    /// - Parameter windingCenter: The center of this Winding
+    /// - Throws: Errors caused by unimplemented features or design errors
     func InitializeLayers(windingCenter:Double) throws {
         
         let preferences = self.preferences

@@ -33,6 +33,29 @@ class Transformer:Codable {
     
     var terminals:[Terminal?] = []
     
+    /// Straightforward init function (designed for the copy() function below)
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?])
+    {
+        self.numPhases = numPhases
+        self.frequency = frequency
+        self.tempRise = tempRise
+        self.core = core
+        self.scFactor = scFactor
+        self.systemGVA = systemGVA
+        self.terminals = terminals
+        
+        for nextWdg in windings
+        {
+            self.windings.append(Winding(srcWdg: nextWdg))
+        }
+    }
+    
+    /// Return a copy of this transformer (designed to be used with Undo functionality)
+    func Copy() -> Transformer
+    {
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals)
+    }
+    
     /// Some different errors that can be thrown by the init routine
     struct DesignFileError:Error
     {
@@ -83,11 +106,13 @@ class Transformer:Codable {
         return result
     }
     
-    func InitializeWindings()
+    func InitializeWindings(prefs:PCH_AFE2020_Prefs)
     {
         for nextWdg in self.windings
         {
             nextWdg.layers.removeAll()
+            
+            nextWdg.preferences = prefs
             
             do {
                 
@@ -103,6 +128,12 @@ class Transformer:Codable {
         }
     }
     
+   
+    
+    /// Initializer to create a transformer from an Excel-generated design file.
+    /// - Parameter designFile: The URL of the design file
+    /// - Parameter prefs: The preferences to apply when creating the transformer
+    /// - Throws: Errors if the URL is not a valid design file; the file is an invalid version (less than 4); the file contains an invalid value
     init(designFile:URL, prefs:PCH_AFE2020_Prefs) throws
     {
         var fileString = ""
@@ -476,7 +507,7 @@ class Transformer:Codable {
         self.scFactor = assymetryFactor
         self.systemGVA = systemStrength
         
-        self.InitializeWindings()
+        self.InitializeWindings(prefs: prefs)
         
     }
 }

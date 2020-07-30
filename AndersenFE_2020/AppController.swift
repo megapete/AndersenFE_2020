@@ -63,6 +63,7 @@ class AppController: NSObject, NSMenuItemValidation {
     // Preferences
     var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true)
     
+    // UI elements
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
     
@@ -103,6 +104,18 @@ class AppController: NSObject, NSMenuItemValidation {
         
         self.currentTxfo = newTransformer
         self.currentTxfoIsDirty = true
+    }
+    
+    // This function does the following things:
+    // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
+    func initializeViews()
+    {
+        
+    }
+    
+    func updateViews()
+    {
+        
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -180,7 +193,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
     }
     
-    @IBAction func handleSaveAFE2020File(_ sender: Any){
+    @IBAction func handleSaveAFE2020File(_ sender: Any) {
         
         guard let fileURL = self.lastOpenedTxfoFile else {
             

@@ -59,20 +59,11 @@ class Transformer:Codable {
     /// Calculate the distance from the center of the core to the tank wall (used for graphics)
     func DistanceFromCoreCenterToTankWall() -> Double
     {
-        guard self.windings.count > 0 else {
-            return 0.0
-        }
-        
-        var outermostWinding = self.windings[0]
-        var result = outermostWinding.layers.last!.OD() / 2.0 + outermostWinding.groundClearance
+        var result = 0.0
         
         for nextWdg in self.windings
         {
-            if nextWdg.coilID > outermostWinding.coilID
-            {
-                outermostWinding = nextWdg
-                result = outermostWinding.layers.last!.OD() / 2.0 + outermostWinding.groundClearance
-            }
+            result = max(nextWdg.layers.last!.OD() / 2.0 + nextWdg.groundClearance, result)
         }
         
         return result

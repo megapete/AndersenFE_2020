@@ -79,11 +79,17 @@ struct SegmentPath {
 class TransformerView: NSView {
 
     var segments:[SegmentPath] = []
+    var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
+    let boundaryColor:NSColor = .gray
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
         // Drawing code here.
+        let boundaryPath = NSBezierPath(rect: boundary)
+        self.boundaryColor.set()
+        boundaryPath.stroke()
+        
         for nextSegment in self.segments
         {
             nextSegment.show()
@@ -92,7 +98,7 @@ class TransformerView: NSView {
     }
     
     // transformer display zoom functions
-    func zoomAll(coreRadius:CGFloat, windowHt:CGFloat)
+    func zoomAll(coreRadius:CGFloat, windowHt:CGFloat, tankWallR:CGFloat)
     {
         // aspectRatio is defined as width/height
         // it is assumed that the window height (z) is ALWAYS the dominant dimension compared to the "half tank-width" in the r-direction
@@ -100,6 +106,9 @@ class TransformerView: NSView {
         let boundsW = windowHt * aspectRatio
         
         self.bounds = NSRect(x: coreRadius, y: 0.0, width: boundsW, height: windowHt)
+        
+        self.boundary = self.bounds
+        self.boundary.size.width = tankWallR - coreRadius
         
         self.needsDisplay = true
     }

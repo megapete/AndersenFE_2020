@@ -127,7 +127,7 @@ class AppController: NSObject, NSMenuItemValidation {
     // Code for testing View-related drawing stuff (will eventually be commented out)
     @IBAction func testInitView(_ sender: Any) {
         // testing for now
-        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0)
+        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0, tankWallR: 250.0)
         print("Bounds: \(self.txfoView.bounds)")
         let segPath = NSBezierPath(rect: NSRect(x: 50.0, y: 50.0, width: 200.0, height: 800.0))
         let testSegment = SegmentPath(path: segPath, segmentColor: .red, isActive: true)
@@ -142,7 +142,7 @@ class AppController: NSObject, NSMenuItemValidation {
         self.txfoView.needsDisplay = true
     }
     @IBAction func testZoomAll(_ sender: Any) {
-        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0)
+        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0, tankWallR: 250.0)
     }
     @IBAction func testZoomIn(_ sender: Any) {
         self.txfoView.setBoundsOrigin(NSPoint(x: 20.0, y: 70.0))
@@ -169,7 +169,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt))
+        self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt), tankWallR: CGFloat(txfo.DistanceFromCoreCenterToTankWall()))
     }
     
     // This function does the following things:

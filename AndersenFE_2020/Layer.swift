@@ -43,4 +43,10 @@ struct Layer:Codable {
     
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal
+    
+    /// Convenience function to get the OD of a Layer
+    func OD() -> Double
+    {
+        return 2.0 * (self.innerRadius + radialBuild)
+    }
 }

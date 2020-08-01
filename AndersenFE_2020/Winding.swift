@@ -145,6 +145,7 @@ class Winding:Codable {
                 cableA += cableInsulation * shrinkageInsulation
                 let numStrandsR = (numStrands + 1) / 2
                 cableR = cableR * Double(numStrandsR) + cableInsulation * shrinkageInsulation
+                cableDim = (axial:cableA, radial:cableR)
                 
             }
             else if self.type == .twin

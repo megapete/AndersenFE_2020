@@ -56,6 +56,28 @@ class Transformer:Codable {
         return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals)
     }
     
+    /// Calculate the distance from the center of the core to the tank wall (used for graphics)
+    func DistanceFromCoreCenterToTankWall() -> Double
+    {
+        guard self.windings.count > 0 else {
+            return 0.0
+        }
+        
+        var outermostWinding = self.windings[0]
+        var result = outermostWinding.layers.last!.OD() / 2.0 + outermostWinding.groundClearance
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.coilID > outermostWinding.coilID
+            {
+                outermostWinding = nextWdg
+                result = outermostWinding.layers.last!.OD() / 2.0 + outermostWinding.groundClearance
+            }
+        }
+        
+        return result
+    }
+    
     /// Some different errors that can be thrown by the init routine
     struct DesignFileError:Error
     {

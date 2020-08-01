@@ -664,6 +664,37 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Test" id="IOt-U7-HRb">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Test" id="ZgQ-mA-mBH">
+                        <items>
+                            <menuItem title="Init View" id="eyV-pp-gAf">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="testInitView:" target="6yZ-bT-Gps" id="x4a-eK-9Pv"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom In" id="edY-dm-SyR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="testZoomIn:" target="6yZ-bT-Gps" id="xfa-pV-37b"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom out" id="1U5-xd-6fj">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="testZoomOut:" target="6yZ-bT-Gps" id="yS1-Mz-bqZ"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom all" id="YMW-lI-5Xc">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="testZoomAll:" target="6yZ-bT-Gps" id="72Y-ke-yIc"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Window" id="aUF-d1-5bR">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">

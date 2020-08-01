@@ -106,6 +106,35 @@ class AppController: NSObject, NSMenuItemValidation {
         self.currentTxfoIsDirty = true
     }
     
+    // Code for testing View-related drawing stuff (will eventually be commented out)
+    @IBAction func testInitView(_ sender: Any) {
+        // testing for now
+        self.txfoView.zoomAll(windowHt: 1000.0)
+        print("Bounds: \(self.txfoView.bounds)")
+        let segPath = NSBezierPath(rect: NSRect(x: 50.0, y: 50.0, width: 200.0, height: 800.0))
+        let testSegment = SegmentPath(path: segPath, segmentColor: .red, isActive: true)
+        self.txfoView.segments.append(testSegment)
+        
+        self.txfoView.needsDisplay = true
+    }
+    @IBAction func testZoomOut(_ sender: Any) {
+        self.txfoView.scaleUnitSquare(to: NSSize(width: 0.5, height: 0.5))
+        print("Bounds: \(self.txfoView.bounds)")
+        self.txfoView.setBoundsOrigin(NSPoint(x: -50.0, y: -50.0))
+        self.txfoView.needsDisplay = true
+    }
+    @IBAction func testZoomAll(_ sender: Any) {
+        self.txfoView.zoomAll(windowHt: 1000.0)
+    }
+    @IBAction func testZoomIn(_ sender: Any) {
+        self.txfoView.setBoundsOrigin(NSPoint(x: 20.0, y: 70.0))
+        let aspectRatio = self.txfoView.frame.width / self.txfoView.frame.height
+        let height:CGFloat = 200.0
+        let width = height * aspectRatio
+        self.txfoView.setBoundsSize(NSSize(width: width, height: height))
+    }
+    
+    
     // This function does the following things:
     // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
     func initializeViews()

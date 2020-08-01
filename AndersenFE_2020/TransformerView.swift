@@ -91,4 +91,15 @@ class TransformerView: NSView {
         
     }
     
+    func zoomAll(windowHt:CGFloat)
+    {
+        // aspectRatio is defined as width/height
+        let aspectRatio = self.frame.width / self.frame.height
+        let boundsW = windowHt * aspectRatio
+        
+        self.bounds = NSRect(x: 0.0, y: 0.0, width: boundsW, height: windowHt)
+        
+        self.needsDisplay = true
+    }
+    
 }

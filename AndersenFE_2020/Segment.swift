@@ -47,6 +47,13 @@ struct Segment:Codable {
     /// The upper dimesion of the Segment
     let maxZ:Double
     
+    /// Convenience property for the height of the segment
+    var height:Double {
+        get {
+            return self.maxZ - self.minZ
+        }
+    }
+    
     /// Function to split this segment into a given number of "subsegments". It is the calling routines responsibility to delete this segment and insert the array of new segments into the the correct place. Note that when creating the new segments, this function sets the active turns to be equal to the total turns - ie: turning off turns is also the calling routines responsibilty
     ///  - Parameter numSegs: The number of segments to split this one into
     ///  - Parameter gap: The axial dimension of the gaps between the new segments

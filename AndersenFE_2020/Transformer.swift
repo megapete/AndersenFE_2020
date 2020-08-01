@@ -64,6 +64,7 @@ class Transformer:Codable {
             case InvalidDesignFile
             case InvalidFileVersion
             case InvalidValue
+            case InvalidConnection
         }
         
         let info:String
@@ -84,6 +85,10 @@ class Transformer:Codable {
                 else if self.type == .InvalidValue
                 {
                     return "There is an invalid value in line \(self.info) of the file."
+                }
+                else if self.type == .InvalidConnection
+                {
+                    return "An invalid connection was specified for terminal: \(self.info)"
                 }
                 
                 return "An unknown error occurred."
@@ -170,11 +175,53 @@ class Transformer:Codable {
         }
         
         // Get the number of phases
-        self.numPhases = Int(lineElements[0])!
-        self.frequency = Double(lineElements[1])!
-        self.tempRise = Double(lineElements[2])!
-        self.core = Core(diameter: Double(lineElements[5])! * mmPerInch, windHt: Double(lineElements[6])! * mmPerInch)
+        if let num = Int(lineElements[0])
+        {
+            self.numPhases = num
+        }
+        else
+        {
+            throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+        }
         
+        // frequency
+        if let num = Double(lineElements[1])
+        {
+            self.frequency = num
+        }
+        else
+        {
+            throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+        }
+        
+        // temperature rise
+        if let num = Double(lineElements[2])
+        {
+            self.tempRise = num
+        }
+        else
+        {
+            throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+        }
+        
+        // core
+        if let num1 = Double(lineElements[5])
+        {
+            if let num2 = Double(lineElements[6])
+            {
+                self.core = Core(diameter: num1 * mmPerInch, windHt: num2 * mmPerInch)
+            }
+            else
+            {
+                throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+            }
+        }
+        else
+        {
+            throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+        }
+        
+        // sc stuff initialization
         var assymetryFactor = 1.8
         var systemStrength = 0.0
         
@@ -193,12 +240,37 @@ class Transformer:Codable {
                     continue
                 }
                 
-                let VA = Double(lineElements[1])! * 1000.0
+                var VA = 0.0
+                if let num = Double(lineElements[1])
+                {
+                    VA = num * 1000.0
+                }
+                else
+                {
+                    throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+                }
                 
                 var termName = ""
                 
-                let newTermNum = Int(lineElements[3])!
-                let currDir = Int(lineElements[4])!
+                var newTermNum:Int = 0
+                if let num = Int(lineElements[3])
+                {
+                    newTermNum = num
+                }
+                else
+                {
+                    throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+                }
+                
+                var currDir = 0
+                if let num = Int(lineElements[4])
+                {
+                    currDir = num
+                }
+                else
+                {
+                    throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+                }
                 
                 let connString = lineElements[2]
                 var connection:Terminal.TerminalConnection = .wye
@@ -243,6 +315,10 @@ class Transformer:Codable {
                 {
                     connection = .auto_common
                     termName = "Auto-C"
+                }
+                else if connString != "Y"
+                {
+                    throw DesignFileError(info: "\(newTermNum)", type: .InvalidConnection)
                 }
                 
                 let newTerm = Terminal(name: termName, voltage: voltage, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
@@ -301,7 +377,7 @@ class Transformer:Codable {
                 
                 // electrical height
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let elecHtb = Double(lineElements[i])! * mmPerInch
+                let elecHt = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // check for spiral section
@@ -492,11 +568,11 @@ class Transformer:Codable {
                     wdgType = .multistart
                 }
                 
-                let internalRadialTurnIns = (wdgType == .helix && numRadialDucts > 0 ? radialDuctDimn * Double(numRadialDucts) : 0.0) * mmPerInch
+                let internalRadialTurnIns = (wdgType == .helix && numRadialDucts > 0 ? radialDuctDimn * Double(numRadialDucts) : 0.0)
                 
                 let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
                 
-                let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHtb, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
+                let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
                 
                 self.windings.append(newWinding)
             }

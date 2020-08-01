@@ -91,14 +91,36 @@ class TransformerView: NSView {
         
     }
     
-    func zoomAll(windowHt:CGFloat)
+    // transformer display zoom functions
+    func zoomAll(coreRadius:CGFloat, windowHt:CGFloat)
     {
         // aspectRatio is defined as width/height
+        // it is assumed that the window height (z) is ALWAYS the dominant dimension compared to the "half tank-width" in the r-direction
         let aspectRatio = self.frame.width / self.frame.height
         let boundsW = windowHt * aspectRatio
         
-        self.bounds = NSRect(x: 0.0, y: 0.0, width: boundsW, height: windowHt)
+        self.bounds = NSRect(x: coreRadius, y: 0.0, width: boundsW, height: windowHt)
         
+        self.needsDisplay = true
+    }
+    
+    // the zoom in/out ratio (maybe consider making this user-settable)
+    let zoomRatio:CGFloat = 0.75
+    func zoomOut()
+    {
+        self.scaleUnitSquare(to: (NSSize(width: zoomRatio, height: zoomRatio)))
+        self.needsDisplay = true
+    }
+    
+    func zoomIn()
+    {
+        self.scaleUnitSquare(to: NSSize(width: 1.0 / zoomRatio, height: 1.0 / zoomRatio))
+        self.needsDisplay = true
+    }
+    
+    func zoomRect(zRect:NSRect)
+    {
+        self.bounds = zRect
         self.needsDisplay = true
     }
     

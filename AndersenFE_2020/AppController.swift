@@ -60,12 +60,20 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
+    @IBOutlet weak var zoomInMenuItem: NSMenuItem!
+    @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
+    @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
+    @IBOutlet weak var zoomAllMenuItem: NSMenuItem!
+    
+    
     // Preferences
     var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true)
     
     // UI elements
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
+    
+    let termColors:[NSColor] = [.red, .green, .orange, .blue, .purple, .brown]
     
     // set up our preference switches
     override func awakeFromNib() {
@@ -92,7 +100,8 @@ class AppController: NSObject, NSMenuItemValidation {
         
     }
     
-    func updateCurrentTransformer(newTransformer:Transformer) {
+    
+    func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false) {
         
         DLog("Updating transformer model...")
         
@@ -104,12 +113,21 @@ class AppController: NSObject, NSMenuItemValidation {
         
         self.currentTxfo = newTransformer
         self.currentTxfoIsDirty = true
+        
+        if reinitialize
+        {
+            self.initializeViews()
+        }
+        else
+        {
+            self.updateViews()
+        }
     }
     
     // Code for testing View-related drawing stuff (will eventually be commented out)
     @IBAction func testInitView(_ sender: Any) {
         // testing for now
-        self.txfoView.zoomAll(windowHt: 1000.0)
+        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0)
         print("Bounds: \(self.txfoView.bounds)")
         let segPath = NSBezierPath(rect: NSRect(x: 50.0, y: 50.0, width: 200.0, height: 800.0))
         let testSegment = SegmentPath(path: segPath, segmentColor: .red, isActive: true)
@@ -124,7 +142,7 @@ class AppController: NSObject, NSMenuItemValidation {
         self.txfoView.needsDisplay = true
     }
     @IBAction func testZoomAll(_ sender: Any) {
-        self.txfoView.zoomAll(windowHt: 1000.0)
+        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0)
     }
     @IBAction func testZoomIn(_ sender: Any) {
         self.txfoView.setBoundsOrigin(NSPoint(x: 20.0, y: 70.0))
@@ -134,17 +152,69 @@ class AppController: NSObject, NSMenuItemValidation {
         self.txfoView.setBoundsSize(NSSize(width: width, height: height))
     }
     
+    @IBAction func handleZoomIn(_ sender: Any) {
+        
+        self.txfoView.zoomIn()
+    }
+    
+    @IBAction func handleZoomOut(_ sender: Any) {
+        
+        self.txfoView.zoomOut()
+    }
+    
+    @IBAction func handleZoomAll(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt))
+    }
     
     // This function does the following things:
     // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
+    // 2) Calls updateViews() to draw the coil segments
     func initializeViews()
     {
+        self.handleZoomAll(self)
         
+        self.updateViews()
     }
     
     func updateViews()
     {
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
         
+        self.txfoView.segments = []
+        
+        for nextWdg in txfo.windings
+        {
+            for nextLayer in nextWdg.layers
+            {
+                if nextLayer.parentTerminal.andersenNumber < 1
+                {
+                    continue
+                }
+                
+                let pathColor = self.termColors[nextLayer.parentTerminal.andersenNumber - 1]
+                
+                for nextSegment in nextLayer.segments
+                {
+                    let path = NSBezierPath(rect: NSRect(x: nextLayer.innerRadius, y: nextSegment.minZ, width: nextLayer.radialBuild, height: nextSegment.height))
+                    path.lineWidth = 2.0
+                    
+                    let newSegPath = SegmentPath(path: path, segmentColor: pathColor, isActive: true)
+                    
+                    self.txfoView.segments.append(newSegPath)
+                }
+            }
+        }
+        
+        self.txfoView.needsDisplay = true
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -153,7 +223,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
-        else if menuItem == self.closeTransformerMenuItem
+        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem
         {
             return currentTxfo != nil
         }
@@ -213,7 +283,7 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 let newTransformer = oldTransformer.Copy()
                 newTransformer.InitializeWindings(prefs: self.preferences)
-                self.updateCurrentTransformer(newTransformer: newTransformer)
+                self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
             }
         }
     }
@@ -382,7 +452,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 self.mainWindow.title = fileURL.deletingPathExtension().lastPathComponent
                 
-                self.updateCurrentTransformer(newTransformer: newTxfo)
+                self.updateCurrentTransformer(newTransformer: newTxfo, reinitialize: true)
                 
                 // the call to updateModel will have set the "dirty" flag to true, set it back to false
                 self.currentTxfoIsDirty = false
@@ -412,7 +482,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 self.mainWindow.title = fileURL.lastPathComponent
                 
-                self.updateCurrentTransformer(newTransformer: newTxfo)
+                self.updateCurrentTransformer(newTransformer: newTxfo, reinitialize: true)
                 
                 return true
             }

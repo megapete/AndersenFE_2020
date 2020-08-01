@@ -26,6 +26,10 @@
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="txfoView" destination="FgI-7N-22l" id="Gpd-xR-ByX"/>
+                <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
+                <outlet property="zoomInMenuItem" destination="q4k-Rw-dqx" id="nDA-f7-y7E"/>
+                <outlet property="zoomOutMenuItem" destination="Oxa-g5-7Sq" id="Xuu-xz-jSR"/>
+                <outlet property="zoomRectMenuItem" destination="pBa-g8-iF6" id="BER-8I-WNV"/>
             </connections>
         </customObject>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
@@ -646,6 +650,26 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="ryN-Oz-L0M"/>
+                            <menuItem title="Zoom In" keyEquivalent="+" id="q4k-Rw-dqx">
+                                <connections>
+                                    <action selector="handleZoomIn:" target="6yZ-bT-Gps" id="w6k-J2-fXK"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom Out" keyEquivalent="-" id="Oxa-g5-7Sq">
+                                <connections>
+                                    <action selector="handleZoomOut:" target="6yZ-bT-Gps" id="Gko-cK-Q31"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom Rect..." id="pBa-g8-iF6">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Zoom All" id="efm-YQ-pKe">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleZoomAll:" target="6yZ-bT-Gps" id="nJO-5G-D4O"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>

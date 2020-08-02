@@ -21,6 +21,8 @@ let MODEL_INTERNAL_LAYER_TAPS_KEY = "PCH_AFE2020_ModelInternalLayerTaps"
 let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGapsSymmetrical"
 // Key to indicate whether multistart windings electrical height is to the centers of the the conductor stack
 let MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY = "PCH_AFE2020_MultiStartElecHeightIsToCenter"
+// Key to default to Terminal 2 as the reference VA terminal
+let DEFAULT_REFERENCE_TERMINAL_2_KEY = "PCH_AFE2020_DefaultReferenceTerminal2"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -35,6 +37,7 @@ struct PCH_AFE2020_Prefs:Codable {
     var modelInternalLayerTaps:Bool
     var upperLowerAxialGapsAreSymmetrical:Bool
     var multiStartElecHtIsToCenter:Bool
+    var defaultRefTerm2:Bool
 }
 
 // Struct to save transformers to disk (this may grow with time)
@@ -50,6 +53,9 @@ class AppController: NSObject, NSMenuItemValidation {
     var lastOpenedTxfoFile:URL? = nil
     var currentTxfoIsDirty:Bool = false
     var lastSavedTxfoFile:URL? = nil
+    
+    // Current reference terminal number (as in Andersen number) (if any)
+    var currentRefTermNumber:Int? = nil
     
     // My stab at Undo and Redo
     var undoStack:[PCH_AFE2020_Save_Struct] = []
@@ -67,7 +73,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     
     // Preferences
-    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true)
+    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true, defaultRefTerm2: true)
     
     // UI elements
     @IBOutlet weak var mainWindow: NSWindow!
@@ -95,8 +101,19 @@ class AppController: NSObject, NSMenuItemValidation {
             self.preferences.multiStartElecHtIsToCenter = UserDefaults.standard.bool(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
         }
         
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY) != nil
+        {
+            self.preferences.defaultRefTerm2 = UserDefaults.standard.bool(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
+        }
+        
+        if self.preferences.defaultRefTerm2
+        {
+            self.currentRefTermNumber = 2
+        }
+        
         // Set up things for the views
-        SegmentPath.bkGroundColor = mainWindow.backgroundColor
+        SegmentPath.bkGroundColor = .white
         
     }
     
@@ -238,7 +255,7 @@ class AppController: NSObject, NSMenuItemValidation {
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.defaultRefTerm2)
         
         let _ = prefDlog.runModal()
         
@@ -276,6 +293,8 @@ class AppController: NSObject, NSMenuItemValidation {
             self.preferences.multiStartElecHtIsToCenter = !self.preferences.multiStartElecHtIsToCenter
             UserDefaults.standard.set(self.preferences.multiStartElecHtIsToCenter, forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
         }
+        
+        
         
         if txfoNeedsUpdate
         {

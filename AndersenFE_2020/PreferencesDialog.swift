@@ -16,6 +16,8 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var upperLowerGapSymmetric: NSButton!
     @IBOutlet weak var prefScopeLabel: NSTextField!
     @IBOutlet weak var multiStartElHtCenters: NSButton!
+    @IBOutlet weak var defaultRefTerm2CheckBox: NSButton!
+    
     
     var modelRadialDucts:Bool
     var modelZeroTerms:Bool
@@ -23,8 +25,9 @@ class PreferencesDialog: PCH_DialogBox {
     var upperLowerGapsAreSymmetric:Bool
     var scopeLabel:String
     var multiStartElecHtIsToCenters:Bool
+    var defaultRefTerm2:Bool
     
-    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool) {
+    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool) {
         
         self.scopeLabel = scopeLabel
         self.modelRadialDucts = modelRadialDucts
@@ -32,6 +35,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.modelLayerTaps = modelLayerTaps
         self.upperLowerGapsAreSymmetric = upperLowerGapsAreSymmetric
         self.multiStartElecHtIsToCenters = multiStartElecHtIsToCenters
+        self.defaultRefTerm2 = defaultRefTerm2
         
         super.init(viewNibFileName: "Preferences", windowTitle: "Preferences", hideCancel: true)
     }
@@ -44,6 +48,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.noLayerWindingTapsCheckBox.state = (self.modelLayerTaps ? .off : .on)
         self.upperLowerGapSymmetric.state = (self.upperLowerGapsAreSymmetric ? .on : .off)
         self.multiStartElHtCenters.state = (self.multiStartElecHtIsToCenters ? .on : .off)
+        self.defaultRefTerm2CheckBox.state = (self.defaultRefTerm2 ? .on : .off)
     }
     
     @IBAction func handleRadialDucts(_ sender: Any) {
@@ -70,5 +75,11 @@ class PreferencesDialog: PCH_DialogBox {
     
         self.multiStartElecHtIsToCenters = self.multiStartElHtCenters.state == .on
     }
+    
+    @IBAction func handleDefaultRefTerm2(_ sender: Any) {
+        
+        self.defaultRefTerm2 = self.defaultRefTerm2CheckBox.state == .on
+    }
+    
     
 }

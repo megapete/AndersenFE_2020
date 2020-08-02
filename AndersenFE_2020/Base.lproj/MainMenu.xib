@@ -25,7 +25,7 @@
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
-                <outlet property="txfoView" destination="FgI-7N-22l" id="Gpd-xR-ByX"/>
+                <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
                 <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
                 <outlet property="zoomInMenuItem" destination="q4k-Rw-dqx" id="nDA-f7-y7E"/>
                 <outlet property="zoomOutMenuItem" destination="Oxa-g5-7Sq" id="Xuu-xz-jSR"/>
@@ -772,9 +772,33 @@
                         <rect key="frame" x="0.0" y="0.0" width="861" height="720"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <customView fixedFrame="YES" id="FgI-7N-22l" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
+                            <customView fixedFrame="YES" id="FgI-7N-22l">
                                 <rect key="frame" x="0.0" y="0.0" width="575" height="720"/>
                                 <autoresizingMask key="autoresizingMask"/>
+                                <subviews>
+                                    <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q4C-Rl-LJ3">
+                                        <rect key="frame" x="-1" y="0.0" width="576" height="721"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <clipView key="contentView" id="07C-KY-SGX">
+                                            <rect key="frame" x="1" y="1" width="559" height="704"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="559" height="704"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                </customView>
+                                            </subviews>
+                                        </clipView>
+                                        <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
+                                            <rect key="frame" x="1" y="705" width="559" height="15"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
+                                            <rect key="frame" x="560" y="1" width="15" height="704"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                </subviews>
                             </customView>
                             <customView fixedFrame="YES" id="VHp-aJ-QOo">
                                 <rect key="frame" x="585" y="0.0" width="142" height="720"/>

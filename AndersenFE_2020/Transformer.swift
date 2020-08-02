@@ -69,6 +69,85 @@ class Transformer:Codable {
         return result
     }
     
+    /// Find the Terminal that has the Andersen number termNum assigned to it. Return nil if none are found
+    func TerminalFromAndersenNumber(termNum:Int) -> Terminal?
+    {
+        for nextTerm in self.terminals
+        {
+            if let term = nextTerm
+            {
+                if term.andersenNumber == termNum
+                {
+                    return nextTerm
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Calculate the V/N for the transformer given the reference terminal number.
+    func VoltsPerTurn(refTerm:Int) -> Double?
+    {
+        guard let terminal = self.TerminalFromAndersenNumber(termNum: refTerm) else
+        {
+            return nil
+        }
+        
+        let legFactor = (terminal.connection == .wye ? SQRT3 : 1.0)
+        let legVolts = terminal.voltage / legFactor
+        
+        let result = legVolts / self.ActiveTurns(terminal: refTerm)
+        
+        return result
+    }
+    
+    /// The effective turns are active turns and takes into account whether the winding is a double-stack
+    func EffectiveTurns(terminal:Int) -> Double
+    {
+        var result = 0.0
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.terminal.andersenNumber == terminal
+            {
+                let effectiveFactor = (nextWdg.isDoubleStack ? 2.0 : 1.0)
+                
+                for nextLayer in nextWdg.layers
+                {
+                    for nextSegment in nextLayer.segments
+                    {
+                        result += nextSegment.activeTurns / effectiveFactor
+                    }
+                }
+            }
+        }
+        
+        return result
+    }
+    
+    /// Return the number of currently-active turns for the winding. Note that this is the total number of active "wound" turns (ie: whether or not the winding is a double-stack does not enter into the calculation) (NOTE: not sure how multi-start windings will be handled)
+    func ActiveTurns(terminal:Int) -> Double
+    {
+        var result = 0.0
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.terminal.andersenNumber == terminal
+            {
+                for nextLayer in nextWdg.layers
+                {
+                    for nextSegment in nextLayer.segments
+                    {
+                        result += nextSegment.activeTurns
+                    }
+                }
+            }
+        }
+        
+        return result
+    }
+    
     /// Some different errors that can be thrown by the init routine
     struct DesignFileError:Error
     {

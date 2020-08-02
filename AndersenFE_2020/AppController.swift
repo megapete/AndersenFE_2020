@@ -54,9 +54,6 @@ class AppController: NSObject, NSMenuItemValidation {
     var currentTxfoIsDirty:Bool = false
     var lastSavedTxfoFile:URL? = nil
     
-    // Current reference terminal number (as in Andersen number) (if any)
-    var currentRefTermNumber:Int? = nil
-    
     // My stab at Undo and Redo
     var undoStack:[PCH_AFE2020_Save_Struct] = []
     var redoStack:[PCH_AFE2020_Save_Struct] = []
@@ -105,11 +102,6 @@ class AppController: NSObject, NSMenuItemValidation {
         if UserDefaults.standard.object(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY) != nil
         {
             self.preferences.defaultRefTerm2 = UserDefaults.standard.bool(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
-        }
-        
-        if self.preferences.defaultRefTerm2
-        {
-            self.currentRefTermNumber = 2
         }
         
         // Set up things for the views
@@ -286,15 +278,22 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             self.preferences.upperLowerAxialGapsAreSymmetrical = !self.preferences.upperLowerAxialGapsAreSymmetrical
             UserDefaults.standard.set(self.preferences.upperLowerAxialGapsAreSymmetrical, forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
+            txfoNeedsUpdate = true
         }
         
         if prefDlog.multiStartElecHtIsToCenters != self.preferences.multiStartElecHtIsToCenter
         {
             self.preferences.multiStartElecHtIsToCenter = !self.preferences.multiStartElecHtIsToCenter
             UserDefaults.standard.set(self.preferences.multiStartElecHtIsToCenter, forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
+            txfoNeedsUpdate = true
         }
         
-        
+        if prefDlog.defaultRefTerm2 != self.preferences.defaultRefTerm2
+        {
+            self.preferences.defaultRefTerm2 = !self.preferences.defaultRefTerm2
+            UserDefaults.standard.set(self.preferences.defaultRefTerm2, forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
+            txfoNeedsUpdate = true
+        }
         
         if txfoNeedsUpdate
         {
@@ -494,6 +493,11 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 // if we make it here, we have successfully opened the file, so save it as the "last successfully opened file"
                 UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
+                
+                if self.preferences.defaultRefTerm2
+                {
+                    newTxfo.refTermNum = 2
+                }
             
                 self.lastOpenedTxfoFile = nil
                 

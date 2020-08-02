@@ -33,8 +33,10 @@ class Transformer:Codable {
     
     var terminals:[Terminal?] = []
     
+    var refTermNum:Int? = nil
+    
     /// Straightforward init function (designed for the copy() function below)
-    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?])
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil)
     {
         self.numPhases = numPhases
         self.frequency = frequency
@@ -43,6 +45,7 @@ class Transformer:Codable {
         self.scFactor = scFactor
         self.systemGVA = systemGVA
         self.terminals = terminals
+        self.refTermNum = refTermNum
         
         for nextWdg in windings
         {
@@ -53,7 +56,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum)
     }
     
     /// Calculate the distance from the center of the core to the tank wall (used for graphics)
@@ -86,9 +89,36 @@ class Transformer:Codable {
         return nil
     }
     
-    /// Calculate the V/N for the transformer given the reference terminal number.
-    func VoltsPerTurn(refTerm:Int) -> Double?
+    func TerminalLineVoltage(terminal:Int) -> Double
     {
+        guard let term = self.TerminalFromAndersenNumber(termNum: terminal) else
+        {
+            return 0.0
+        }
+        
+        guard let VpN = self.VoltsPerTurn() else
+        {
+            return term.voltage
+        }
+        
+        var phaseFactor = 1.0
+        
+        if term.connection == .wye
+        {
+            phaseFactor = SQRT3
+        }
+        
+        return VpN * EffectiveTurns(terminal: terminal) * phaseFactor
+    }
+    
+    /// Calculate the V/N for the transformer given the reference terminal number.
+    func VoltsPerTurn() -> Double?
+    {
+        guard let refTerm = self.refTermNum else
+        {
+            return nil
+        }
+        
         guard let terminal = self.TerminalFromAndersenNumber(termNum: refTerm) else
         {
             return nil

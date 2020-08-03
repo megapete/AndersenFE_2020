@@ -76,6 +76,8 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
     
+    
+    
     let termColors:[NSColor] = [.red, .green, .orange, .blue, .purple, .brown]
     
     // set up our preference switches
@@ -224,6 +226,8 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         self.txfoView.needsDisplay = true
+        
+        
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {

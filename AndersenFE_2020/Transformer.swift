@@ -102,13 +102,31 @@ class Transformer:Codable {
         }
         
         var phaseFactor = 1.0
+        var autoFactor = 1.0
         
-        if term.connection == .wye
+        if term.connection == .wye || term.connection == .zig || term.connection == .zag || term.connection == .auto_common || term.connection == .auto_series
         {
             phaseFactor = SQRT3
         }
         
-        return VpN * EffectiveTurns(terminal: terminal) * phaseFactor
+        if term.connection == .auto_series
+        {
+            for nextTerm in self.terminals
+            {
+                if let cTerm = nextTerm
+                {
+                    if cTerm.connection == .auto_common
+                    {
+                        let commonTurns = EffectiveTurns(terminal: cTerm.andersenNumber)
+                        let seriesTurns = EffectiveTurns(terminal: terminal)
+                        
+                        autoFactor = (seriesTurns + commonTurns) / commonTurns
+                    }
+                }
+            }
+        }
+        
+        return VpN * EffectiveTurns(terminal: terminal) * phaseFactor * autoFactor
     }
     
     /// Calculate the V/N for the transformer given the reference terminal number.
@@ -124,7 +142,7 @@ class Transformer:Codable {
             return nil
         }
         
-        let legFactor = (terminal.connection == .wye ? SQRT3 : 1.0)
+        let legFactor = (terminal.connection == .wye || terminal.connection == .auto_common || terminal.connection == .auto_series ? SQRT3 : 1.0)
         let legVolts = terminal.voltage / legFactor
         
         let result = legVolts / self.ActiveTurns(terminal: refTerm)
@@ -187,6 +205,7 @@ class Transformer:Codable {
             case InvalidFileVersion
             case InvalidValue
             case InvalidConnection
+            case MissingComplementConnection
         }
         
         let info:String
@@ -211,6 +230,10 @@ class Transformer:Codable {
                 else if self.type == .InvalidConnection
                 {
                     return "An invalid connection was specified for terminal: \(self.info)"
+                }
+                else if self.type == .MissingComplementConnection
+                {
+                    return "A\(self.info) connection is missing one of its parts"
                 }
                 
                 return "An unknown error occurred."
@@ -349,6 +372,11 @@ class Transformer:Codable {
         
         currIndex += 1
         
+        var gotZig = false
+        var gotZag = false
+        var gotAutoSeries = false
+        var gotAutoCommon = false
+        
         while currIndex < 9
         {
             lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
@@ -421,21 +449,27 @@ class Transformer:Codable {
                 else if connString == "ZIG"
                 {
                     connection = .zig
+                    gotZig = true
                     termName = "ZIG"
                 }
                 else if connString == "ZAG"
                 {
                     connection = .zag
+                    gotZag = true
                     termName = "ZAG"
                 }
                 else if connString == "AS" // auto series
                 {
                     connection = .auto_series
+                    gotAutoSeries = true
+                    newTermNum = 1
                     termName = "Auto-S"
                 }
                 else if connString == "AC" // auto common
                 {
                     connection = .auto_common
+                    gotAutoCommon = true
+                    newTermNum = 2
                     termName = "Auto-C"
                 }
                 else if connString != "Y"
@@ -453,6 +487,16 @@ class Transformer:Codable {
             }
             
             currIndex += 1
+        }
+        
+        // do a check to make sure that auto and zigzag connections are correctly done
+        if gotZig != gotZag
+        {
+            throw DesignFileError(info: " Zigzag", type: .MissingComplementConnection)
+        }
+        if gotAutoCommon != gotAutoSeries
+        {
+            throw DesignFileError(info: "n Autotransformer", type: .MissingComplementConnection)
         }
         
         var rowMap:[Int?] = []

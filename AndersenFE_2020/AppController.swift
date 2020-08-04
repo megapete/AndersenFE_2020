@@ -23,6 +23,8 @@ let UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY = "PCH_AFE2020_UpperAndLowerAxialGa
 let MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY = "PCH_AFE2020_MultiStartElecHeightIsToCenter"
 // Key to default to Terminal 2 as the reference VA terminal
 let DEFAULT_REFERENCE_TERMINAL_2_KEY = "PCH_AFE2020_DefaultReferenceTerminal2"
+// Key to default to using the Andersen FLD12 program for finite-element calculations
+let USE_ANDERSEN_FLD12_PROGRAM_KEY = "PCH_AFE2020_UseAndersenFLD12"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -30,6 +32,7 @@ let AFE2020_EXTENSION = "afe2020"
 // Struct for preferences. Preferences are handled as follows:
 // 1) The currently-saved user preferences are used when opening an Excel-generated file. These preferences are applied to each Winding in the model (and saved as a property of each separate winding).
 // 2) The user can selectively change the preferences for any winding as he likes.
+// 3) SOme preferences are obviously not intended to be "saved" along with the file (like the "useAndersenFLD12" oreference) but they still will be. This shouldn't be an issue for now, but I will need to decide how to treat these things.
 struct PCH_AFE2020_Prefs:Codable {
     
     var modelRadialDucts:Bool
@@ -38,6 +41,7 @@ struct PCH_AFE2020_Prefs:Codable {
     var upperLowerAxialGapsAreSymmetrical:Bool
     var multiStartElecHtIsToCenter:Bool
     var defaultRefTerm2:Bool
+    var useAndersenFLD12:Bool
 }
 
 // Struct to save transformers to disk (this may grow with time)
@@ -70,15 +74,12 @@ class AppController: NSObject, NSMenuItemValidation {
     
     
     // Preferences
-    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true, defaultRefTerm2: true)
+    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true, defaultRefTerm2: true, useAndersenFLD12: true)
     
     // UI elements
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
     @IBOutlet weak var termsView: TerminalsView!
-    
-    
-    
     
     
     // set up our preference switches
@@ -105,6 +106,12 @@ class AppController: NSObject, NSMenuItemValidation {
         if UserDefaults.standard.object(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY) != nil
         {
             self.preferences.defaultRefTerm2 = UserDefaults.standard.bool(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
+        }
+        
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY) != nil
+        {
+            self.preferences.useAndersenFLD12 = UserDefaults.standard.bool(forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
         }
         
         // Set up things for the views
@@ -196,6 +203,8 @@ class AppController: NSObject, NSMenuItemValidation {
     {
         self.handleZoomAll(self)
         
+        self.termsView.InitializeFields()
+        
         self.updateViews()
     }
     
@@ -275,7 +284,7 @@ class AppController: NSObject, NSMenuItemValidation {
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.defaultRefTerm2)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.defaultRefTerm2, useAndersenFLD12: self.preferences.useAndersenFLD12)
         
         let _ = prefDlog.runModal()
         
@@ -321,6 +330,13 @@ class AppController: NSObject, NSMenuItemValidation {
             self.preferences.defaultRefTerm2 = !self.preferences.defaultRefTerm2
             UserDefaults.standard.set(self.preferences.defaultRefTerm2, forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
             txfoNeedsUpdate = true
+        }
+        
+        if prefDlog.useAndersenFLD12 != self.preferences.useAndersenFLD12
+        {
+            self.preferences.useAndersenFLD12 = !self.preferences.useAndersenFLD12
+            UserDefaults.standard.set(self.preferences.useAndersenFLD12, forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
+            // don't update the transformer for this
         }
         
         if txfoNeedsUpdate

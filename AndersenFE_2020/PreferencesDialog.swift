@@ -17,6 +17,7 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var prefScopeLabel: NSTextField!
     @IBOutlet weak var multiStartElHtCenters: NSButton!
     @IBOutlet weak var defaultRefTerm2CheckBox: NSButton!
+    @IBOutlet weak var useAndersenCheckBox: NSButton!
     
     
     var modelRadialDucts:Bool
@@ -26,8 +27,9 @@ class PreferencesDialog: PCH_DialogBox {
     var scopeLabel:String
     var multiStartElecHtIsToCenters:Bool
     var defaultRefTerm2:Bool
+    var useAndersenFLD12:Bool
     
-    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool) {
+    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool, useAndersenFLD12:Bool) {
         
         self.scopeLabel = scopeLabel
         self.modelRadialDucts = modelRadialDucts
@@ -36,6 +38,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.upperLowerGapsAreSymmetric = upperLowerGapsAreSymmetric
         self.multiStartElecHtIsToCenters = multiStartElecHtIsToCenters
         self.defaultRefTerm2 = defaultRefTerm2
+        self.useAndersenFLD12 = useAndersenFLD12
         
         super.init(viewNibFileName: "Preferences", windowTitle: "Preferences", hideCancel: true)
     }
@@ -49,6 +52,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.upperLowerGapSymmetric.state = (self.upperLowerGapsAreSymmetric ? .on : .off)
         self.multiStartElHtCenters.state = (self.multiStartElecHtIsToCenters ? .on : .off)
         self.defaultRefTerm2CheckBox.state = (self.defaultRefTerm2 ? .on : .off)
+        self.useAndersenCheckBox.state = (self.useAndersenFLD12 ? .on : .off)
     }
     
     @IBAction func handleRadialDucts(_ sender: Any) {
@@ -81,5 +85,9 @@ class PreferencesDialog: PCH_DialogBox {
         self.defaultRefTerm2 = self.defaultRefTerm2CheckBox.state == .on
     }
     
+    @IBAction func handleUseAndersenFLD12(_ sender: Any) {
+        
+        self.useAndersenFLD12 = self.useAndersenCheckBox.state == .on
+    }
     
 }

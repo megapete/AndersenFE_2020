@@ -14,6 +14,7 @@
                 <outlet property="noZeroTerminalsCheckbox" destination="GBE-JY-ur9" id="Uym-Vp-Eis"/>
                 <outlet property="prefScopeLabel" destination="VfH-m3-Ox6" id="ZL9-KI-9Ra"/>
                 <outlet property="upperLowerGapSymmetric" destination="1hT-7g-qK9" id="rxj-oH-JJt"/>
+                <outlet property="useAndersenCheckBox" destination="y5f-Cl-1l8" id="Wcq-IX-tLb"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -26,7 +27,7 @@
                     <rect key="frame" x="20" y="241" width="442" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="When loading an Excel-generated design file:" id="8EG-B4-Meu">
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -36,7 +37,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model radial ducts" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3IM-Yv-lI3">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleRadialDucts:" target="-2" id="pHx-bV-UFm"/>
@@ -47,7 +48,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model windings with terminal number '0'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MY8-z2-jyM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleZeroTerms:" target="-2" id="SsI-Qz-Mvm"/>
@@ -58,7 +59,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Don't model in-winding taps for layer windings" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NmJ-Mu-1xQ">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleInWindingTaps:" target="-2" id="Gp4-zK-UAA"/>
@@ -69,7 +70,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Assume upper and lower axial gaps are symmetric about the center" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1oR-OI-07G">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleUpperLowerSymGaps:" target="-2" id="qiz-7A-1ba"/>
@@ -80,7 +81,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Assume multi-start winding's electrical height is to the CENTER of the stack of conductors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="b1J-6u-WWy">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleMultiStartElHtCenters:" target="-2" id="naZ-Df-Fhf"/>
@@ -91,10 +92,21 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Use Terminal 2 as Reference Voltage &amp; Amps" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C6J-g2-JPV">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="label" size="13"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="handleDefaultRefTerm2:" target="-2" id="iAn-sL-hvB"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y5f-Cl-1l8">
+                    <rect key="frame" x="20" y="97" width="363" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" title="Use Andersen FLD12 for impedance &amp; force calculations" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="IXX-4m-aba">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="handleUseAndersenFLD12:" target="-2" id="hYu-bm-luN"/>
                     </connections>
                 </button>
             </subviews>

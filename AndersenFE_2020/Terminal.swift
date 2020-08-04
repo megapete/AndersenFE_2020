@@ -31,6 +31,36 @@ struct Terminal: Codable
         case zag = 7
     }
     
+    static func StringForConnection(connection:TerminalConnection) -> String
+    {
+        if connection == .wye
+        {
+            return "Wye"
+        }
+        else if connection == .delta
+        {
+            return "Delta"
+        }
+        else if connection == .auto_common
+        {
+            return "Auto-Common"
+        }
+        else if connection == .auto_series
+        {
+            return "Auto-Series"
+        }
+        else if connection == .zig
+        {
+            return "Zig"
+        }
+        else if connection == .zag
+        {
+            return "Zag"
+        }
+        
+        return "-ERROR-"
+    }
+    
     /// The connection to use for this Terminal
     let connection:TerminalConnection
     

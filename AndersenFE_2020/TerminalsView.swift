@@ -10,7 +10,11 @@ import Cocoa
 
 class TerminalsView: NSView {
     
+    static let termColors:[NSColor] = [.red, .green, .orange, .blue, .purple, .brown]
+    
     var termFields:[NSTextField] = []
+    
+    var referenceTerminal = 2
     
     func InitializeFields()
     {
@@ -25,14 +29,22 @@ class TerminalsView: NSView {
         }
     }
     
-    func SetTermData(termNum:Int, name:String, displayVolts:Double, VA:Double, connection:Terminal.TerminalConnection)
+    func SetTermData(termNum:Int, name:String, displayVolts:Double, VA:Double, connection:Terminal.TerminalConnection, isReference:Bool = false)
     {
         if let textFld = self.termFields.first(where: {$0.tag == termNum})
         {
-            let displayString = "Terminal \(termNum)\n\(name)\nkV: \(displayVolts / 1000.0)\nMVA:\(VA / 1.0E6)\n\(Terminal.StringForConnection(connection: connection))"
+            let volts = String(format: "%0.3f", displayVolts / 1000.0)
+            
+            let displayString = "Terminal \(termNum)\n\(name)\nkV: \(volts)\nMVA: \(VA / 1.0E6)\n\(Terminal.StringForConnection(connection: connection))"
             
             textFld.stringValue = displayString
             textFld.isHidden = false
+            if isReference
+            {
+                self.referenceTerminal = termNum
+            }
+            
+            self.needsDisplay = true
         }
         else
         {
@@ -59,7 +71,28 @@ class TerminalsView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        let baselineWidth:CGFloat = 1.5
         // Drawing code here.
+        for i in 0..<self.termFields.count
+        {
+            let nextFld = self.termFields[i]
+            
+            if nextFld.isHidden
+            {
+                continue
+            }
+            
+            let fldColor = TerminalsView.termColors[i]
+            
+            let useLineWidth = (self.referenceTerminal == nextFld.tag ? 5.0 * baselineWidth : baselineWidth)
+            
+            fldColor.set()
+            
+            let boxPath = NSBezierPath(rect: nextFld.frame)
+            boxPath.lineWidth = useLineWidth
+            
+            boxPath.stroke()
+        }
     }
     
 }

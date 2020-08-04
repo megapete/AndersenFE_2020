@@ -8,7 +8,7 @@
 
 import Cocoa
 
-let PCH_SupportedFileVersion = 4
+let PCH_AFE2020_SupportedFileVersion = 4
 
 /// The Transformer struct is the encompassing Andersen-oriented data for the model. All of its fields are self-explanatory.
 class Transformer:Codable {
@@ -87,6 +87,22 @@ class Transformer:Codable {
         }
         
         return nil
+    }
+    
+    /// Return a set of Ints that represent the Andersen-terminals that are available
+    func AvailableTerminals() -> Set<Int>
+    {
+        var result:Set<Int> = []
+        
+        for nextEntry in self.terminals
+        {
+            if let nextTerm = nextEntry
+            {
+                result.insert(nextTerm.andersenNumber)
+            }
+        }
+        
+        return result
     }
     
     func TerminalLineVoltage(terminal:Int) -> Double
@@ -221,7 +237,7 @@ class Transformer:Codable {
                 }
                 else if self.type == .InvalidFileVersion
                 {
-                    return "This program requires a file version of \(PCH_SupportedFileVersion) or greater."
+                    return "This program requires a file version of \(PCH_AFE2020_SupportedFileVersion) or greater."
                 }
                 else if self.type == .InvalidValue
                 {
@@ -314,7 +330,7 @@ class Transformer:Codable {
             throw DesignFileError(info: "", type: .InvalidDesignFile)
         }
         
-        if version < PCH_SupportedFileVersion
+        if version < PCH_AFE2020_SupportedFileVersion
         {
             throw DesignFileError(info: "", type: .InvalidFileVersion)
         }

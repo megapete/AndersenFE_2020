@@ -79,7 +79,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     
     
-    let termColors:[NSColor] = [.red, .green, .orange, .blue, .purple, .brown]
+    
     
     // set up our preference switches
     override func awakeFromNib() {
@@ -217,7 +217,7 @@ class AppController: NSObject, NSMenuItemValidation {
                     continue
                 }
                 
-                let pathColor = self.termColors[nextLayer.parentTerminal.andersenNumber - 1]
+                let pathColor = TerminalsView.termColors[nextLayer.parentTerminal.andersenNumber - 1]
                 
                 for nextSegment in nextLayer.segments
                 {
@@ -233,6 +233,24 @@ class AppController: NSObject, NSMenuItemValidation {
         
         self.txfoView.needsDisplay = true
         
+        let termSet = txfo.AvailableTerminals()
+        
+        for nextTerm in termSet
+        {
+            if let terminal = txfo.TerminalFromAndersenNumber(termNum: nextTerm)
+            {
+                var isRef = false
+                if let refTerm = txfo.refTermNum
+                {
+                    if refTerm == nextTerm
+                    {
+                        isRef = true
+                    }
+                }
+                
+                self.termsView.SetTermData(termNum: nextTerm, name: terminal.name, displayVolts: txfo.TerminalLineVoltage(terminal: nextTerm), VA: terminal.VA, connection: terminal.connection, isReference: isRef)
+            }
+        }
         
     }
     

@@ -13,11 +13,11 @@
 		D314456724C224650084DEC5 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314456624C224650084DEC5 /* Segment.swift */; };
 		D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */; };
 		D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D38833E024CCC1C400A0C7A5 /* Preferences.xib */; };
+		D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */; };
 		D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */; };
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
-		F5910E9C24D8B30A00B6EEC5 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5910E9B24D8B30A00B6EEC5 /* TerminalsView.swift */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5A0F06224C6231000C4CFE8 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */; };
 		F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */; };
@@ -36,11 +36,11 @@
 		D314456624C224650084DEC5 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 		D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDialog.swift; sourceTree = "<group>"; };
 		D38833E024CCC1C400A0C7A5 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
+		D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
 		D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_BaseClass_DialogBox.swift; path = "../../../../Dropbox/MyProjects/Base Classes/PCH_BaseClass_DialogBox.swift"; sourceTree = "<group>"; };
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
-		F5910E9B24D8B30A00B6EEC5 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -93,7 +93,7 @@
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
 				F5ED558C24C32659002E7031 /* Terminal.swift */,
-				F5910E9B24D8B30A00B6EEC5 /* TerminalsView.swift */,
+				D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */,
 				D314456624C224650084DEC5 /* Segment.swift */,
 				D3E307E324C2473A00FDAA83 /* Layer.swift */,
 				D314455A24C220A00084DEC5 /* Assets.xcassets */,
@@ -186,7 +186,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */,
-				F5910E9C24D8B30A00B6EEC5 /* TerminalsView.swift in Sources */,
+				D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */,
 				D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */,
 				F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */,
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,

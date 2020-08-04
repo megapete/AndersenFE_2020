@@ -8,11 +8,29 @@
 
 import Cocoa
 
-class TerminalsView: NSViewController {
+class TerminalsView: NSView {
+    
+    var termFields:[NSTextField] = []
+    
+    override func awakeFromNib() {
+        
+        for nextView in self.subviews
+        {
+            if let nextField = nextView as? NSTextField
+            {
+                self.termFields.append(nextField)
+            }
+        }
+        
+        self.termFields.sort(by: {$0.tag < $1.tag})
+        
+        DLog("Textfield count: \(termFields.count)")
+    }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        // Drawing code here.
     }
     
 }

@@ -158,7 +158,7 @@ class Transformer:Codable {
             useTurns = NoLoadTurns(terminal: terminal)
         }
         
-        return VpN * useTurns * phaseFactor * autoFactor
+        return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
@@ -214,6 +214,7 @@ class Transformer:Codable {
         return result
     }
     
+    /// Signed value representing the number of turns associated with the give terminal
     func CurrentCarryingTurns(terminal:Int) -> Double
     {
         var result = 0.0

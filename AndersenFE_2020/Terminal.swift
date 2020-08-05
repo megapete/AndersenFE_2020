@@ -14,8 +14,8 @@ struct Terminal: Codable
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String
     
-    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts
-    let voltage:Double
+    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings
+    var voltage:Double
     
     /// The total (1-ph or 3-ph) VA for the Terminal
     let VA:Double

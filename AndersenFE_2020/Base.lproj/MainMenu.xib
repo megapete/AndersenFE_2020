@@ -22,6 +22,7 @@
         <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
+                <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
@@ -808,9 +809,29 @@
                                     </scrollView>
                                 </subviews>
                             </customView>
-                            <customView fixedFrame="YES" id="VHp-aJ-QOo">
+                            <customView fixedFrame="YES" id="VHp-aJ-QOo" customClass="DataView" customModule="AndersenFE_2020" customModuleProvider="target">
                                 <rect key="frame" x="554" y="0.0" width="180" height="720"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <subviews>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="eFz-0U-JKl">
+                                        <rect key="frame" x="20" y="644" width="140" height="56"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Volts per Turn" drawsBackground="YES" id="rTb-c6-sLq">
+                                            <font key="font" usesAppearanceFont="YES"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="IXf-LW-In8">
+                                        <rect key="frame" x="20" y="589" width="140" height="45"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Ampere Turns" drawsBackground="YES" id="Iwe-UW-lIc">
+                                            <font key="font" usesAppearanceFont="YES"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
                             </customView>
                             <customView fixedFrame="YES" id="JKq-ah-7fY" customClass="TerminalsView" customModule="AndersenFE_2020" customModuleProvider="target">
                                 <rect key="frame" x="744" y="0.0" width="164" height="720"/>

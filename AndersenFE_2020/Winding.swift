@@ -314,58 +314,45 @@ class Winding:Codable {
         self.layers = srcWdg.layers
     }
     
-    /// The AmpTurns calculation is necessarily a bit convoluted due to the (unlikely) possibility that some Layers of a given Winding may have opposite current directions
-    func AmpTurns(voltsPerTurn:Double) -> Double
-    {
-        let phaseFactor = (self.terminal.connection == .single_phase ? 1.0 : 3.0)
-        let legVA = self.terminal.VA / phaseFactor
-        let legVolts = voltsPerTurn * self.RealTurns()
-        let legAmps = legVA / legVolts
-        
-        let result = legAmps * ActiveTurns()
-        
-        return result
-    }
     
-    /// RealTurns is the same as ActiveTurns multiplied by the current direction of each layer. This is needed in case one or more Layers of this Winding have opposing current directions.
-    func RealTurns() -> Double
+    
+    
+    /// The current-carrying turns are the effective turns, and a SIGNED quantity, depending on the current direction
+    func CurrentCarryingTurns() -> Double
     {
         var result = 0.0
+        
+        let parallelFactor = self.isDoubleStack ? 2.0 : 1.0
         
         for nextLayer in self.layers
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.activeTurns * Double(nextLayer.currentDirection)
+                result += nextSegment.totalTurns * Double(nextLayer.currentDirection)
             }
         }
         
-        return result
+        return result / parallelFactor
     }
     
-    /// Effective turns are the active turns but take into account whether the winding is in two parallel sections
-    func EffectiveTurns() -> Double
-    {
-        let effectiveFactor = (self.isDoubleStack ? 2.0 : 1.0)
-        
-        return self.ActiveTurns() / effectiveFactor
-    }
-    
-    /// Active turns are the active turns WITHOUT taking into account whether the winding is in two parallel sections
-    func ActiveTurns() -> Double
+    /// The no-load turns are the effective turns that make up the winding, regardless of whether they carry current.
+    func NoLoadTurns() -> Double
     {
         var result = 0.0
+        
+        let parallelFactor = self.isDoubleStack ? 2.0 : 1.0
         
         for nextLayer in self.layers
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.activeTurns
+                result += nextSegment.totalTurns
             }
         }
         
-        return result
+        return result / parallelFactor
     }
+    
     
     /// Initialize the 'layers' array based on the data currently in this Winding's properties. The old 'layers' array will be cleared.
     /// - Parameter windingCenter: The center of this Winding

@@ -80,6 +80,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
     @IBOutlet weak var termsView: TerminalsView!
+    @IBOutlet weak var dataView: DataView!
     
     
     // set up our preference switches
@@ -204,6 +205,8 @@ class AppController: NSObject, NSMenuItemValidation {
         
         self.termsView.InitializeFields()
         
+        self.dataView.InitializeFields()
+        
         self.updateViews()
     }
     
@@ -259,6 +262,14 @@ class AppController: NSObject, NSMenuItemValidation {
                 self.termsView.SetTermData(termNum: nextTerm, name: terminal.name, displayVolts: txfo.TerminalLineVoltage(terminal: nextTerm), VA: terminal.VA, connection: terminal.connection, isReference: isRef)
             }
         }
+        
+        if let vpn = txfo.VoltsPerTurn()
+        {
+            self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
+        }
+        
+        self.dataView.SetAmpereTurns(newNI: txfo.AmpTurns())
+        
         
     }
     

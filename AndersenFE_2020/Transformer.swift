@@ -105,6 +105,7 @@ class Transformer:Codable {
         return result
     }
     
+    /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, the no-load voltage of the sum of all the turns (active or not) of teh terminal is calculated.
     func TerminalLineVoltage(terminal:Int) -> Double
     {
         guard let term = self.TerminalFromAndersenNumber(termNum: terminal) else
@@ -133,8 +134,17 @@ class Transformer:Codable {
                 {
                     if cTerm.connection == .auto_common
                     {
-                        let commonTurns = EffectiveTurns(terminal: cTerm.andersenNumber)
-                        let seriesTurns = EffectiveTurns(terminal: terminal)
+                        var commonTurns = CurrentCarryingTurns(terminal: cTerm.andersenNumber)
+                        if commonTurns == 0
+                        {
+                            commonTurns = NoLoadTurns(terminal: cTerm.andersenNumber)
+                        }
+                        
+                        var seriesTurns = CurrentCarryingTurns(terminal: terminal)
+                        if seriesTurns == 0
+                        {
+                            seriesTurns = NoLoadTurns(terminal: terminal)
+                        }
                         
                         autoFactor = (seriesTurns + commonTurns) / commonTurns
                     }
@@ -142,7 +152,13 @@ class Transformer:Codable {
             }
         }
         
-        return VpN * EffectiveTurns(terminal: terminal) * phaseFactor * autoFactor
+        var useTurns = CurrentCarryingTurns(terminal: terminal)
+        if useTurns == 0
+        {
+            useTurns = NoLoadTurns(terminal: terminal)
+        }
+        
+        return VpN * useTurns * phaseFactor * autoFactor
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
@@ -150,22 +166,12 @@ class Transformer:Codable {
     {
         var result:Double = 0.0
         
-        if let vPn = self.VoltsPerTurn()
-        {
-            for nextWdg in self.windings
-            {
-                result += nextWdg.AmpTurns(voltsPerTurn: vPn)
-            }
-        }
-        else
-        {
-            return nil
-        }
+        
         
         return result
     }
     
-    /// Calculate the V/N for the transformer given the reference terminal number.
+    /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the SUM of all the voltages for the terminal. Note that in the event that the reference terminal has 0 active turns, its no-load voltage sum (and turns) are used.
     func VoltsPerTurn() -> Double?
     {
         guard let refTerm = self.refTermNum else
@@ -178,16 +184,37 @@ class Transformer:Codable {
             return nil
         }
         
-        let legFactor = (terminal.connection == .wye || terminal.connection == .auto_common || terminal.connection == .auto_series ? SQRT3 : 1.0)
-        let legVolts = terminal.voltage / legFactor
+        var result = 0.0
         
-        let result = legVolts / self.ActiveTurns(terminal: refTerm)
+        let legFactor = (terminal.connection == .wye || terminal.connection == .auto_common || terminal.connection == .auto_series ? SQRT3 : 1.0)
+        
+        var voltageSum = 0.0
+        var noloadVoltageSum = 0.0
+        for nextWdg in self.windings
+        {
+            if nextWdg.terminal.andersenNumber == refTerm
+            {
+                noloadVoltageSum += nextWdg.terminal.voltage
+                
+                voltageSum += nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * nextWdg.terminal.voltage
+            }
+        }
+        
+        var turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
+        
+        if turnsToUse == 0
+        {
+            // use the no-load turns & voltage
+            turnsToUse = self.NoLoadTurns(terminal: refTerm)
+            voltageSum = noloadVoltageSum
+        }
+        
+        result = voltageSum / legFactor / turnsToUse
         
         return result
     }
     
-    /// The effective turns are active turns and takes into account whether the winding is a double-stack
-    func EffectiveTurns(terminal:Int) -> Double
+    func CurrentCarryingTurns(terminal:Int) -> Double
     {
         var result = 0.0
         
@@ -195,15 +222,14 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                result += nextWdg.EffectiveTurns()
+                result += nextWdg.CurrentCarryingTurns()
             }
         }
         
         return result
     }
     
-    /// Return the number of currently-active turns for the winding. Note that this is the total number of active "wound" turns (ie: whether or not the winding is a double-stack does not enter into the calculation) (NOTE: not sure how multi-start windings will be handled)
-    func ActiveTurns(terminal:Int) -> Double
+    func NoLoadTurns(terminal:Int) -> Double
     {
         var result = 0.0
         
@@ -211,7 +237,7 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                result += nextWdg.ActiveTurns()
+                result += nextWdg.NoLoadTurns()
             }
         }
         
@@ -759,6 +785,12 @@ class Transformer:Codable {
                 let internalRadialTurnIns = (wdgType == .helix && numRadialDucts > 0 ? radialDuctDimn * Double(numRadialDucts) : 0.0)
                 
                 let turnDef = Winding.TurnDefinition(strandA: strandAxialDimn, strandR: strandRadialDimn, type: cableType, numStrands: numStrandsCTC, numCablesAxial: numAxialCables, numCablesRadial: numRadialCables, strandInsulation: strandInsulation, cableInsulation: cableInsulation, internalRadialInsulation: internalRadialTurnIns, internalAxialInsulation: internalTurnInsulation)
+                
+                // fix the terminal voltage for double-stacked windings
+                if (isDoubleStack)
+                {
+                    terminals[termIndex - 1]!.voltage /= 2.0
+                }
                 
                 let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
                 

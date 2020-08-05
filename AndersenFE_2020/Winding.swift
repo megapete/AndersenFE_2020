@@ -314,6 +314,44 @@ class Winding:Codable {
         self.layers = srcWdg.layers
     }
     
+    func AmpTurns(voltsPerTurn:Double) -> Double
+    {
+        var result = 0.0
+        
+        let phaseFactor = (self.terminal.connection == .single_phase ? 1.0 : 3.0)
+        let legVA = self.terminal.VA / phaseFactor
+        let legVolts = voltsPerTurn * self.ActiveTurns()
+        let legAmps = legVA / legVolts
+        
+        return result
+    }
+    
+    /// Effective turns are the active turns but take into account whether the winding is in two parallel sections
+    func EffectiveTurns() -> Double
+    {
+        var result = 0.0
+        
+        let effectiveFactor = (self.isDoubleStack ? 2.0 : 1.0)
+        
+        return result / effectiveFactor
+    }
+    
+    /// Active turns are the active turns WITHOUT taking into account whether the winding is in two parallel sections
+    func ActiveTurns() -> Double
+    {
+        var result = 0.0
+        
+        for nextLayer in self.layers
+        {
+            for nextSegment in nextLayer.segments
+            {
+                result += nextSegment.activeTurns
+            }
+        }
+        
+        return result
+    }
+    
     /// Initialize the 'layers' array based on the data currently in this Winding's properties. The old 'layers' array will be cleared.
     /// - Parameter windingCenter: The center of this Winding
     /// - Throws: Errors caused by unimplemented features or design errors

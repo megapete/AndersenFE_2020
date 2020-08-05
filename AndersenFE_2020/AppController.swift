@@ -170,7 +170,6 @@ class AppController: NSObject, NSMenuItemValidation {
         let width = height * aspectRatio
         self.txfoView.setBoundsSize(NSSize(width: width, height: height))
     }
-    
     @IBAction func handleTestTermView(_ sender: Any) {
         termsView.SetTermData(termNum: 5, name: "TEST", displayVolts: 123000.0, VA: 47000000, connection: .auto_common)
     }

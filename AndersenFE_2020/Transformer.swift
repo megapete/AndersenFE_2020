@@ -175,15 +175,7 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                let effectiveFactor = (nextWdg.isDoubleStack ? 2.0 : 1.0)
-                
-                for nextLayer in nextWdg.layers
-                {
-                    for nextSegment in nextLayer.segments
-                    {
-                        result += nextSegment.activeTurns / effectiveFactor
-                    }
-                }
+                result += nextWdg.EffectiveTurns()
             }
         }
         
@@ -199,13 +191,7 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                for nextLayer in nextWdg.layers
-                {
-                    for nextSegment in nextLayer.segments
-                    {
-                        result += nextSegment.activeTurns
-                    }
-                }
+                result += nextWdg.ActiveTurns()
             }
         }
         

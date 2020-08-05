@@ -314,14 +314,31 @@ class Winding:Codable {
         self.layers = srcWdg.layers
     }
     
+    /// The AmpTurns calculation is necessarily a bit convoluted due to the (unlikely) possibility that some Layers of a given Winding may have opposite current directions
     func AmpTurns(voltsPerTurn:Double) -> Double
+    {
+        let phaseFactor = (self.terminal.connection == .single_phase ? 1.0 : 3.0)
+        let legVA = self.terminal.VA / phaseFactor
+        let legVolts = voltsPerTurn * self.RealTurns()
+        let legAmps = legVA / legVolts
+        
+        let result = legAmps * ActiveTurns()
+        
+        return result
+    }
+    
+    /// RealTurns is the same as ActiveTurns multiplied by the current direction of each layer. This is needed in case one or more Layers of this Winding have opposing current directions.
+    func RealTurns() -> Double
     {
         var result = 0.0
         
-        let phaseFactor = (self.terminal.connection == .single_phase ? 1.0 : 3.0)
-        let legVA = self.terminal.VA / phaseFactor
-        let legVolts = voltsPerTurn * self.ActiveTurns()
-        let legAmps = legVA / legVolts
+        for nextLayer in self.layers
+        {
+            for nextSegment in nextLayer.segments
+            {
+                result += nextSegment.activeTurns * Double(nextLayer.currentDirection)
+            }
+        }
         
         return result
     }
@@ -329,11 +346,9 @@ class Winding:Codable {
     /// Effective turns are the active turns but take into account whether the winding is in two parallel sections
     func EffectiveTurns() -> Double
     {
-        var result = 0.0
-        
         let effectiveFactor = (self.isDoubleStack ? 2.0 : 1.0)
         
-        return result / effectiveFactor
+        return self.ActiveTurns() / effectiveFactor
     }
     
     /// Active turns are the active turns WITHOUT taking into account whether the winding is in two parallel sections

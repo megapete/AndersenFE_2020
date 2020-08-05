@@ -145,6 +145,26 @@ class Transformer:Codable {
         return VpN * EffectiveTurns(terminal: terminal) * phaseFactor * autoFactor
     }
     
+    /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
+    func AmpTurns() -> Double?
+    {
+        var result:Double = 0.0
+        
+        if let vPn = self.VoltsPerTurn()
+        {
+            for nextWdg in self.windings
+            {
+                result += nextWdg.AmpTurns(voltsPerTurn: vPn)
+            }
+        }
+        else
+        {
+            return nil
+        }
+        
+        return result
+    }
+    
     /// Calculate the V/N for the transformer given the reference terminal number.
     func VoltsPerTurn() -> Double?
     {

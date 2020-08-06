@@ -168,17 +168,43 @@ class Transformer:Codable {
             return nil
         }
         
-        return 0.0
+        guard let vpn = self.VoltsPerTurn() else {
+            
+            return nil
+        }
         
+        let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.VA
+        
+        return va / vpn
         
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
-    func AmpTurns() -> Double?
+    func AmpTurns(forceBalance:Bool) -> Double?
     {
         var result:Double = 0.0
         
-        
+        if forceBalance
+        {
+            guard let refTermNI = self.ReferenceOnanAmpTurns() else {
+                
+                let alert = NSAlert()
+                alert.messageText = "A reference terminal must be defined! The program will now likely crash"
+                let _ = alert.runModal()
+                return nil
+            }
+            
+            
+        }
+        else
+        {
+            // This branch simply uses the current VA and voltage (calculated using the current V/N, if any) to calculate total amp-turns and allows non-zero results (ie: the user has to figure it out)
+            let alert = NSAlert()
+            alert.messageText = "Unimplemented function, probably about to crash!"
+            let _ = alert.runModal()
+            ALog("This is not yet implemented!")
+            return nil
+        }
         
         return result
     }
@@ -323,7 +349,7 @@ class Transformer:Codable {
         {
             nextWdg.layers.removeAll()
             
-            nextWdg.preferences = prefs
+            nextWdg.preferences = prefs.wdgPrefs
             
             do {
                 
@@ -805,7 +831,7 @@ class Transformer:Codable {
                     terminals[termIndex - 1]!.voltage /= 2.0
                 }
                 
-                let newWinding = Winding(preferences: prefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
+                let newWinding = Winding(preferences: prefs.wdgPrefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
                 
                 self.windings.append(newWinding)
             }

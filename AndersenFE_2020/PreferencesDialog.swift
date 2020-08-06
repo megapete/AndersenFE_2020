@@ -18,6 +18,7 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var multiStartElHtCenters: NSButton!
     @IBOutlet weak var defaultRefTerm2CheckBox: NSButton!
     @IBOutlet weak var useAndersenCheckBox: NSButton!
+    @IBOutlet weak var forceAmpTurnBalanceCheckBox: NSButton!
     
     
     var modelRadialDucts:Bool
@@ -28,8 +29,9 @@ class PreferencesDialog: PCH_DialogBox {
     var multiStartElecHtIsToCenters:Bool
     var defaultRefTerm2:Bool
     var useAndersenFLD12:Bool
+    var forceAmpTurnBalance:Bool
     
-    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool, useAndersenFLD12:Bool) {
+    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool, useAndersenFLD12:Bool, forceAmpTurnBalance:Bool) {
         
         self.scopeLabel = scopeLabel
         self.modelRadialDucts = modelRadialDucts
@@ -39,6 +41,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.multiStartElecHtIsToCenters = multiStartElecHtIsToCenters
         self.defaultRefTerm2 = defaultRefTerm2
         self.useAndersenFLD12 = useAndersenFLD12
+        self.forceAmpTurnBalance = forceAmpTurnBalance
         
         super.init(viewNibFileName: "Preferences", windowTitle: "Preferences", hideCancel: true)
     }
@@ -53,6 +56,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.multiStartElHtCenters.state = (self.multiStartElecHtIsToCenters ? .on : .off)
         self.defaultRefTerm2CheckBox.state = (self.defaultRefTerm2 ? .on : .off)
         self.useAndersenCheckBox.state = (self.useAndersenFLD12 ? .on : .off)
+        self.forceAmpTurnBalanceCheckBox.state = (self.forceAmpTurnBalance ? .on : .off)
     }
     
     @IBAction func handleRadialDucts(_ sender: Any) {
@@ -88,6 +92,11 @@ class PreferencesDialog: PCH_DialogBox {
     @IBAction func handleUseAndersenFLD12(_ sender: Any) {
         
         self.useAndersenFLD12 = self.useAndersenCheckBox.state == .on
+    }
+    
+    @IBAction func handleForceAmpTurnBalance(_ sender: Any) {
+        
+        self.forceAmpTurnBalance = self.forceAmpTurnBalanceCheckBox.state == .on
     }
     
 }

@@ -22,7 +22,7 @@ class Winding:Codable {
     }
     
     /// Each winding has its own "preferences", which can be changed by the user
-    var preferences:PCH_AFE2020_Prefs
+    var preferences:PCH_AFE2020_Prefs.WindingPrefs
     
     /// The type of winding
     var wdgType:WindingType
@@ -282,7 +282,7 @@ class Winding:Codable {
     }
     
     /// Designated initializer for the class, does not set the 'layers' member (the calling routine must call InitializeLayers to come up with an array of default Layers)
-    init(preferences: PCH_AFE2020_Prefs, wdgType: WindingType, isSpiral:Bool, isDoubleStack:Bool, numTurns:NumberOfTurns, elecHt:Double, numAxialSections:Int, radialSpacer:RadialSpacer, numAxialColumns:Int, numRadialSections:Int, radialInsulation:Double, ducts:RadialDucts, numRadialSupports:Int, turnDef:TurnDefinition, axialGaps:AxialGaps, bottomEdgePack:Double, coilID:Double, radialOverbuild:Double, groundClearance:Double, terminal:Terminal)
+    init(preferences: PCH_AFE2020_Prefs.WindingPrefs, wdgType: WindingType, isSpiral:Bool, isDoubleStack:Bool, numTurns:NumberOfTurns, elecHt:Double, numAxialSections:Int, radialSpacer:RadialSpacer, numAxialColumns:Int, numRadialSections:Int, radialInsulation:Double, ducts:RadialDucts, numRadialSupports:Int, turnDef:TurnDefinition, axialGaps:AxialGaps, bottomEdgePack:Double, coilID:Double, radialOverbuild:Double, groundClearance:Double, terminal:Terminal)
     {
         self.preferences = preferences
         self.wdgType = wdgType

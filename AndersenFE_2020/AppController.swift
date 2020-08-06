@@ -25,6 +25,8 @@ let MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY = "PCH_AFE2020_MultiStartElecHeigh
 let DEFAULT_REFERENCE_TERMINAL_2_KEY = "PCH_AFE2020_DefaultReferenceTerminal2"
 // Key to default to using the Andersen FLD12 program for finite-element calculations
 let USE_ANDERSEN_FLD12_PROGRAM_KEY = "PCH_AFE2020_UseAndersenFLD12"
+// Key to default to letting the program force Ampere-Turn balance at all times
+let FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY = "PCH_AFE2020_ForceAmpereTurnBalance"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -35,13 +37,23 @@ let AFE2020_EXTENSION = "afe2020"
 // 3) SOme preferences are obviously not intended to be "saved" along with the file (like the "useAndersenFLD12" oreference) but they still will be. This shouldn't be an issue for now, but I will need to decide how to treat these things.
 struct PCH_AFE2020_Prefs:Codable {
     
-    var modelRadialDucts:Bool
-    var model0Terminals:Bool
-    var modelInternalLayerTaps:Bool
-    var upperLowerAxialGapsAreSymmetrical:Bool
-    var multiStartElecHtIsToCenter:Bool
-    var defaultRefTerm2:Bool
-    var useAndersenFLD12:Bool
+    struct WindingPrefs:Codable {
+        var modelRadialDucts:Bool
+        var model0Terminals:Bool
+        var modelInternalLayerTaps:Bool
+        var upperLowerAxialGapsAreSymmetrical:Bool
+        var multiStartElecHtIsToCenter:Bool
+    }
+    
+    var wdgPrefs:WindingPrefs
+    
+    struct GeneralPrefs:Codable {
+        var defaultRefTerm2:Bool
+        var useAndersenFLD12:Bool
+        var forceAmpTurnBalance:Bool
+    }
+    
+    var generalPrefs:GeneralPrefs
 }
 
 // Struct to save transformers to disk (this may grow with time)
@@ -74,7 +86,8 @@ class AppController: NSObject, NSMenuItemValidation {
     
     
     // Preferences
-    var preferences = PCH_AFE2020_Prefs(modelRadialDucts:false, model0Terminals:false, modelInternalLayerTaps:false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true, defaultRefTerm2: true, useAndersenFLD12: true)
+    var preferences = PCH_AFE2020_Prefs(wdgPrefs: PCH_AFE2020_Prefs.WindingPrefs(modelRadialDucts: false, model0Terminals: false, modelInternalLayerTaps: false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true), generalPrefs: PCH_AFE2020_Prefs.GeneralPrefs(defaultRefTerm2: true, useAndersenFLD12: true, forceAmpTurnBalance: true))
+    
     
     // UI elements
     @IBOutlet weak var mainWindow: NSWindow!
@@ -87,32 +100,38 @@ class AppController: NSObject, NSMenuItemValidation {
     override func awakeFromNib() {
         
         // The default (original) values for these Bools is false anyway, so it doesn't matter if they don't exist
-        self.preferences.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
-        self.preferences.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
-        self.preferences.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+        self.preferences.wdgPrefs.modelRadialDucts = UserDefaults.standard.bool(forKey: MODEL_RADIAL_DUCTS_KEY)
+        self.preferences.wdgPrefs.model0Terminals = UserDefaults.standard.bool(forKey: MODEL_ZERO_TERMINALS_KEY)
+        self.preferences.wdgPrefs.modelInternalLayerTaps = UserDefaults.standard.bool(forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
         
         // The default (original) value for this Bool is true, so test to make sure it exists
         if UserDefaults.standard.object(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY) != nil
         {
-            self.preferences.upperLowerAxialGapsAreSymmetrical = UserDefaults.standard.bool(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
+            self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical = UserDefaults.standard.bool(forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
         }
         
         // The default (original) value for this Bool is true, so test to make sure it exists
         if UserDefaults.standard.object(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY) != nil
         {
-            self.preferences.multiStartElecHtIsToCenter = UserDefaults.standard.bool(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
+            self.preferences.wdgPrefs.multiStartElecHtIsToCenter = UserDefaults.standard.bool(forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
         }
         
         // The default (original) value for this Bool is true, so test to make sure it exists
         if UserDefaults.standard.object(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY) != nil
         {
-            self.preferences.defaultRefTerm2 = UserDefaults.standard.bool(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
+            self.preferences.generalPrefs.defaultRefTerm2 = UserDefaults.standard.bool(forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
         }
         
         // The default (original) value for this Bool is true, so test to make sure it exists
         if UserDefaults.standard.object(forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY) != nil
         {
-            self.preferences.useAndersenFLD12 = UserDefaults.standard.bool(forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
+            self.preferences.generalPrefs.useAndersenFLD12 = UserDefaults.standard.bool(forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
+        }
+        
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY) != nil
+        {
+            self.preferences.generalPrefs.forceAmpTurnBalance = UserDefaults.standard.bool(forKey: FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY)
         }
         
         // Set up things for the views
@@ -268,7 +287,7 @@ class AppController: NSObject, NSMenuItemValidation {
             self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
         }
         
-        self.dataView.SetAmpereTurns(newNI: txfo.AmpTurns())
+        self.dataView.SetAmpereTurns(newNI: txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance))
         
         
     }
@@ -294,58 +313,58 @@ class AppController: NSObject, NSMenuItemValidation {
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.modelRadialDucts, modelZeroTerms: self.preferences.model0Terminals, modelLayerTaps: self.preferences.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.defaultRefTerm2, useAndersenFLD12: self.preferences.useAndersenFLD12)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.wdgPrefs.modelRadialDucts, modelZeroTerms: self.preferences.wdgPrefs.model0Terminals, modelLayerTaps: self.preferences.wdgPrefs.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.wdgPrefs.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.generalPrefs.defaultRefTerm2, useAndersenFLD12: self.preferences.generalPrefs.useAndersenFLD12, forceAmpTurnBalance: self.preferences.generalPrefs.forceAmpTurnBalance)
         
         let _ = prefDlog.runModal()
         
         var txfoNeedsUpdate = false
         
-        if prefDlog.modelRadialDucts != self.preferences.modelRadialDucts
+        if prefDlog.modelRadialDucts != self.preferences.wdgPrefs.modelRadialDucts
         {
-            self.preferences.modelRadialDucts = !self.preferences.modelRadialDucts
-            UserDefaults.standard.set(self.preferences.modelRadialDucts, forKey: MODEL_RADIAL_DUCTS_KEY)
+            self.preferences.wdgPrefs.modelRadialDucts = !self.preferences.wdgPrefs.modelRadialDucts
+            UserDefaults.standard.set(self.preferences.wdgPrefs.modelRadialDucts, forKey: MODEL_RADIAL_DUCTS_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.modelZeroTerms != self.preferences.model0Terminals
+        if prefDlog.modelZeroTerms != self.preferences.wdgPrefs.model0Terminals
         {
-            self.preferences.model0Terminals = !self.preferences.model0Terminals
-            UserDefaults.standard.set(self.preferences.model0Terminals, forKey: MODEL_ZERO_TERMINALS_KEY)
+            self.preferences.wdgPrefs.model0Terminals = !self.preferences.wdgPrefs.model0Terminals
+            UserDefaults.standard.set(self.preferences.wdgPrefs.model0Terminals, forKey: MODEL_ZERO_TERMINALS_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.modelLayerTaps != self.preferences.modelInternalLayerTaps
+        if prefDlog.modelLayerTaps != self.preferences.wdgPrefs.modelInternalLayerTaps
         {
-            self.preferences.modelInternalLayerTaps = !self.preferences.modelInternalLayerTaps
-            UserDefaults.standard.set(self.preferences.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
+            self.preferences.wdgPrefs.modelInternalLayerTaps = !self.preferences.wdgPrefs.modelInternalLayerTaps
+            UserDefaults.standard.set(self.preferences.wdgPrefs.modelInternalLayerTaps, forKey: MODEL_INTERNAL_LAYER_TAPS_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.upperLowerGapsAreSymmetric != self.preferences.upperLowerAxialGapsAreSymmetrical
+        if prefDlog.upperLowerGapsAreSymmetric != self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical
         {
-            self.preferences.upperLowerAxialGapsAreSymmetrical = !self.preferences.upperLowerAxialGapsAreSymmetrical
-            UserDefaults.standard.set(self.preferences.upperLowerAxialGapsAreSymmetrical, forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
+            self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical = !self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical
+            UserDefaults.standard.set(self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical, forKey: UPPER_AND_LOWER_AXIAL_GAPS_SYMMETRIC_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.multiStartElecHtIsToCenters != self.preferences.multiStartElecHtIsToCenter
+        if prefDlog.multiStartElecHtIsToCenters != self.preferences.wdgPrefs.multiStartElecHtIsToCenter
         {
-            self.preferences.multiStartElecHtIsToCenter = !self.preferences.multiStartElecHtIsToCenter
-            UserDefaults.standard.set(self.preferences.multiStartElecHtIsToCenter, forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
+            self.preferences.wdgPrefs.multiStartElecHtIsToCenter = !self.preferences.wdgPrefs.multiStartElecHtIsToCenter
+            UserDefaults.standard.set(self.preferences.wdgPrefs.multiStartElecHtIsToCenter, forKey: MULTI_START_ELECTRIC_HEIGHT_TO_CENTER_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.defaultRefTerm2 != self.preferences.defaultRefTerm2
+        if prefDlog.defaultRefTerm2 != self.preferences.generalPrefs.defaultRefTerm2
         {
-            self.preferences.defaultRefTerm2 = !self.preferences.defaultRefTerm2
-            UserDefaults.standard.set(self.preferences.defaultRefTerm2, forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
+            self.preferences.generalPrefs.defaultRefTerm2 = !self.preferences.generalPrefs.defaultRefTerm2
+            UserDefaults.standard.set(self.preferences.generalPrefs.defaultRefTerm2, forKey: DEFAULT_REFERENCE_TERMINAL_2_KEY)
             txfoNeedsUpdate = true
         }
         
-        if prefDlog.useAndersenFLD12 != self.preferences.useAndersenFLD12
+        if prefDlog.useAndersenFLD12 != self.preferences.generalPrefs.useAndersenFLD12
         {
-            self.preferences.useAndersenFLD12 = !self.preferences.useAndersenFLD12
-            UserDefaults.standard.set(self.preferences.useAndersenFLD12, forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
+            self.preferences.generalPrefs.useAndersenFLD12 = !self.preferences.generalPrefs.useAndersenFLD12
+            UserDefaults.standard.set(self.preferences.generalPrefs.useAndersenFLD12, forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
             // don't update the transformer for this
         }
         
@@ -548,7 +567,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 // if we make it here, we have successfully opened the file, so save it as the "last successfully opened file"
                 UserDefaults.standard.set(fileURL, forKey: LAST_OPENED_INPUT_FILE_KEY)
                 
-                if self.preferences.defaultRefTerm2
+                if self.preferences.generalPrefs.defaultRefTerm2
                 {
                     newTxfo.refTermNum = 2
                 }

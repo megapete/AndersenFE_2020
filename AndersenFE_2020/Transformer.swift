@@ -173,7 +173,7 @@ class Transformer:Codable {
             return nil
         }
         
-        let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.VA
+        let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.legVA
         
         return va / vpn
         
@@ -194,7 +194,16 @@ class Transformer:Codable {
                 return nil
             }
             
+            let nonRefTerms = self.AvailableTerminals().subtracting([self.refTermNum!])
             
+            if nonRefTerms.count == 1
+            {
+                // easy
+            }
+            else
+            {
+                // less easy
+            }
         }
         else
         {

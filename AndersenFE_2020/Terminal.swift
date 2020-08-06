@@ -20,15 +20,20 @@ struct Terminal: Codable
     /// The total (1-ph or 3-ph) VA for the Terminal
     let VA:Double
     
+    var legVA:Double {
+        get {
+            let phaseFactor = self.connection == .single_phase_one_leg ? 1.0 : self.connection == .single_phase_two_legs ? 2.0 : 3.0
+            return self.VA / phaseFactor
+        }
+    }
+    
     /// The nominal ONAN leg amps of the Terminal (winding)
     var NominalOnanAmps:Double {
         get {
-            
-            let phaseFactor = self.connection == .single_phase ? 1.0 : 3.0
-            let legVA = self.VA / phaseFactor
+    
             let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
             
-            let result = legVA / (self.voltage / connFactor)
+            let result = self.legVA / (self.voltage / connFactor)
             
             return result
         }
@@ -36,13 +41,14 @@ struct Terminal: Codable
     
     /// Possible Terminal connections
     enum TerminalConnection:Int, Codable {
-        case single_phase = 1
-        case wye = 2
-        case delta = 3
-        case auto_common = 4
-        case auto_series = 5
-        case zig = 6
-        case zag = 7
+        case single_phase_one_leg
+        case single_phase_two_legs
+        case wye
+        case delta
+        case auto_common
+        case auto_series
+        case zig
+        case zag
     }
     
     static func StringForConnection(connection:TerminalConnection) -> String

@@ -314,9 +314,6 @@ class Winding:Codable {
         self.layers = srcWdg.layers
     }
     
-    
-    
-    
     /// The current-carrying turns are the effective turns, and a SIGNED quantity, depending on the current direction
     func CurrentCarryingTurns() -> Double
     {

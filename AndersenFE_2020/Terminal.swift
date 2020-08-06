@@ -14,11 +14,25 @@ struct Terminal: Codable
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String
     
-    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings
+    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings)
     var voltage:Double
     
     /// The total (1-ph or 3-ph) VA for the Terminal
     let VA:Double
+    
+    /// The nominal ONAN leg amps of the Terminal (winding)
+    var NominalOnanAmps:Double {
+        get {
+            
+            let phaseFactor = self.connection == .single_phase ? 1.0 : 3.0
+            let legVA = self.VA / phaseFactor
+            let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
+            
+            let result = legVA / (self.voltage / connFactor)
+            
+            return result
+        }
+    }
     
     /// Possible Terminal connections
     enum TerminalConnection:Int, Codable {

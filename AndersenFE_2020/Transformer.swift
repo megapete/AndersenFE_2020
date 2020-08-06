@@ -161,6 +161,18 @@ class Transformer:Codable {
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
+    func ReferenceOnanAmpTurns() -> Double?
+    {
+        guard let refTerm = self.refTermNum else
+        {
+            return nil
+        }
+        
+        return 0.0
+        
+        
+    }
+    
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
     func AmpTurns() -> Double?
     {

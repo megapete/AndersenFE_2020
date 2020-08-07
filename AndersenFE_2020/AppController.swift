@@ -267,19 +267,30 @@ class AppController: NSObject, NSMenuItemValidation {
         
         for nextTerm in termSet
         {
-            if let terminal = txfo.TerminalFromAndersenNumber(termNum: nextTerm)
+            var terminals:[Terminal] = []
+            do
             {
-                var isRef = false
-                if let refTerm = txfo.refTermNum
-                {
-                    if refTerm == nextTerm
-                    {
-                        isRef = true
-                    }
-                }
-                
-                self.termsView.SetTermData(termNum: nextTerm, name: terminal.name, displayVolts: txfo.TerminalLineVoltage(terminal: nextTerm), VA: terminal.VA, connection: terminal.connection, isReference: isRef)
+                terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
             }
+            catch
+            {
+                // There are no terminals with this number. Theoretically, this can never happen.
+                let alert = NSAlert(error: error)
+                let _ = alert.runModal()
+                return
+            }
+            
+            var isRef = false
+            if let refTerm = txfo.refTermNum
+            {
+                if refTerm == nextTerm
+                {
+                    isRef = true
+                }
+            }
+            
+            self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: txfo.TerminalLineVoltage(terminal: nextTerm), VA: terminals[0].VA, connection: terminals[0].connection, isReference: isRef)
+            
         }
         
         if let vpn = txfo.VoltsPerTurn()

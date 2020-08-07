@@ -18,7 +18,7 @@ struct Terminal: Codable
     var voltage:Double
     
     /// The total (1-ph or 3-ph) VA for the Terminal
-    let VA:Double
+    var VA:Double
     
     var legVA:Double {
         get {

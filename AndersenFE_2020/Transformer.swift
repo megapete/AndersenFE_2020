@@ -59,6 +59,42 @@ class Transformer:Codable {
         return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum)
     }
     
+    /// Some errors that can be thrown by various routines
+    struct TransformerErrors:Error
+    {
+        enum errorType
+        {
+            case NoReferenceTerminalDefined
+            case NoSuchTerminalNumber
+            case UnimplementedFeature
+        }
+        
+        let info:String
+        let type:errorType
+        
+        var localizedDescription: String
+        {
+            get
+            {
+                if self.type == .NoReferenceTerminalDefined
+                {
+                    return "The reference terminal has not been defined!"
+                }
+                else if self.type == .NoSuchTerminalNumber
+                {
+                    return "The terminal number \(info) does not exist in the model"
+                }
+                else if self.type == .UnimplementedFeature
+                {
+                    return "This feature has not been implemented: \(info)"
+                }
+                
+                
+                return "An unknown error occurred."
+            }
+        }
+    }
+    
     /// Calculate the distance from the center of the core to the tank wall (used for graphics)
     func DistanceFromCoreCenterToTankWall() -> Double
     {
@@ -72,21 +108,28 @@ class Transformer:Codable {
         return result
     }
     
-    /// Find the Terminal that has the Andersen number termNum assigned to it. Return nil if none are found
-    func TerminalFromAndersenNumber(termNum:Int) -> Terminal?
+    /// Find the Terminals that have the Andersen number termNum assigned to it. Return an empty array if there aren't any.
+    func TerminalsFromAndersenNumber(termNum:Int) throws -> [Terminal]
     {
+        var result:[Terminal] = []
+        
         for nextTerm in self.terminals
         {
             if let term = nextTerm
             {
                 if term.andersenNumber == termNum
                 {
-                    return nextTerm
+                    result.append(term)
                 }
             }
         }
         
-        return nil
+        if result.count == 0
+        {
+            throw TransformerErrors.init(info: "\(termNum)", type: .NoSuchTerminalNumber)
+        }
+        
+        return result
     }
     
     /// Return a set of Ints that represent the Andersen-terminals that are available
@@ -106,27 +149,39 @@ class Transformer:Codable {
     }
     
     /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, the no-load voltage of the sum of all the turns (active or not) of teh terminal is calculated.
-    func TerminalLineVoltage(terminal:Int) -> Double
+    func TerminalLineVoltage(terminal:Int) throws -> Double
     {
-        guard let term = self.TerminalFromAndersenNumber(termNum: terminal) else
+        var terms:[Terminal] = []
+        
+        do
         {
-            return 0.0
+            terms = try self.TerminalsFromAndersenNumber(termNum: terminal)
+        }
+        catch
+        {
+            throw error
         }
         
-        guard let VpN = self.VoltsPerTurn() else
+        var VpN = 0.0
+        
+        do
         {
-            return term.voltage
+            VpN = try self.VoltsPerTurn()
+        }
+        catch
+        {
+            throw error
         }
         
         var phaseFactor = 1.0
         var autoFactor = 1.0
         
-        if term.connection == .wye || term.connection == .zig || term.connection == .zag || term.connection == .auto_common || term.connection == .auto_series
+        if terms[0].connection == .wye || terms[0].connection == .zig || terms[0].connection == .zag || terms[0].connection == .auto_common || terms[0].connection == .auto_series
         {
             phaseFactor = SQRT3
         }
         
-        if term.connection == .auto_series
+        if terms[0].connection == .auto_series
         {
             for nextTerm in self.terminals
             {
@@ -161,46 +216,86 @@ class Transformer:Codable {
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
-    func ReferenceOnanAmpTurns() -> Double?
+    func ReferenceOnanAmpTurns() throws -> Double
     {
         guard let refTerm = self.refTermNum else
         {
-            return nil
+            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
         }
         
-        guard let vpn = self.VoltsPerTurn() else {
-            
-            return nil
+        var vpn = 0.0
+        do
+        {
+            vpn = try self.VoltsPerTurn()
+        }
+        catch
+        {
+            throw error
         }
         
-        let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.legVA
+        
+        var va = 0.0
+        
+        var terms:[Terminal] = []
+        
+        do
+        {
+            terms = try self.TerminalsFromAndersenNumber(termNum: refTerm)
+        }
+        catch
+        {
+            throw error
+        }
+        
+        for nextTerm in terms
+        {
+            va += nextTerm.legVA
+        }
+        
+        // let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.legVA
         
         return va / vpn
         
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
-    func AmpTurns(forceBalance:Bool) -> Double?
+    func AmpTurns(forceBalance:Bool) throws -> Double
     {
         var result:Double = 0.0
         
         if forceBalance
         {
-            guard let refTermNI = self.ReferenceOnanAmpTurns() else {
-                
-                let alert = NSAlert()
-                alert.messageText = "A reference terminal must be defined! The program will now likely crash"
-                let _ = alert.runModal()
-                return nil
+            var refTermNI = 0.0
+            do
+            {
+                refTermNI = try self.ReferenceOnanAmpTurns()
+            }
+            catch
+            {
+                throw error
             }
             
             let nonRefTerms = self.AvailableTerminals().subtracting([self.refTermNum!])
             
             if nonRefTerms.count == 1
             {
-                // easy
+                var terminals:[Terminal] = []
+                do
+                {
+                    terminals = try self.TerminalsFromAndersenNumber(termNum: self.refTermNum!)
+                }
+                catch
+                {
+                    throw error
+                }
+                
+                let totalTurns = self.CurrentCarryingTurns(terminal: self.refTermNum!)
+                
+                let amps = refTermNI / totalTurns
+                
+                
             }
-            else
+            else // there's more than just two terminals
             {
                 // less easy
             }
@@ -208,32 +303,33 @@ class Transformer:Codable {
         else
         {
             // This branch simply uses the current VA and voltage (calculated using the current V/N, if any) to calculate total amp-turns and allows non-zero results (ie: the user has to figure it out)
-            let alert = NSAlert()
-            alert.messageText = "Unimplemented function, probably about to crash!"
-            let _ = alert.runModal()
-            ALog("This is not yet implemented!")
-            return nil
+            throw TransformerErrors.init(info: "Manual (user) calculation of terminal VAs to balance AmpTurns", type: .UnimplementedFeature)
         }
         
         return result
     }
     
     /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the SUM of all the voltages for the terminal. Note that in the event that the reference terminal has 0 active turns, its no-load voltage sum (and turns) are used.
-    func VoltsPerTurn() -> Double?
+    func VoltsPerTurn() throws -> Double
     {
         guard let refTerm = self.refTermNum else
         {
-            return nil
+            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
         }
         
-        guard let terminal = self.TerminalFromAndersenNumber(termNum: refTerm) else
+        var terminals:[Terminal] = []
+        do
         {
-            return nil
+            terminals = try self.TerminalsFromAndersenNumber(termNum: self.refTermNum!)
+        }
+        catch
+        {
+            throw error
         }
         
         var result = 0.0
         
-        let legFactor = (terminal.connection == .wye || terminal.connection == .auto_common || terminal.connection == .auto_series ? SQRT3 : 1.0)
+        let legFactor = (terminals[0].connection == .wye || terminals[0].connection == .auto_common || terminals[0].connection == .auto_series ? SQRT3 : 1.0)
         
         var voltageSum = 0.0
         var noloadVoltageSum = 0.0

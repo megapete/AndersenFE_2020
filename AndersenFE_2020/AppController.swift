@@ -267,40 +267,45 @@ class AppController: NSObject, NSMenuItemValidation {
         
         for nextTerm in termSet
         {
-            var terminals:[Terminal] = []
             do
             {
-                terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
+                let terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
+                var isRef = false
+                if let refTerm = txfo.refTermNum
+                {
+                    if refTerm == nextTerm
+                    {
+                        isRef = true
+                    }
+                }
+                
+                let termLineVolts = try txfo.TerminalLineVoltage(terminal: nextTerm)
+                self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: termLineVolts, VA: terminals[0].VA, connection: terminals[0].connection, isReference: isRef)
             }
             catch
             {
-                // There are no terminals with this number. Theoretically, this can never happen.
+                // An error occurred
                 let alert = NSAlert(error: error)
                 let _ = alert.runModal()
                 return
             }
-            
-            var isRef = false
-            if let refTerm = txfo.refTermNum
-            {
-                if refTerm == nextTerm
-                {
-                    isRef = true
-                }
-            }
-            
-            self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: txfo.TerminalLineVoltage(terminal: nextTerm), VA: terminals[0].VA, connection: terminals[0].connection, isReference: isRef)
-            
         }
         
-        if let vpn = txfo.VoltsPerTurn()
+        do
         {
+            let vpn = try txfo.VoltsPerTurn()
             self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
+            
+            let newNI = try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance)
+            self.dataView.SetAmpereTurns(newNI: newNI)
         }
-        
-        self.dataView.SetAmpereTurns(newNI: txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance))
-        
-        
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+       
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {

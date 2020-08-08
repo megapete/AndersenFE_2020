@@ -15,7 +15,7 @@ struct Terminal: Codable
     let name:String
     
     /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings)
-    var voltage:Double
+    var nominalLineVolts:Double
     
     /// The total (1-ph or 3-ph) VA for the Terminal
     var VA:Double
@@ -33,7 +33,7 @@ struct Terminal: Codable
     
             let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
             
-            let result = self.legVA / (self.voltage / connFactor)
+            let result = self.legVA / (self.nominalLineVolts / connFactor)
             
             return result
         }
@@ -100,11 +100,20 @@ struct Terminal: Codable
     init(name:String, voltage:Double, VA:Double, connection:TerminalConnection, currDir:Int, termNum:Int)
     {
         self.name = name
-        self.voltage = voltage
+        self.nominalLineVolts = voltage
         self.VA = VA
         self.connection = connection
         self.currentDirection = currDir
         self.andersenNumber = termNum
+    }
+    
+    mutating func SetVoltsAndVA(legVolts:Double, amps:Double)
+    {
+        let phaseFactor = self.connection == .single_phase_one_leg ? 1.0 : self.connection == .single_phase_two_legs ? 2.0 : 3.0
+        let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
+        
+        self.nominalLineVolts = legVolts * connFactor
+        self.VA = legVolts * amps * phaseFactor
     }
 
 }

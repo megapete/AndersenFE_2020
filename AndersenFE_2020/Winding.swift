@@ -246,7 +246,7 @@ class Winding:Codable {
     let groundClearance:Double
     
     /// The Terminal to which this Winding belongs
-    let terminal:Terminal
+    var terminal:Terminal
     
     /// The Layers that make up this winding
     var layers:[Layer] = []
@@ -332,6 +332,12 @@ class Winding:Codable {
         return result / parallelFactor
     }
     
+    /// The Actual Voltage of the winding is a SIGNED quantity that depends on the current direction
+    func ActualVoltage(voltsPerTurn:Double) -> Double
+    {
+        return voltsPerTurn * self.CurrentCarryingTurns()
+    }
+    
     /// The no-load turns are the effective turns that make up the winding, regardless of whether they carry current.
     func NoLoadTurns() -> Double
     {
@@ -348,6 +354,11 @@ class Winding:Codable {
         }
         
         return result / parallelFactor
+    }
+    
+    func NoLoadVoltage(voltsPerTurn:Double) -> Double
+    {
+        return voltsPerTurn * self.NoLoadTurns()
     }
     
     

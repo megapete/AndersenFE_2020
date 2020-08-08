@@ -132,6 +132,26 @@ class Transformer:Codable {
         return result
     }
     
+    func WindingsFromAndersenNumber(termNum:Int) throws -> [Winding]
+    {
+        var result:[Winding] = []
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.terminal.andersenNumber == termNum
+            {
+                result.append(nextWdg)
+            }
+        }
+        
+        if result.count == 0
+        {
+            throw TransformerErrors.init(info: "\(termNum)", type: .NoSuchTerminalNumber)
+        }
+        
+        return result
+    }
+    
     /// Return a set of Ints that represent the Andersen-terminals that are available
     func AvailableTerminals() -> Set<Int>
     {
@@ -258,10 +278,13 @@ class Transformer:Codable {
         
     }
     
-    /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance. If the reference terminal has not been defined, thsi function returns nil.
+    /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage' and 'VA' fields to force amp-turns to be equal to 0.
     func AmpTurns(forceBalance:Bool) throws -> Double
     {
-        var result:Double = 0.0
+        guard let refTerm = self.refTermNum else {
+            
+            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
+        }
         
         if forceBalance
         {
@@ -275,30 +298,37 @@ class Transformer:Codable {
                 throw error
             }
             
-            let nonRefTerms = self.AvailableTerminals().subtracting([self.refTermNum!])
+            let nonRefTerms = self.AvailableTerminals().subtracting([refTerm])
             
             if nonRefTerms.count == 1
             {
-                var terminals:[Terminal] = []
                 do
                 {
-                    terminals = try self.TerminalsFromAndersenNumber(termNum: self.refTermNum!)
+                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: refTerm)
+                    
+                    let totalTurns = self.CurrentCarryingTurns(terminal: refTerm)
+                    
+                    let amps = refTermNI / totalTurns
+                    let vpn = try self.VoltsPerTurn()
+                    
+                    for nextWdg in nonRefWdgs
+                    {
+                        let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
+                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: amps)
+                    }
+                    
                 }
                 catch
                 {
                     throw error
                 }
-                
-                let totalTurns = self.CurrentCarryingTurns(terminal: self.refTermNum!)
-                
-                let amps = refTermNI / totalTurns
-                
-                
             }
             else // there's more than just two terminals
             {
                 // less easy
             }
+            
+            return 0.0
         }
         else
         {
@@ -306,7 +336,7 @@ class Transformer:Codable {
             throw TransformerErrors.init(info: "Manual (user) calculation of terminal VAs to balance AmpTurns", type: .UnimplementedFeature)
         }
         
-        return result
+        
     }
     
     /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the SUM of all the voltages for the terminal. Note that in the event that the reference terminal has 0 active turns, its no-load voltage sum (and turns) are used.
@@ -337,9 +367,9 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == refTerm
             {
-                noloadVoltageSum += nextWdg.terminal.voltage
+                noloadVoltageSum += nextWdg.terminal.nominalLineVolts
                 
-                voltageSum += nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * nextWdg.terminal.voltage
+                voltageSum += nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * nextWdg.terminal.nominalLineVolts
             }
         }
         
@@ -933,7 +963,7 @@ class Transformer:Codable {
                 // fix the terminal voltage for double-stacked windings
                 if (isDoubleStack)
                 {
-                    terminals[termIndex - 1]!.voltage /= 2.0
+                    terminals[termIndex - 1]!.nominalLineVolts /= 2.0
                 }
                 
                 let newWinding = Winding(preferences: prefs.wdgPrefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)

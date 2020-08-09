@@ -725,6 +725,13 @@
                                     <action selector="handleTestTermView:" target="6yZ-bT-Gps" id="jPx-Tq-BTY"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="mkK-oO-05k"/>
+                            <menuItem title="Test AmpTurns View" id="F1p-V3-IxQ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleTestAmpereTurnsView:" target="6yZ-bT-Gps" id="sCv-Ik-gWQ"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

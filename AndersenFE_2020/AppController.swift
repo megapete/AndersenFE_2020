@@ -194,6 +194,12 @@ class AppController: NSObject, NSMenuItemValidation {
         termsView.SetTermData(termNum: 5, name: "TEST", displayVolts: 123000.0, VA: 47000000, connection: .auto_common)
     }
     
+    @IBAction func handleTestAmpereTurnsView(_ sender: Any) {
+        
+        let ampTurnDlog = AmpTurnsDistributionDialog(term1: -80.0, term2: -20.0, term3: 100.0)
+        let _ = ampTurnDlog.runModal()
+    }
+    
     
     @IBAction func handleZoomIn(_ sender: Any) {
         

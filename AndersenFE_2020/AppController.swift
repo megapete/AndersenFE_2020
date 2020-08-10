@@ -209,8 +209,8 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleTestAmpereTurnsView(_ sender: Any) {
         
-        let ampTurnDlog = AmpTurnsDistributionDialog(term1: -80.0, term2: -20.0, term3: 100.0)
-        let _ = ampTurnDlog.runModal()
+        // let ampTurnDlog = AmpTurnsDistributionDialog(term1: -80.0, term2: -20.0, term3: 100.0)
+        // let _ = ampTurnDlog.runModal()
     }
     
     
@@ -273,7 +273,7 @@ class AppController: NSObject, NSMenuItemValidation {
                     let path = NSBezierPath(rect: NSRect(x: nextLayer.innerRadius, y: nextSegment.minZ, width: nextLayer.radialBuild, height: nextSegment.height))
                     path.lineWidth = 2.0
                     
-                    let newSegPath = SegmentPath(path: path, segmentColor: pathColor, isActive: true)
+                    let newSegPath = SegmentPath(path: path, segmentColor: pathColor, isActive: nextSegment.activeTurns == nextSegment.totalTurns)
                     
                     self.txfoView.segments.append(newSegPath)
                 }
@@ -299,6 +299,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
                 
                 let termLineVolts = try txfo.TerminalLineVoltage(terminal: nextTerm)
+                
                 self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: termLineVolts, VA: terminals[0].VA, connection: terminals[0].connection, isReference: isRef)
             }
             catch

@@ -34,8 +34,9 @@ class TerminalsView: NSView {
         if let textFld = self.termFields.first(where: {$0.tag == termNum})
         {
             let volts = String(format: "%0.3f", displayVolts / 1000.0)
+            let va = String(format: "%0.3f", fabs(VA / 1.0E6))
             
-            let displayString = "Terminal \(termNum)\n\(name)\nkV: \(volts)\nMVA: \(VA / 1.0E6)\n\(Terminal.StringForConnection(connection: connection))"
+            let displayString = "Terminal \(termNum)\n\(name)\nkV: \(volts)\nMVA: \(va)\n\(Terminal.StringForConnection(connection: connection))"
             
             textFld.stringValue = displayString
             textFld.isHidden = false

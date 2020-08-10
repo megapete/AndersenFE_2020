@@ -8,21 +8,27 @@
         <customObject id="-2" userLabel="File's Owner" customClass="AmpTurnsDistributionDialog" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
                 <outlet property="term1BalanceButton" destination="Sp3-ug-Aq1" id="Wug-Vz-6yy"/>
+                <outlet property="term1Label" destination="OUH-Ke-ckP" id="MnH-Zd-vRL"/>
                 <outlet property="term1Slider" destination="fC4-jN-ybP" id="1Cu-fB-wLa"/>
                 <outlet property="term1TextField" destination="ksH-my-h2G" id="ME3-qJ-dsd"/>
                 <outlet property="term2BalanceButton" destination="62R-AY-sTd" id="KQc-GC-FEn"/>
+                <outlet property="term2Label" destination="mVb-gZ-aSk" id="4kJ-9B-hEi"/>
                 <outlet property="term2Slider" destination="bYw-Cj-cwi" id="7UG-3R-OGA"/>
                 <outlet property="term2TextField" destination="fzX-aG-KSn" id="aII-Dm-kTw"/>
                 <outlet property="term3BalanceButton" destination="XrA-Fh-w1f" id="dKF-Ip-LCW"/>
+                <outlet property="term3Label" destination="DSS-7s-2Io" id="rv5-kv-yqS"/>
                 <outlet property="term3Slider" destination="LRD-lU-uBU" id="1WB-Ti-drj"/>
                 <outlet property="term3TextField" destination="ntd-TE-UeR" id="8Kb-dO-c3s"/>
                 <outlet property="term4BalanceButton" destination="oJn-iV-MEP" id="PFz-in-eYS"/>
+                <outlet property="term4Label" destination="2Zx-5f-oDN" id="DDA-bm-1xd"/>
                 <outlet property="term4Slider" destination="WBJ-Sz-rIT" id="KHz-Ae-Lk8"/>
                 <outlet property="term4TextField" destination="Lgy-7A-JNH" id="PNk-UV-0Cd"/>
                 <outlet property="term5BalanceButton" destination="QrR-w8-Tqp" id="Dk6-dO-qfn"/>
+                <outlet property="term5Label" destination="25G-aB-KkO" id="eeq-zJ-W3Q"/>
                 <outlet property="term5Slider" destination="ImB-st-kC8" id="zpA-Dj-LFL"/>
                 <outlet property="term5TextField" destination="fbZ-uo-IGR" id="w65-ch-Guo"/>
                 <outlet property="term6BalanceButton" destination="QuI-BR-Hee" id="b3I-rt-mqs"/>
+                <outlet property="term6Label" destination="oxT-JJ-24u" id="pfb-x8-xLE"/>
                 <outlet property="term6Slider" destination="4ag-vW-rTu" id="mWp-J8-th6"/>
                 <outlet property="term6TextField" destination="ugZ-Qj-TIZ" id="aJi-6L-SVw"/>
                 <outlet property="warningLabel" destination="3Te-r5-2ZR" id="DQb-r8-ugt"/>

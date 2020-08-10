@@ -364,9 +364,11 @@ class Transformer:Codable {
                 niArray[refTerm - 1] = refTermNIpercentage
                 niArray[otherMainTerm - 1] = -refTermNIpercentage
                 
+                let termsToAdjust:Set<Int> = self.AvailableTerminals()
+                
                 if showDistributionDialog || self.niDistribution == nil
                 {
-                    let niDlog = AmpTurnsDistributionDialog(termPercentages: niArray)
+                    let niDlog = AmpTurnsDistributionDialog(termsToShow: termsToAdjust, termPercentages: niArray)
                     
                     if niDlog.runModal() == .OK
                     {
@@ -374,15 +376,6 @@ class Transformer:Codable {
                     }
                     
                     self.niDistribution = niArray
-                }
-                
-                var termsToAdjust:[Int] = []
-                for i in 0..<6
-                {
-                    if niArray[i] != 0.0 && i != (refTerm - 1)
-                    {
-                        termsToAdjust.append(i + 1)
-                    }
                 }
                 
                 var voltAmps:[(terminal:Terminal, volts:Double, amps:Double)] = []

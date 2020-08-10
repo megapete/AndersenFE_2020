@@ -35,8 +35,10 @@ class Transformer:Codable {
     
     var refTermNum:Int? = nil
     
+    var niDistribution:[Double]? = nil
+    
     /// Straightforward init function (designed for the copy() function below)
-    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil)
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil, niDistribution:[Double]? = nil)
     {
         self.numPhases = numPhases
         self.frequency = frequency
@@ -46,6 +48,7 @@ class Transformer:Codable {
         self.systemGVA = systemGVA
         self.terminals = terminals
         self.refTermNum = refTermNum
+        self.niDistribution = niDistribution
         
         for nextWdg in windings
         {
@@ -56,7 +59,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum, niDistribution: self.niDistribution)
     }
     
     /// Some errors that can be thrown by various routines
@@ -303,7 +306,7 @@ class Transformer:Codable {
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage' and 'VA' fields to force amp-turns to be equal to 0.
-    func AmpTurns(forceBalance:Bool) throws -> Double
+    func AmpTurns(forceBalance:Bool, showDistributionDialog:Bool) throws -> Double
     {
         guard let refTerm = self.refTermNum else {
             
@@ -361,11 +364,16 @@ class Transformer:Codable {
                 niArray[refTerm - 1] = refTermNIpercentage
                 niArray[otherMainTerm - 1] = -refTermNIpercentage
                 
-                let niDlog = AmpTurnsDistributionDialog(termPercentages: niArray)
-                
-                if niDlog.runModal() == .OK
+                if showDistributionDialog || self.niDistribution == nil
                 {
-                    niArray = niDlog.currentTerminalPercentages
+                    let niDlog = AmpTurnsDistributionDialog(termPercentages: niArray)
+                    
+                    if niDlog.runModal() == .OK
+                    {
+                        niArray = niDlog.currentTerminalPercentages
+                    }
+                    
+                    self.niDistribution = niArray
                 }
                 
                 var termsToAdjust:[Int] = []

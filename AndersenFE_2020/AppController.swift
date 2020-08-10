@@ -144,6 +144,19 @@ class AppController: NSObject, NSMenuItemValidation {
         
         DLog("Updating transformer model...")
         
+        // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
+        do
+        {
+            let _ = try newTransformer.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+        
         // push old transformer (if any) onto the undo stack
         if let oldTransformer = self.currentTxfo
         {
@@ -302,7 +315,7 @@ class AppController: NSObject, NSMenuItemValidation {
             let vpn = try txfo.VoltsPerTurn()
             self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
             
-            let newNI = try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance)
+            let newNI = try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
             self.dataView.SetAmpereTurns(newNI: newNI)
         }
         catch

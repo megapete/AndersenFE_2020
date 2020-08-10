@@ -6,6 +6,8 @@
 //  Copyright © 2020 Peter Huber. All rights reserved.
 //
 
+// This Dialog Box is used to find the ampere-turn distribution in transformers with 3 or more terminals. The user must adjust the sliders (or enter real numbers, or use the provided "Balance" buttons) so that the total NI equals zero. The Ok button is disabled whenever the NI does NOT equal zero. The calling routine should access the 'currentTerminalPercentages' array to get the final distribution upon exit, where the index 'i' into the array is for the (Andersen) terminal 'i+1'.
+
 import Cocoa
 
 class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
@@ -49,8 +51,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     // warning label
     @IBOutlet weak var warningLabel: NSTextField!
     
-    
-    
     var currentTerminalPercentages:[Double] = Array(repeating: 0.0, count: 6)
     
     init(term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0)
@@ -63,6 +63,11 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         self.currentTerminalPercentages[5] = min(maxValue, max(minValue, term6))
         
         super.init(viewNibFileName: "AmpTurnsDistribution", windowTitle: "AmpTurns Distribution", hideCancel: false)
+    }
+    
+    convenience init(termPercentages:[Double])
+    {
+        self.init(term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5])
     }
     
     func CheckAmpTurns() -> Double
@@ -124,9 +129,15 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         self.niTextFields.append(self.term6TextField)
         self.balanceButtons.append(self.term6BalanceButton)
         
+        // Set up a formatter to clamp the allowable values in the text fields to -100...+100
+        let textFieldFormatter = NumberFormatter()
+        textFieldFormatter.minimum = NSNumber(floatLiteral: -100.0)
+        textFieldFormatter.maximum = NSNumber(floatLiteral: 100.0)
+        
         for nextFld in self.niTextFields
         {
             nextFld.delegate = self
+            nextFld.formatter = textFieldFormatter
         }
         
         let _ = self.CheckAmpTurns()

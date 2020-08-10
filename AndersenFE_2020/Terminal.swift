@@ -9,7 +9,7 @@
 import Foundation
 
 /// The Terminal class basically wraps the data from the first page of the Excel document
-struct Terminal: Codable
+class Terminal: Codable
 {
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     let name:String
@@ -107,7 +107,7 @@ struct Terminal: Codable
         self.andersenNumber = termNum
     }
     
-    mutating func SetVoltsAndVA(legVolts:Double, amps:Double)
+    func SetVoltsAndVA(legVolts:Double, amps:Double)
     {
         let phaseFactor = self.connection == .single_phase_one_leg ? 1.0 : self.connection == .single_phase_two_legs ? 2.0 : 3.0
         let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
@@ -115,5 +115,7 @@ struct Terminal: Codable
         self.nominalLineVolts = legVolts * connFactor
         self.VA = legVolts * amps * phaseFactor
     }
+    
+    
 
 }

@@ -236,6 +236,7 @@ class Transformer:Codable {
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
+    /// This is a SIGNED quantity.
     func ReferenceOnanAmpTurns() throws -> Double
     {
         guard let refTerm = self.refTermNum else
@@ -272,10 +273,33 @@ class Transformer:Codable {
             va += nextTerm.legVA
         }
         
-        // let va = self.TerminalFromAndersenNumber(termNum: refTerm)!.legVA
+        let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
         
-        return va / vpn
-        
+        return sign * va / vpn
+    }
+    
+    // The total VA (three-phase or single-phase, depending on the connection) of the Andersen-type terminal
+    func TerminalVA(termNum:Int) throws -> Double
+    {
+        do
+        {
+            let wdgs = try self.WindingsFromAndersenNumber(termNum: termNum)
+            
+            var result = 0.0
+            
+            for nextWdg in wdgs
+            {
+                let wdgVA = nextWdg.terminal.VA * nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns()
+                
+                result += wdgVA
+            }
+            
+            return result
+        }
+        catch
+        {
+            throw error
+        }
     }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage' and 'VA' fields to force amp-turns to be equal to 0.
@@ -304,11 +328,11 @@ class Transformer:Codable {
             {
                 do
                 {
-                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: refTerm)
+                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: nonRefTerms.first!)
                     
-                    let totalTurns = self.CurrentCarryingTurns(terminal: refTerm)
+                    let totalTurns = self.CurrentCarryingTurns(terminal: nonRefTerms.first!)
                     
-                    let amps = refTermNI / totalTurns
+                    let amps = -refTermNI / totalTurns
                     let vpn = try self.VoltsPerTurn()
                     
                     for nextWdg in nonRefWdgs
@@ -316,7 +340,6 @@ class Transformer:Codable {
                         let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
                         nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: amps)
                     }
-                    
                 }
                 catch
                 {
@@ -325,7 +348,65 @@ class Transformer:Codable {
             }
             else // there's more than just two terminals
             {
-                // less easy
+                // Start out by assuming that the ref terminal has 100% (or -100 if the current direction is negative) of the amp-turns and that Terminal 1 or Terminal 2 has the full offsetting NI. This way, if the user Cancels out of the DialogBox, everything is balanced.
+                
+                let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
+                
+                let refTermNIpercentage = sign * 100.0
+                
+                let otherMainTerm = (refTerm == 2 ? 1 : 2)
+                
+                var niArray:[Double] = Array(repeating: 0.0, count: 6)
+                
+                niArray[refTerm - 1] = refTermNIpercentage
+                niArray[otherMainTerm - 1] = -refTermNIpercentage
+                
+                let niDlog = AmpTurnsDistributionDialog(termPercentages: niArray)
+                
+                if niDlog.runModal() == .OK
+                {
+                    niArray = niDlog.currentTerminalPercentages
+                }
+                
+                var termsToAdjust:[Int] = []
+                for i in 0..<6
+                {
+                    if niArray[i] != 0.0 && i != (refTerm - 1)
+                    {
+                        termsToAdjust.append(i + 1)
+                    }
+                }
+                
+                var voltAmps:[(terminal:Terminal, volts:Double, amps:Double)] = []
+                do
+                {
+                    for nextTerm in termsToAdjust
+                    {
+                        let windings = try self.WindingsFromAndersenNumber(termNum: nextTerm)
+                        let turns = self.CurrentCarryingTurns(terminal: nextTerm)
+                        
+                        let amps = niArray[nextTerm - 1] / 100.0 * refTermNI / turns
+                        let vpn = try self.VoltsPerTurn()
+                        
+                        for nextWdg in windings
+                        {
+                            let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
+                            voltAmps.append((nextWdg.terminal, voltage, amps))
+                        }
+                        
+                    }
+                }
+                catch
+                {
+                    throw error
+                }
+                
+                // if we get here, then there were no errors so change the terminal VAs
+                for va in voltAmps
+                {
+                    let term = va.terminal
+                    term.SetVoltsAndVA(legVolts: va.volts, amps: va.amps)
+                }
             }
             
             return 0.0

@@ -30,6 +30,17 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     @IBOutlet weak var term6Label: NSTextField!
     var labels:[NSTextField] = []
     
+    @IBOutlet weak var term1percentLabel: NSTextField!
+    @IBOutlet weak var term2percentLabel: NSTextField!
+    @IBOutlet weak var term3percentLabel: NSTextField!
+    @IBOutlet weak var term4percentLabel: NSTextField!
+    @IBOutlet weak var term5percentLabel: NSTextField!
+    @IBOutlet weak var term6percentLabel: NSTextField!
+    var percentLabels:[NSTextField] = []
+    
+    // percent signs
+    
+    
     // sliders
     @IBOutlet weak var term1Slider: NSSlider!
     @IBOutlet weak var term2Slider: NSSlider!
@@ -111,41 +122,47 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         self.niTextFields.append(self.term1TextField)
         self.balanceButtons.append(self.term1BalanceButton)
         self.labels.append(self.term1Label)
+        self.percentLabels.append(self.term1percentLabel)
         
         self.term2Slider.doubleValue = currentTerminalPercentages[1]
         self.sliders.append(self.term2Slider)
         self.term2TextField.doubleValue = currentTerminalPercentages[1]
         self.niTextFields.append(self.term2TextField)
         self.balanceButtons.append(self.term2BalanceButton)
-        self.labels.append(self.term1Label)
+        self.labels.append(self.term2Label)
+        self.percentLabels.append(self.term2percentLabel)
         
         self.term3Slider.doubleValue = currentTerminalPercentages[2]
         self.sliders.append(self.term3Slider)
         self.term3TextField.doubleValue = currentTerminalPercentages[2]
         self.niTextFields.append(self.term3TextField)
         self.balanceButtons.append(self.term3BalanceButton)
-        self.labels.append(self.term1Label)
+        self.labels.append(self.term3Label)
+        self.percentLabels.append(self.term3percentLabel)
         
         self.term4Slider.doubleValue = currentTerminalPercentages[3]
         self.sliders.append(self.term4Slider)
         self.term4TextField.doubleValue = currentTerminalPercentages[3]
         self.niTextFields.append(self.term4TextField)
         self.balanceButtons.append(self.term4BalanceButton)
-        self.labels.append(self.term1Label)
+        self.labels.append(self.term4Label)
+        self.percentLabels.append(self.term4percentLabel)
         
         self.term5Slider.doubleValue = currentTerminalPercentages[4]
         self.sliders.append(self.term5Slider)
         self.term5TextField.doubleValue = currentTerminalPercentages[4]
         self.niTextFields.append(self.term5TextField)
         self.balanceButtons.append(self.term5BalanceButton)
-        self.labels.append(self.term1Label)
+        self.labels.append(self.term5Label)
+        self.percentLabels.append(self.term5percentLabel)
         
         self.term6Slider.doubleValue = currentTerminalPercentages[5]
         self.sliders.append(self.term6Slider)
         self.term6TextField.doubleValue = currentTerminalPercentages[5]
         self.niTextFields.append(self.term6TextField)
         self.balanceButtons.append(self.term6BalanceButton)
-        self.labels.append(self.term1Label)
+        self.labels.append(self.term6Label)
+        self.percentLabels.append(self.term6percentLabel)
         
         // Set up a formatter to clamp the allowable values in the text fields to -100...+100
         let textFieldFormatter = NumberFormatter()
@@ -157,12 +174,21 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             self.niTextFields[i].delegate = self
             self.niTextFields[i].formatter = textFieldFormatter
             
-            if !self.termsToShow.contains(i + 1)
+            if self.termsToShow.contains(i + 1)
+            {
+                self.niTextFields[i].isHidden = false
+                self.sliders[i].isHidden = false
+                self.balanceButtons[i].isHidden = false
+                self.labels[i].isHidden = false
+                self.percentLabels[i].isHidden = false
+            }
+            else
             {
                 self.niTextFields[i].isHidden = true
                 self.sliders[i].isHidden = true
                 self.balanceButtons[i].isHidden = true
                 self.labels[i].isHidden = true
+                self.percentLabels[i].isHidden = true
             }
         }
         

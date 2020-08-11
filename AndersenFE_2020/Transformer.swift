@@ -726,6 +726,7 @@ class Transformer:Codable {
                     throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
                 }
                 
+                
                 let connString = lineElements[2]
                 var connection:Terminal.TerminalConnection = .wye
                 

@@ -78,6 +78,9 @@ struct SegmentPath {
 
 class TransformerView: NSView {
 
+    // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity
+    var appController:AppController? = nil
+    
     var segments:[SegmentPath] = []
     var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
     let boundaryColor:NSColor = .gray
@@ -111,6 +114,12 @@ class TransformerView: NSView {
         self.boundary.size.width = tankWallR - coreRadius
         
         self.needsDisplay = true
+    }
+    
+    // Mouse events
+    override func mouseDown(with event: NSEvent) {
+        
+        
     }
     
     // the zoom in/out ratio (maybe consider making this user-settable)

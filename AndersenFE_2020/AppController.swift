@@ -137,6 +137,9 @@ class AppController: NSObject, NSMenuItemValidation {
         // Set up things for the views
         SegmentPath.bkGroundColor = .white
         
+        // Stuff a reference to this AppController into the TransformerView
+        self.txfoView.appController = self
+        
     }
     
     

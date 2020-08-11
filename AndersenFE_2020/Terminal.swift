@@ -85,7 +85,7 @@ class Terminal: Codable
     let connection:TerminalConnection
     
     /// The current direction for this Terminal
-    let currentDirection:Int
+    var currentDirection:Int
     
     /// The Andersen-file Terminal number
     var andersenNumber:Int
@@ -113,9 +113,8 @@ class Terminal: Codable
         let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
         
         self.nominalLineVolts = legVolts * connFactor
-        self.VA = legVolts * amps * phaseFactor
+        self.VA = legVolts * fabs(amps) * phaseFactor
+        self.currentDirection = amps == 0.0 ? 0 : (amps < 0.0 ? -1 : 1)
     }
     
-    
-
 }

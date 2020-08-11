@@ -335,13 +335,14 @@ class Transformer:Codable {
                     
                     let totalTurns = self.CurrentCarryingTurns(terminal: nonRefTerms.first!)
                     
-                    let amps = -refTermNI / totalTurns
+                    let amps = (totalTurns == 0.0 ? 0.0 : -refTermNI / totalTurns)
                     let vpn = try self.VoltsPerTurn()
                     
                     for nextWdg in nonRefWdgs
                     {
                         let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
-                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: amps)
+                        let wdgAmps = nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * amps
+                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: wdgAmps)
                     }
                 }
                 catch
@@ -386,15 +387,15 @@ class Transformer:Codable {
                         let windings = try self.WindingsFromAndersenNumber(termNum: nextTerm)
                         let turns = self.CurrentCarryingTurns(terminal: nextTerm)
                         
-                        let amps = niArray[nextTerm - 1] / 100.0 * refTermNI / turns
+                        let amps = turns == 0.0 ? 0.0 : niArray[nextTerm - 1] / 100.0 * refTermNI / turns
                         let vpn = try self.VoltsPerTurn()
                         
                         for nextWdg in windings
                         {
                             let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
-                            voltAmps.append((nextWdg.terminal, voltage, amps))
+                            let wdgAmps = nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * amps
+                            voltAmps.append((nextWdg.terminal, voltage, wdgAmps))
                         }
-                        
                     }
                 }
                 catch

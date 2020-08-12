@@ -185,11 +185,35 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSetReferenceTerminal(_ sender: Any) {
         
-        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: 2)
+        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.refTermNum)
+        
+        var oldRefNumIndex = -1
+        if let refNum = self.currentTxfo!.refTermNum
+        {
+            oldRefNumIndex = refNum - 1
+        }
         
         if refnumDlog.runModal() == .OK
         {
-            DLog("got OK")
+            if refnumDlog.currentRefIndex != oldRefNumIndex
+            {
+                let alert = NSAlert()
+                alert.messageText = "Changing the reference terminal will cause the transformer to be recreated from scratch, using the current terminal voltages, VAs, etc."
+                alert.informativeText = "You may Undo this operation"
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "Cancel")
+                
+                if alert.runModal() == .OK
+                {
+                    if refnumDlog.currentRefIndex >= 0
+                    {
+                        let newTransformer = self.currentTxfo!.Copy()
+                        newTransformer.refTermNum = refnumDlog.currentRefIndex + 1
+                        
+                        self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
+                    }
+                }
+            }
         }
     }
     
@@ -353,7 +377,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
-        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem
+        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem
         {
             return currentTxfo != nil
         }

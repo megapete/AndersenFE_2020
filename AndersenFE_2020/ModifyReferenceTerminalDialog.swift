@@ -17,11 +17,15 @@ class ModifyReferenceTerminalDialog: PCH_DialogBox {
     @IBOutlet weak var term5: NSButton!
     @IBOutlet weak var term6: NSButton!
     var termButtons:[NSButton] = []
-    var currentRefIndex:Int = 0
+    var currentRefIndex:Int = -1
     
-    init(oldTerminal:Int) {
+    /// oldTerminal must be either 'nil' or an Int from 1...6
+    init(oldTerminal:Int?) {
         
-        self.currentRefIndex = oldTerminal - 1
+        if let oldRefTerm = oldTerminal
+        {
+            self.currentRefIndex = oldRefTerm - 1
+        }
         
         super.init(viewNibFileName: "ModifyReferenceTerminal", windowTitle: "ModifyReferenceTerminal", hideCancel: false)
     }
@@ -30,9 +34,22 @@ class ModifyReferenceTerminalDialog: PCH_DialogBox {
         
         self.termButtons = [self.term1, self.term2, self.term3, self.term4, self.term5, self.term6]
         
-        self.termButtons[self.currentRefIndex].state = .on
+        if self.currentRefIndex >= 0
+        {
+            self.termButtons[self.currentRefIndex].state = .on
+        }
     }
     
     @IBAction func handleButtonChange(_ sender: Any) {
+        
+        for i in 0..<6
+        {
+            if self.termButtons[i].state == .on
+            {
+                self.currentRefIndex = i
+                
+                break
+            }
+        }
     }
 }

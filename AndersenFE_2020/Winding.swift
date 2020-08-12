@@ -306,7 +306,7 @@ class Winding:Codable {
         self.terminal = terminal
     }
     
-    /// Convenience initializer that deep-copies an existing Winding, including the 'layers' array (designed to be used for implementing Undo). Use this instead of '='.
+    /// Convenience initializer that deep-copies an existing Winding, including the 'layers' array (designed to be used for implementing Undo). Use this instead of '=' for deep copying,
     convenience init(srcWdg:Winding)
     {
         let newTerm = Terminal(name: srcWdg.terminal.name, voltage: srcWdg.terminal.nominalLineVolts, VA: srcWdg.terminal.VA, connection: srcWdg.terminal.connection, currDir: srcWdg.terminal.currentDirection, termNum: srcWdg.terminal.andersenNumber)

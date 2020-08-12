@@ -9,7 +9,7 @@
 import Foundation
 
 /// A Layer is a "solid" radial section, made up of Segments (ie: this is similar to the "Andersen" definition of a "Layer")
-struct Layer:Codable {
+class Layer:Codable {
     
     /// Andersen-accepted conductor materials
     enum ConductorMaterial:Int, Codable {
@@ -17,8 +17,27 @@ struct Layer:Codable {
         case aluminum
     }
     
+    /// The backing store for the segments that make up the layer
+    private var segArray:[Segment] = []
+    
     /// The segments that make up the layer. It is assumed that the segment with the lowest dimension is first in the array, then subsequent arrays move closer towar the top.
-    var segments:[Segment]
+    var segments:[Segment] {
+        
+        get {
+            
+            return self.segArray
+        }
+        
+        set {
+            
+            for nextSeg in newValue
+            {
+                nextSeg.inLayer = self
+            }
+            
+            self.segArray = newValue
+        }
+    }
     
     /// The number of spacer blocks ("radial spacers"), or "axial columns" in the Layer
     let numSpacerBlocks:Int
@@ -43,6 +62,19 @@ struct Layer:Codable {
     
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal
+    
+    init(segments:[Segment] = [], numSpacerBlocks:Int, spacerBlockWidth:Double, material:ConductorMaterial, currentDirection:Int, numberParallelGroups:Int, radialBuild:Double, innerRadius:Double, parentTerminal:Terminal)
+    {
+        self.numSpacerBlocks = numSpacerBlocks
+        self.spacerBlockWidth = spacerBlockWidth
+        self.material = material
+        self.currentDirection = currentDirection
+        self.numberParallelGroups = numberParallelGroups
+        self.radialBuild = radialBuild
+        self.innerRadius = innerRadius
+        self.parentTerminal = parentTerminal
+        self.segments = segments
+    }
     
     /// Convenience function to get the OD of a Layer
     func OD() -> Double

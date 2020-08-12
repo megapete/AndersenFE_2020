@@ -11,21 +11,7 @@
 import Foundation
 
 /// A Segment is a collection of turns (made up of a number of strands per turn and strands per layer) with a lower dimension of minZ and an upper dimension of maxZ
-struct Segment:Codable {
-    
-    /*
-    /// A Segment must conform to one of these types: nonTap, posTap, or negTap
-    enum TapType:Int, Codable {
-        
-        case nonTap
-        case posTap
-        case negTap
-    }
-    
-    /// The TapType of the Segment
-    let type:TapType
-    */
-    // let num:Int
+class Segment:Codable {
     
     /// Strand Axial Dimension
     let strandA:Double
@@ -46,6 +32,21 @@ struct Segment:Codable {
     let minZ:Double
     /// The upper dimesion of the Segment
     let maxZ:Double
+    
+    var inLayer:Layer? = nil
+    
+    init(strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, inLayer:Layer? = nil) {
+        
+        self.strandA = strandA
+        self.strandR = strandR
+        self.strandsPerLayer = strandsPerLayer
+        self.strandsPerTurn = strandsPerTurn
+        self.activeTurns = activeTurns
+        self.totalTurns = totalTurns
+        self.minZ = minZ
+        self.maxZ = maxZ
+        self.inLayer = inLayer
+    }
     
     /// Convenience property for the height of the segment
     var height:Double {
@@ -70,7 +71,7 @@ struct Segment:Codable {
         
         while result.count < numSegs
         {
-            let newSegment = Segment(/*type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
+            let newSegment = Segment(strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
             
             result.append(newSegment)
             

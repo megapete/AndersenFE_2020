@@ -10,31 +10,31 @@ import Cocoa
 
 struct SegmentPath {
     
-    let path:NSBezierPath
+    let segment:Segment
+    
+    var path:NSBezierPath? {
+        get {
+            
+            guard let parentLayer = segment.inLayer else
+            {
+                return nil
+            }
+            
+            return NSBezierPath(rect: NSRect(x: parentLayer.innerRadius, y: self.segment.minZ, width: parentLayer.radialBuild, height: self.segment.height))
+        }
+    }
+        
     let segmentColor:NSColor
     static var bkGroundColor:NSColor = .white
-    var isActive:Bool
+    
+    var isActive:Bool {
+        get {
+            return self.segment.IsActive()
+        }
+    }
     
     // constant for showing that a segment is not active
     let nonActiveAlpha:CGFloat = 0.25
-    
-    mutating func activate()
-    {
-        if !isActive
-        {
-            self.clear()
-            self.isActive = true
-        }
-    }
-    
-    mutating func deactivate()
-    {
-        if isActive
-        {
-            self.fill(alpha: nonActiveAlpha)
-            self.isActive = false
-        }
-    }
     
     func show()
     {
@@ -51,28 +51,43 @@ struct SegmentPath {
     // Some functions that make it so we can use SegmentPaths in a similar way as NSBezierPaths
     func stroke()
     {
+        guard let path = self.path else
+        {
+            return
+        }
+        
         if self.isActive
         {
             self.segmentColor.set()
-            self.path.stroke()
+            path.stroke()
         }
     }
     
     func fill(alpha:CGFloat)
     {
+        guard let path = self.path else
+        {
+            return
+        }
+        
         self.segmentColor.withAlphaComponent(alpha).set()
-        self.path.fill()
+        path.fill()
         self.segmentColor.set()
-        self.path.stroke()
+        path.stroke()
     }
     
     // fill the path with the background color
     func clear()
     {
+        guard let path = self.path else
+        {
+            return
+        }
+        
         SegmentPath.bkGroundColor.set()
-        self.path.fill()
+        path.fill()
         self.segmentColor.set()
-        self.path.stroke()
+        path.stroke()
     }
 }
 

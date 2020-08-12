@@ -178,7 +178,7 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
-    
+    /*
     // Code for testing View-related drawing stuff (will eventually be commented out)
     @IBAction func testInitView(_ sender: Any) {
         // testing for now
@@ -215,6 +215,7 @@ class AppController: NSObject, NSMenuItemValidation {
         // let ampTurnDlog = AmpTurnsDistributionDialog(term1: -80.0, term2: -20.0, term3: 100.0)
         // let _ = ampTurnDlog.runModal()
     }
+ */
     
     
     @IBAction func handleZoomIn(_ sender: Any) {
@@ -273,10 +274,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 for nextSegment in nextLayer.segments
                 {
-                    let path = NSBezierPath(rect: NSRect(x: nextLayer.innerRadius, y: nextSegment.minZ, width: nextLayer.radialBuild, height: nextSegment.height))
-                    path.lineWidth = 2.0
-                    
-                    let newSegPath = SegmentPath(path: path, segmentColor: pathColor, isActive: nextSegment.activeTurns == nextSegment.totalTurns)
+                    let newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
                     
                     self.txfoView.segments.append(newSegPath)
                 }

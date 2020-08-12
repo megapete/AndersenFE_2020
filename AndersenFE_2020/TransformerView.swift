@@ -93,8 +93,8 @@ struct SegmentPath {
 
 class TransformerView: NSView {
 
-    // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity
-    var appController:AppController? = nil
+    // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity, so I'll just save a weak reference to the AppController here
+    weak var appController:AppController? = nil
     
     var segments:[SegmentPath] = []
     var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
@@ -103,6 +103,8 @@ class TransformerView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        NSBezierPath.defaultLineWidth *= 2.0
+        
         // Drawing code here.
         let boundaryPath = NSBezierPath(rect: boundary)
         self.boundaryColor.set()
@@ -113,8 +115,17 @@ class TransformerView: NSView {
             nextSegment.show()
         }
         
+        NSBezierPath.defaultLineWidth /= 2.0
     }
     
+    // MARK: Mouse Events
+    // Mouse events, all of which are ultimately handled by the AppController
+    override func mouseDown(with event: NSEvent) {
+        
+        
+    }
+    
+    // MARK: Zoom Functions
     // transformer display zoom functions
     func zoomAll(coreRadius:CGFloat, windowHt:CGFloat, tankWallR:CGFloat)
     {
@@ -129,12 +140,6 @@ class TransformerView: NSView {
         self.boundary.size.width = tankWallR - coreRadius
         
         self.needsDisplay = true
-    }
-    
-    // Mouse events
-    override func mouseDown(with event: NSEvent) {
-        
-        
     }
     
     // the zoom in/out ratio (maybe consider making this user-settable)

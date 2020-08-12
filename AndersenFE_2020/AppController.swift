@@ -64,38 +64,42 @@ struct PCH_AFE2020_Save_Struct:Codable {
 
 class AppController: NSObject, NSMenuItemValidation {
     
-    // Currently-loaded transformer properties
+    // MARK: Transformer Properties
     var currentTxfo:Transformer? = nil
     var lastOpenedTxfoFile:URL? = nil
     var currentTxfoIsDirty:Bool = false
     var lastSavedTxfoFile:URL? = nil
     
-    // My stab at Undo and Redo
+    // MARK: Undo & Redo
     var undoStack:[PCH_AFE2020_Save_Struct] = []
     var redoStack:[PCH_AFE2020_Save_Struct] = []
     
-    // Menu outlets for turning them on/off
+    // MARK: Menu outlets
     @IBOutlet weak var saveMenuItem: NSMenuItem!
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
+    
+    @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
+    @IBOutlet weak var setMVAMenuItem: NSMenuItem!
+    @IBOutlet weak var setAmpTurnsDistributionMenuItem: NSMenuItem!
+    
     
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
     @IBOutlet weak var zoomAllMenuItem: NSMenuItem!
     
-    
-    // Preferences
+    // MARK: Preferences
     var preferences = PCH_AFE2020_Prefs(wdgPrefs: PCH_AFE2020_Prefs.WindingPrefs(modelRadialDucts: false, model0Terminals: false, modelInternalLayerTaps: false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true), generalPrefs: PCH_AFE2020_Prefs.GeneralPrefs(defaultRefTerm2: true, useAndersenFLD12: true, forceAmpTurnBalance: true))
     
-    
-    // UI elements
+    // MARK: UI elements
     @IBOutlet weak var mainWindow: NSWindow!
     @IBOutlet weak var txfoView: TransformerView!
     @IBOutlet weak var termsView: TerminalsView!
     @IBOutlet weak var dataView: DataView!
     
     
+    // MARK: Initialization
     // set up our preference switches
     override func awakeFromNib() {
         
@@ -142,7 +146,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
     }
     
-    
+    // MARK: Model Modification & Update functions
     func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false) {
         
         DLog("Updating transformer model...")
@@ -178,6 +182,18 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    @IBAction func handleSetReferenceTerminal(_ sender: Any) {
+        
+        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: 2)
+        
+        if refnumDlog.runModal() == .OK
+        {
+            DLog("got OK")
+        }
+    }
+    
+    
     /*
     // Code for testing View-related drawing stuff (will eventually be commented out)
     @IBAction func testInitView(_ sender: Any) {
@@ -217,7 +233,7 @@ class AppController: NSObject, NSMenuItemValidation {
     }
  */
     
-    
+    // MARK: Zoom functions
     @IBAction func handleZoomIn(_ sender: Any) {
         
         self.txfoView.zoomIn()
@@ -238,6 +254,7 @@ class AppController: NSObject, NSMenuItemValidation {
         self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt), tankWallR: CGFloat(txfo.DistanceFromCoreCenterToTankWall()))
     }
     
+    // MARK: View functions
     // This function does the following things:
     // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
     // 2) Calls updateViews() to draw the coil segments
@@ -329,6 +346,7 @@ class AppController: NSObject, NSMenuItemValidation {
        
     }
     
+    // MARK: Menu validation
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
         if menuItem == self.saveMenuItem
@@ -343,6 +361,7 @@ class AppController: NSObject, NSMenuItemValidation {
         return true
     }
     
+    // MARK: Preference functions
     @IBAction func handleGlobalPreferences(_ sender: Any) {
         
         let alert = NSAlert()
@@ -416,6 +435,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    // MARK: Saving and Loading functions
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         
     }

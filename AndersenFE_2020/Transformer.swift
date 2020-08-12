@@ -46,9 +46,22 @@ class Transformer:Codable {
         self.core = core
         self.scFactor = scFactor
         self.systemGVA = systemGVA
-        self.terminals = terminals
         self.refTermNum = refTermNum
         self.niDistribution = niDistribution
+        
+        for nextTerm in terminals
+        {
+            if let oldTerm = nextTerm
+            {
+                let newTerm = Terminal(name: oldTerm.name, voltage: oldTerm.nominalLineVolts, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
+                
+                self.terminals.append(newTerm)
+            }
+            else
+            {
+                self.terminals.append(nil)
+            }
+        }
         
         for nextWdg in windings
         {

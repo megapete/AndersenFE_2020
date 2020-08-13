@@ -63,9 +63,12 @@ class Transformer:Codable {
             }
         }
         
+        var index = 0
         for nextWdg in windings
         {
-            self.windings.append(Winding(srcWdg: nextWdg))
+            self.windings.append(Winding(srcWdg: nextWdg, terminal: self.terminals[index]!))
+            
+            index += 1
         }
     }
     
@@ -286,12 +289,12 @@ class Transformer:Codable {
         
         for nextTerm in terms
         {
-            va += nextTerm.legVA
+            va += nextTerm.legVA * Double(nextTerm.currentDirection)
         }
         
-        let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
+        //let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
         
-        return sign * va / vpn
+        return va / vpn
     }
     
     // The total VA (three-phase or single-phase, depending on the connection) of the Andersen-type terminal

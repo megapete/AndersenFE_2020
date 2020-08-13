@@ -307,11 +307,9 @@ class Winding:Codable {
     }
     
     /// Convenience initializer that deep-copies an existing Winding, including the 'layers' array (designed to be used for implementing Undo). Use this instead of '=' for deep copying,
-    convenience init(srcWdg:Winding)
+    convenience init(srcWdg:Winding, terminal:Terminal)
     {
-        let newTerm = Terminal(name: srcWdg.terminal.name, voltage: srcWdg.terminal.nominalLineVolts, VA: srcWdg.terminal.VA, connection: srcWdg.terminal.connection, currDir: srcWdg.terminal.currentDirection, termNum: srcWdg.terminal.andersenNumber)
-        
-        self.init(preferences: srcWdg.preferences, wdgType: srcWdg.wdgType, isSpiral:srcWdg.isSpiral, isDoubleStack:srcWdg.isDoubleStack, numTurns:srcWdg.numTurns, elecHt:srcWdg.elecHt, numAxialSections:srcWdg.numAxialSections, radialSpacer:srcWdg.radialSpacer, numAxialColumns:srcWdg.numAxialColumns, numRadialSections:srcWdg.numRadialSections, radialInsulation:srcWdg.radialInsulation, ducts:srcWdg.ducts, numRadialSupports:srcWdg.numRadialSupports, turnDef:srcWdg.turnDef, axialGaps:srcWdg.axialGaps, bottomEdgePack:srcWdg.bottomEdgePack, coilID:srcWdg.coilID, radialOverbuild:srcWdg.radialOverbuild, groundClearance:srcWdg.groundClearance, terminal:newTerm)
+        self.init(preferences: srcWdg.preferences, wdgType: srcWdg.wdgType, isSpiral:srcWdg.isSpiral, isDoubleStack:srcWdg.isDoubleStack, numTurns:srcWdg.numTurns, elecHt:srcWdg.elecHt, numAxialSections:srcWdg.numAxialSections, radialSpacer:srcWdg.radialSpacer, numAxialColumns:srcWdg.numAxialColumns, numRadialSections:srcWdg.numRadialSections, radialInsulation:srcWdg.radialInsulation, ducts:srcWdg.ducts, numRadialSupports:srcWdg.numRadialSupports, turnDef:srcWdg.turnDef, axialGaps:srcWdg.axialGaps, bottomEdgePack:srcWdg.bottomEdgePack, coilID:srcWdg.coilID, radialOverbuild:srcWdg.radialOverbuild, groundClearance:srcWdg.groundClearance, terminal:terminal)
         
         for nextLayer in srcWdg.layers
         {
@@ -322,7 +320,7 @@ class Winding:Codable {
                 newSegs.append(Segment(strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ))
             }
             
-            self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, currentDirection: nextLayer.currentDirection, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: newTerm))
+            self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, currentDirection: nextLayer.currentDirection, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: terminal))
         }
     }
     
@@ -337,7 +335,7 @@ class Winding:Codable {
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.totalTurns * Double(nextLayer.currentDirection)
+                result += nextSegment.totalTurns * Double(self.terminal.currentDirection)
             }
         }
         
@@ -361,7 +359,7 @@ class Winding:Codable {
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.totalTurns
+                result += nextSegment.totalTurns * Double(self.terminal.currentDirection)
             }
         }
         

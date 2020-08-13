@@ -213,7 +213,38 @@ class AppController: NSObject, NSMenuItemValidation {
     
     func doSetReferenceMVA(newMVA:Double)
     {
+        guard let currTxfo = self.currentTxfo else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
         
+        guard let refTerm = currTxfo.refTermNum else
+        {
+            DLog("No reference terminal has been defined")
+            let alert = NSAlert()
+            alert.messageText = "A reference terminal has not been defined for this transformer."
+            alert.alertStyle = .critical
+            alert.runModal()
+            
+            return
+        }
+        
+        let txfo = currTxfo.Copy()
+        
+        for nextWdg in txfo.windings
+        {
+            let totalCCturns = txfo.CurrentCarryingTurns(terminal: refTerm)
+            
+            if nextWdg.terminal.andersenNumber == refTerm
+            {
+                let wdgCCturns = nextWdg.CurrentCarryingTurns()
+                
+                nextWdg.terminal.VA = newMVA * 1.0E6 * wdgCCturns / totalCCturns
+            }
+        }
+        
+        self.updateCurrentTransformer(newTransformer: txfo)
     }
     
     

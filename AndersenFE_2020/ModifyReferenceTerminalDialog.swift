@@ -27,7 +27,7 @@ class ModifyReferenceTerminalDialog: PCH_DialogBox {
             self.currentRefIndex = oldRefTerm - 1
         }
         
-        super.init(viewNibFileName: "ModifyReferenceTerminal", windowTitle: "ModifyReferenceTerminal", hideCancel: false)
+        super.init(viewNibFileName: "ModifyReferenceTerminal", windowTitle: "Modify Reference Terminal", hideCancel: false)
     }
     
     override func awakeFromNib() {

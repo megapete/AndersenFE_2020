@@ -183,6 +183,40 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    @IBAction func handleSetReferenceMVA(_ sender: Any) {
+        
+        let refTerm = self.currentTxfo!.refTermNum!
+        
+        var currentMVA = 0.0
+        
+        do
+        {
+            let va = try self.currentTxfo!.TerminalVA(termNum: refTerm)
+            
+            currentMVA = va / 1.0E6
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+        
+        let mvaDlog = ModifyReferenceMvaDialog(currentMVA: currentMVA)
+        
+        if mvaDlog.runModal() == .OK
+        {
+            doSetReferenceMVA(newMVA: mvaDlog.MVA)
+        }
+    }
+    
+    func doSetReferenceMVA(newMVA:Double)
+    {
+        
+    }
+    
+    
     @IBAction func handleSetReferenceTerminal(_ sender: Any) {
         
         let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.refTermNum)
@@ -207,14 +241,18 @@ class AppController: NSObject, NSMenuItemValidation {
                 {
                     if refnumDlog.currentRefIndex >= 0
                     {
-                        let newTransformer = self.currentTxfo!.Copy()
-                        newTransformer.refTermNum = refnumDlog.currentRefIndex + 1
-                        
-                        self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
+                        self.doSetReferenceTerminal(refTerm: refnumDlog.currentRefIndex + 1)
                     }
                 }
             }
         }
+    }
+    
+    func doSetReferenceTerminal(refTerm:Int)
+    {
+        let newTransformer = self.currentTxfo!.Copy()
+        newTransformer.refTermNum = refTerm
+        self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
     }
     
     
@@ -380,6 +418,10 @@ class AppController: NSObject, NSMenuItemValidation {
         else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem
         {
             return currentTxfo != nil
+        }
+        else if menuItem == self.setMVAMenuItem
+        {
+            return currentTxfo != nil && currentTxfo!.refTermNum != nil
         }
         
         return true

@@ -16,6 +16,8 @@
 		D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */; };
 		D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */; };
 		D3CF829624E46A2600055311 /* ModifyReferenceTerminal.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */; };
+		D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */; };
+		D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */; };
 		D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */; };
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
@@ -44,6 +46,8 @@
 		D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
 		D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceTerminalDialog.swift; sourceTree = "<group>"; };
 		D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceTerminal.xib; sourceTree = "<group>"; };
+		D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceMvaDialog.swift; sourceTree = "<group>"; };
+		D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceMva.xib; sourceTree = "<group>"; };
 		D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_BaseClass_DialogBox.swift; path = "../../../../Dropbox/MyProjects/Base Classes/PCH_BaseClass_DialogBox.swift"; sourceTree = "<group>"; };
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
@@ -103,6 +107,8 @@
 				F5D9DC4324DF42D900D11103 /* AmpTurnsDistribution.xib */,
 				D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */,
 				D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */,
+				D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */,
+				D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */,
 				F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
@@ -189,6 +195,7 @@
 			files = (
 				D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */,
 				D3CF829624E46A2600055311 /* ModifyReferenceTerminal.xib in Resources */,
+				D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */,
 				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
@@ -209,6 +216,7 @@
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,
 				D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
+				D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
 				D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */,

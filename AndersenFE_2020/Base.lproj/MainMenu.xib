@@ -26,8 +26,8 @@
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
-                <outlet property="setAmpTurnsDistributionMenuItem" destination="Fal-I4-PZk" id="kyr-xt-BuG"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
+                <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
                 <outlet property="setRefTerminalMenuItem" destination="Gi5-1S-RQB" id="2Ei-rb-WXd"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
@@ -395,8 +395,11 @@
                                     <action selector="handleSetReferenceMVA:" target="6yZ-bT-Gps" id="tjA-PX-wei"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Set Amp-Turns Distribution..." id="Fal-I4-PZk">
+                            <menuItem title="Set Amp-Turn Distribution..." id="5gM-0S-Fyc">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetReferenceMVA:" target="6yZ-bT-Gps" id="s45-D6-jfz"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>
@@ -542,7 +545,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="861" height="720"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="861" height="720"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -559,21 +562,21 @@
                                         <rect key="frame" x="45" y="0.0" width="499" height="721"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="497" height="719"/>
+                                            <rect key="frame" x="1" y="1" width="482" height="704"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="497" height="719"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="482" height="704"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </customView>
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="704" width="497" height="16"/>
+                                            <rect key="frame" x="1" y="705" width="482" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="482" y="1" width="16" height="719"/>
+                                            <rect key="frame" x="483" y="1" width="15" height="704"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>

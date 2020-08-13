@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ModifyReferenceMvaDialog: PCH_DialogBox, NSTextFieldDelegate {
+class ModifyReferenceMvaDialog: PCH_DialogBox {
 
     @IBOutlet weak var mvaTextField: NSTextField!
     var MVA = 0.0
@@ -22,20 +22,23 @@ class ModifyReferenceMvaDialog: PCH_DialogBox, NSTextFieldDelegate {
     
     override func awakeFromNib() {
         
-        self.mvaTextField.stringValue = "\(self.MVA)"
+        self.mvaTextField.stringValue = "\(fabs(self.MVA))"
+        
+        // Set up a formatter to clamp the allowable values in the text fields to -100...+100
+        let textFieldFormatter = NumberFormatter()
+        textFieldFormatter.minimum = NSNumber(floatLiteral: 0.0)
+        textFieldFormatter.maximum = NSNumber(floatLiteral: 1000.0)
+        
+        self.mvaTextField.formatter = textFieldFormatter
     }
     
-    func controlTextDidEndEditing(_ obj: Notification) {
+    // override the handleOK function to get the value of MVA
+    override func handleOk() {
         
-        if let txFld = obj.object as? NSTextField
-        {
-            if txFld == self.mvaTextField
-            {
-                if let mvaNum = Double(txFld.stringValue)
-                {
-                    self.MVA = max(0.01, mvaNum)
-                }
-            }
-        }
+        self.MVA = Double(self.mvaTextField.stringValue)!
+        
+        // make sure to call the super version of this function to actually handle the OK click
+        super.handleOk()
     }
+    
 }

@@ -81,7 +81,8 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
-    @IBOutlet weak var setAmpTurnsDistributionMenuItem: NSMenuItem!
+    @IBOutlet weak var setNIdistMenuItem: NSMenuItem!
+    
     
     
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
@@ -453,6 +454,10 @@ class AppController: NSObject, NSMenuItemValidation {
         else if menuItem == self.setMVAMenuItem
         {
             return currentTxfo != nil && currentTxfo!.refTermNum != nil
+        }
+        else if menuItem == self.setNIdistMenuItem
+        {
+            return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.AvailableTerminals().count >= 3
         }
         
         return true

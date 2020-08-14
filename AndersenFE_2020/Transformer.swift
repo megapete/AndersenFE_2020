@@ -49,24 +49,16 @@ class Transformer:Codable {
         self.refTermNum = refTermNum
         self.niDistribution = niDistribution
         
-        for nextTerm in terminals
-        {
-            if let oldTerm = nextTerm
-            {
-                let newTerm = Terminal(name: oldTerm.name, voltage: oldTerm.nominalLineVolts, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
-                
-                self.terminals.append(newTerm)
-            }
-            else
-            {
-                self.terminals.append(nil)
-            }
-        }
+        self.terminals = Array(repeating: nil, count: 6)
         
         var index = 0
         for nextWdg in windings
         {
-            self.windings.append(Winding(srcWdg: nextWdg, terminal: self.terminals[index]!))
+            let oldTerm = nextWdg.terminal
+            let newTerm = Terminal(name: oldTerm.name, voltage: oldTerm.nominalLineVolts, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
+            
+            self.windings.append(Winding(srcWdg: nextWdg, terminal: newTerm))
+            self.terminals.append(newTerm)
             
             index += 1
         }
@@ -85,6 +77,7 @@ class Transformer:Codable {
         {
             case NoReferenceTerminalDefined
             case NoSuchTerminalNumber
+            case UnexpectedZeroTurns
             case UnimplementedFeature
         }
         
@@ -102,6 +95,10 @@ class Transformer:Codable {
                 else if self.type == .NoSuchTerminalNumber
                 {
                     return "The terminal number \(info) does not exist in the model"
+                }
+                else if self.type == .UnexpectedZeroTurns
+                {
+                    return "The winding \(info) has zero effective turns (illegal situation)."
                 }
                 else if self.type == .UnimplementedFeature
                 {
@@ -291,9 +288,7 @@ class Transformer:Codable {
         {
             va += nextTerm.legVA * Double(nextTerm.currentDirection)
         }
-        
-        //let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
-        
+                
         return va / vpn
     }
     
@@ -321,7 +316,7 @@ class Transformer:Codable {
         }
     }
     
-    /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage' and 'VA' fields to force amp-turns to be equal to 0.
+    /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage','VA', and 'currentDirection' fields to force amp-turns to be equal to 0.
     func AmpTurns(forceBalance:Bool, showDistributionDialog:Bool) throws -> Double
     {
         guard let refTerm = self.refTermNum else {
@@ -334,6 +329,7 @@ class Transformer:Codable {
             var refTermNI = 0.0
             do
             {
+                // refTermNI is a SIGNED quantity
                 refTermNI = try self.ReferenceOnanAmpTurns()
             }
             catch
@@ -347,18 +343,25 @@ class Transformer:Codable {
             {
                 do
                 {
-                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: nonRefTerms.first!)
+                    let nonRefTerm = nonRefTerms.first!
+                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: nonRefTerm)
                     
-                    let totalTurns = self.CurrentCarryingTurns(terminal: nonRefTerms.first!)
+                    let totalEffectiveTurns = self.CurrentCarryingTurns(terminal: nonRefTerm)
                     
-                    let amps = (totalTurns == 0.0 ? 0.0 : -refTermNI / totalTurns)
+                    if totalEffectiveTurns == 0.0
+                    {
+                        throw TransformerErrors(info: "\(nonRefTerm)", type: .UnexpectedZeroTurns)
+                    }
+                    
+                    // note that 'amps' is a SIGNED quantity, and can never be equal to zero
+                    let amps = -refTermNI / totalEffectiveTurns
                     let vpn = try self.VoltsPerTurn()
                     
                     for nextWdg in nonRefWdgs
                     {
-                        let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
-                        let wdgAmps = nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * amps
-                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: wdgAmps)
+                        let voltage = nextWdg.CurrentCarryingTurns() * vpn
+                        
+                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: amps)
                     }
                 }
                 catch
@@ -458,19 +461,18 @@ class Transformer:Codable {
         
         var result = 0.0
         
-        let legFactor = (terminals[0].connection == .wye || terminals[0].connection == .auto_common || terminals[0].connection == .auto_series ? SQRT3 : 1.0)
+        let legFactor = terminals[0].connectionFactor
         
-        var voltageSum = 0.0
         var noloadVoltageSum = 0.0
         for nextWdg in self.windings
         {
             if nextWdg.terminal.andersenNumber == refTerm
             {
-                noloadVoltageSum += nextWdg.terminal.nominalLineVolts
-                
-                voltageSum += nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * nextWdg.terminal.nominalLineVolts
+                noloadVoltageSum += nextWdg.terminal.nominalLineVolts * Double(nextWdg.terminal.currentDirection)
             }
         }
+        
+        noloadVoltageSum = fabs(noloadVoltageSum)
         
         var turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
         
@@ -478,15 +480,14 @@ class Transformer:Codable {
         {
             // use the no-load turns & voltage
             turnsToUse = self.NoLoadTurns(terminal: refTerm)
-            voltageSum = noloadVoltageSum
         }
         
-        result = voltageSum / legFactor / turnsToUse
+        result = noloadVoltageSum / legFactor / turnsToUse
         
         return result
     }
     
-    /// Signed value representing the number of turns associated with the give terminal
+    /// Unsigned value representing the number of turns associated with the give terminal. These are the effective "active" turns
     func CurrentCarryingTurns(terminal:Int) -> Double
     {
         var result = 0.0
@@ -495,13 +496,14 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                result += nextWdg.CurrentCarryingTurns()
+                result += nextWdg.CurrentCarryingTurns() * Double(nextWdg.terminal.currentDirection)
             }
         }
         
-        return result
+        return fabs(result)
     }
     
+    /// Unsigned value representing the total number of turns associated with the given terminal. These are the effective "total" turns
     func NoLoadTurns(terminal:Int) -> Double
     {
         var result = 0.0
@@ -510,11 +512,11 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                result += nextWdg.NoLoadTurns()
+                result += nextWdg.NoLoadTurns() * Double(nextWdg.terminal.currentDirection)
             }
         }
         
-        return result
+        return fabs(result)
     }
     
     /// Some different errors that can be thrown by the init routine

@@ -22,18 +22,31 @@ class Terminal: Codable
     
     var legVA:Double {
         get {
-            let phaseFactor = self.connection == .single_phase_one_leg ? 1.0 : self.connection == .single_phase_two_legs ? 2.0 : 3.0
-            return self.VA / phaseFactor
+            
+            return self.VA / self.phaseFactor
+        }
+    }
+    
+    /// Phase factor for the terminal (1, 2 or 3)
+    var phaseFactor:Double {
+        get {
+            
+            return (self.connection == .single_phase_one_leg ? 1.0 : (self.connection == .single_phase_two_legs ? 2.0 : 3.0))
+        }
+    }
+    
+    var connectionFactor:Double {
+        get {
+            
+            return (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
         }
     }
     
     /// The nominal ONAN leg amps of the Terminal (winding)
     var NominalOnanAmps:Double {
         get {
-    
-            let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
             
-            let result = self.legVA / (self.nominalLineVolts / connFactor)
+            let result = self.legVA / (self.nominalLineVolts / self.connectionFactor)
             
             return result
         }
@@ -114,7 +127,11 @@ class Terminal: Codable
         
         self.nominalLineVolts = legVolts * connFactor
         self.VA = legVolts * fabs(amps) * phaseFactor
-        self.currentDirection = amps == 0.0 ? 0 : (amps < 0.0 ? -1 : 1)
+        
+        if amps < 0.0
+        {
+            self.currentDirection = -self.currentDirection
+        }
     }
     
 }

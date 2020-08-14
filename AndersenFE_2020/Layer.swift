@@ -48,8 +48,13 @@ class Layer:Codable {
     /// The widning material used in the Layer
     let material:ConductorMaterial
     
-    /// The current direction (-1, 1, or 0)
-    let currentDirection:Int
+    /// The current direction, which comes from the parent Terminal (-1, 1, or 0)
+    var currentDirection:Int {
+        get {
+            
+            return self.parentTerminal.currentDirection
+        }
+    }
     
     /// The number of parallel axial groups in the Layer (either 1 or 2)
     let numberParallelGroups:Int
@@ -63,12 +68,11 @@ class Layer:Codable {
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal
     
-    init(segments:[Segment] = [], numSpacerBlocks:Int, spacerBlockWidth:Double, material:ConductorMaterial, currentDirection:Int, numberParallelGroups:Int, radialBuild:Double, innerRadius:Double, parentTerminal:Terminal)
+    init(segments:[Segment] = [], numSpacerBlocks:Int, spacerBlockWidth:Double, material:ConductorMaterial, numberParallelGroups:Int, radialBuild:Double, innerRadius:Double, parentTerminal:Terminal)
     {
         self.numSpacerBlocks = numSpacerBlocks
         self.spacerBlockWidth = spacerBlockWidth
         self.material = material
-        self.currentDirection = currentDirection
         self.numberParallelGroups = numberParallelGroups
         self.radialBuild = radialBuild
         self.innerRadius = innerRadius

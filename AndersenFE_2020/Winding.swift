@@ -320,11 +320,11 @@ class Winding:Codable {
                 newSegs.append(Segment(strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ))
             }
             
-            self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, currentDirection: nextLayer.currentDirection, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: terminal))
+            self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: terminal))
         }
     }
     
-    /// The current-carrying turns are the effective turns, and a SIGNED quantity, depending on the current direction
+    /// The current-carrying turns are the effective turns, and an UNSIGNED quantity
     func CurrentCarryingTurns() -> Double
     {
         var result = 0.0
@@ -335,7 +335,7 @@ class Winding:Codable {
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.totalTurns * Double(self.terminal.currentDirection)
+                result += nextSegment.totalTurns
             }
         }
         
@@ -359,7 +359,7 @@ class Winding:Codable {
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.totalTurns * Double(self.terminal.currentDirection)
+                result += nextSegment.totalTurns
             }
         }
         
@@ -674,7 +674,7 @@ class Winding:Codable {
         
         for _ in 0..<numLayers
         {
-            let newLayer = Layer(segments: layerSegments, numSpacerBlocks: self.numAxialColumns, spacerBlockWidth: self.radialSpacer.width, material: .copper, currentDirection: self.terminal.currentDirection, numberParallelGroups: (self.isDoubleStack ? 2 : 1), radialBuild: copperRadialBuild, innerRadius: nextIR, parentTerminal: self.terminal)
+            let newLayer = Layer(segments: layerSegments, numSpacerBlocks: self.numAxialColumns, spacerBlockWidth: self.radialSpacer.width, material: .copper, numberParallelGroups: (self.isDoubleStack ? 2 : 1), radialBuild: copperRadialBuild, innerRadius: nextIR, parentTerminal: self.terminal)
             
             self.layers.append(newLayer)
             

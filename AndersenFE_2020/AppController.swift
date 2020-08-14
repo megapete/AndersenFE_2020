@@ -220,32 +220,45 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        guard let refTerm = currTxfo.refTermNum else
+        do
         {
-            DLog("No reference terminal has been defined")
-            let alert = NSAlert()
-            alert.messageText = "A reference terminal has not been defined for this transformer."
-            alert.alertStyle = .critical
-            alert.runModal()
+            let txfo = currTxfo.Copy()
             
+            let vpn = try txfo.VoltsPerTurn()
+            
+            let refWdgs = try txfo.WindingsFromAndersenNumber(termNum: txfo.refTermNum!)
+            
+            let phaseFactor = refWdgs[0].terminal.phaseFactor
+            let connFactor = refWdgs[0].terminal.connectionFactor
+            
+            var lineVolts = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!) * vpn
+            var legVA = newMVA * 1.0E6 / phaseFactor
+            
+            if lineVolts == 0.0
+            {
+                lineVolts = txfo.NoLoadTurns(terminal: txfo.refTermNum!) * vpn
+                legVA = 0.0
+            }
+            
+            let legVolts = lineVolts / connFactor
+            
+            let legAmps = legVA / legVolts
+            
+            for nextWdg in refWdgs
+            {
+                let voltage = nextWdg.CurrentCarryingTurns() * vpn
+                
+                nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: legAmps)
+            }
+            
+            self.updateCurrentTransformer(newTransformer: txfo)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
             return
         }
-        
-        let txfo = currTxfo.Copy()
-        
-        for nextWdg in txfo.windings
-        {
-            let totalCCturns = txfo.CurrentCarryingTurns(terminal: refTerm)
-            
-            if nextWdg.terminal.andersenNumber == refTerm
-            {
-                let wdgCCturns = nextWdg.CurrentCarryingTurns()
-                
-                nextWdg.terminal.VA = newMVA * 1.0E6 * wdgCCturns / totalCCturns
-            }
-        }
-        
-        self.updateCurrentTransformer(newTransformer: txfo)
     }
     
     

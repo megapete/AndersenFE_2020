@@ -78,6 +78,7 @@ class Transformer:Codable {
             case NoReferenceTerminalDefined
             case NoSuchTerminalNumber
             case UnexpectedZeroTurns
+            case UnexpectedAmpTurnsOutOfBalance
             case UnimplementedFeature
         }
         
@@ -99,6 +100,10 @@ class Transformer:Codable {
                 else if self.type == .UnexpectedZeroTurns
                 {
                     return "The winding \(info) has zero effective turns (illegal situation)."
+                }
+                else if self.type == .UnexpectedAmpTurnsOutOfBalance
+                {
+                    return "The transformer's ampere-turns are unexpectedly out of balance!"
                 }
                 else if self.type == .UnimplementedFeature
                 {
@@ -292,29 +297,6 @@ class Transformer:Codable {
         return va / vpn
     }
     
-    // The total VA (three-phase or single-phase, depending on the connection) of the Andersen-type terminal
-    func TerminalVA(termNum:Int) throws -> Double
-    {
-        do
-        {
-            let wdgs = try self.WindingsFromAndersenNumber(termNum: termNum)
-            
-            var result = 0.0
-            
-            for nextWdg in wdgs
-            {
-                let wdgVA = nextWdg.terminal.VA * nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns()
-                
-                result += wdgVA
-            }
-            
-            return result
-        }
-        catch
-        {
-            throw error
-        }
-    }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage','VA', and 'currentDirection' fields to force amp-turns to be equal to 0.
     func AmpTurns(forceBalance:Bool, showDistributionDialog:Bool) throws -> Double
@@ -369,64 +351,65 @@ class Transformer:Codable {
                     throw error
                 }
             }
-            else // there's more than just two terminals
+            else // there's more than just two terminals, which complicates things considerably
             {
-                // Start out by assuming that the ref terminal has 100% (or -100 if the current direction is negative) of the amp-turns and that Terminal 1 or Terminal 2 has the full offsetting NI. This way, if the user Cancels out of the DialogBox, everything is balanced.
-                
-                let sign = self.CurrentCarryingTurns(terminal: refTerm) < 0.0 ? -1.0 : 1.0
-                
-                let refTermNIpercentage = sign * 100.0
-                
-                let otherMainTerm = (refTerm == 2 ? 1 : 2)
-                
-                var niArray:[Double] = Array(repeating: 0.0, count: 6)
-                
-                niArray[refTerm - 1] = refTermNIpercentage
-                niArray[otherMainTerm - 1] = -refTermNIpercentage
-                
-                let termsToAdjust:Set<Int> = self.AvailableTerminals()
-                
-                if showDistributionDialog || self.niDistribution == nil
-                {
-                    let niDlog = AmpTurnsDistributionDialog(termsToShow: termsToAdjust, termPercentages: niArray)
-                    
-                    if niDlog.runModal() == .OK
-                    {
-                        niArray = niDlog.currentTerminalPercentages
-                    }
-                    
-                    self.niDistribution = niArray
-                }
-                
-                var voltAmps:[(terminal:Terminal, volts:Double, amps:Double)] = []
                 do
                 {
-                    for nextTerm in termsToAdjust
+                    // first we'll check what the current VA's for the various terminals come up with as amp-turns, and if they don't balance we'll bring up the AmpTurnsDistributionDialog
+                    var termVoltAmps:[(termNum:Int, va:Double)] = []
+                    
+                    let availableTerms = self.AvailableTerminals()
+                    
+                    var maxNegativeAmpTurns = 0.0
+                    
+                    for nextAvailableTerm in availableTerms
                     {
-                        let windings = try self.WindingsFromAndersenNumber(termNum: nextTerm)
-                        let turns = self.CurrentCarryingTurns(terminal: nextTerm)
+                        var va = 0.0
                         
-                        let amps = turns == 0.0 ? 0.0 : niArray[nextTerm - 1] / 100.0 * refTermNI / turns
-                        let vpn = try self.VoltsPerTurn()
-                        
-                        for nextWdg in windings
+                        for nextWdg in self.windings
                         {
-                            let voltage = nextWdg.NoLoadVoltage(voltsPerTurn: vpn)
-                            let wdgAmps = nextWdg.CurrentCarryingTurns() / nextWdg.NoLoadTurns() * amps
-                            voltAmps.append((nextWdg.terminal, voltage, wdgAmps))
+                            if nextWdg.terminal.andersenNumber == nextAvailableTerm
+                            {
+                                va += nextWdg.terminal.legVA * Double(nextWdg.terminal.currentDirection)
+                            }
                         }
+                        
+                        if va < 0.0
+                        {
+                            // yes, there's a reason why I'm converting it to a positve
+                            maxNegativeAmpTurns -= va
+                        }
+                        
+                        termVoltAmps.append((nextAvailableTerm, va))
+                    }
+                    
+                    var checkVA = 0.0
+                    var niArray:[Double] = Array(repeating: 0.0, count: 6)
+                    for nextTva in termVoltAmps
+                    {
+                        checkVA += nextTva.va
+                        
+                        niArray[nextTva.termNum - 1] = checkVA / maxNegativeAmpTurns * 100.0
+                    }
+                    
+                    if showDistributionDialog || checkVA != 0
+                    {
+                        let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray)
+                        
+                        if niDlog.runModal() == .OK
+                        {
+                            niArray = niDlog.currentTerminalPercentages
+                        }
+                        
+                        // not sure this is needed any more
+                        self.niDistribution = niArray
+                        
+                        
                     }
                 }
                 catch
                 {
                     throw error
-                }
-                
-                // if we get here, then there were no errors so change the terminal VAs
-                for va in voltAmps
-                {
-                    let term = va.terminal
-                    term.SetVoltsAndVA(legVolts: va.volts, amps: va.amps)
                 }
             }
             

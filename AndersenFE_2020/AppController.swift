@@ -190,19 +190,20 @@ class AppController: NSObject, NSMenuItemValidation {
         
         var currentMVA = 0.0
         
-        do
+        var va = 0.0
+        let txfo = self.currentTxfo!
+        for nextTerm in txfo.terminals
         {
-            let va = try self.currentTxfo!.TerminalVA(termNum: refTerm)
-            
-            currentMVA = va / 1.0E6
+            if let term = nextTerm
+            {
+                if term.andersenNumber == refTerm
+                {
+                    va += term.VA
+                }
+            }
         }
-        catch
-        {
-            // An error occurred
-            let alert = NSAlert(error: error)
-            let _ = alert.runModal()
-            return
-        }
+        
+        currentMVA = va / 1.0E6
         
         let mvaDlog = ModifyReferenceMvaDialog(currentMVA: currentMVA)
         
@@ -217,6 +218,15 @@ class AppController: NSObject, NSMenuItemValidation {
         guard let currTxfo = self.currentTxfo else
         {
             DLog("Current transformer is not defined")
+            return
+        }
+        
+        guard currTxfo.CurrentCarryingTurns(terminal: currTxfo.refTermNum!) != 0.0 else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Reference Terminal has no effective turns!"
+            alert.informativeText = "Add some turns to the reference terminal before trying to change the MVA of the transformer"
+            let _ = alert.runModal()
             return
         }
         
@@ -466,7 +476,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         else if menuItem == self.setMVAMenuItem
         {
-            return currentTxfo != nil && currentTxfo!.refTermNum != nil
+            return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.CurrentCarryingTurns(terminal: currentTxfo!.refTermNum!) != 0.0
         }
         else if menuItem == self.setNIdistMenuItem
         {

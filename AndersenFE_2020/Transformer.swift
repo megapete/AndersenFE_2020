@@ -411,8 +411,23 @@ class Transformer:Codable {
                         self.niDistribution = niArray
                     }
                     
-                    // at this point, niArray is guaranteed to be in balance. Set the Terminal VA's accordingly
+                    // At this point, niArray (array of "terminal" NI percentages) is guaranteed to be in balance. Set the Terminal VA's accordingly. The problem here is that the "terminal" VA is actually the _sum_ of the "Terminals" VAs. We assume that the "relative" current directions of the Terminals is maintained. That is, if the overall "terminal" current directions was positive, but after the dialog it is now negative, all of the Terminals currentDirection properties must be reversed.
                     
+                    for maybeTerm in self.terminals
+                    {
+                        if let nextTerm = maybeTerm
+                        {
+                            let index = nextTerm.andersenNumber - 1
+                            let totalTermVA = niArray[index] / 100.0 * maxNegativeVoltAmps
+                            
+                            let windings = try self.WindingsFromAndersenNumber(termNum: nextTerm.andersenNumber)
+                            
+                            for nextWinding in windings
+                            {
+                                
+                            }
+                        }
+                    }
                 }
                 catch
                 {

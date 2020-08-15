@@ -335,7 +335,7 @@ class Winding:Codable {
         {
             for nextSegment in nextLayer.segments
             {
-                result += nextSegment.totalTurns
+                result += nextSegment.activeTurns
             }
         }
         

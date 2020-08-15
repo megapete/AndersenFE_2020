@@ -120,13 +120,32 @@ class Terminal: Codable
         self.andersenNumber = termNum
     }
     
+    
+    func SetTerminalVA(legVA:Double)
+    {
+        if legVA == 0.0
+        {
+            self.VA = 0.0
+            return
+        }
+        
+        self.VA = fabs(legVA) * self.phaseFactor
+        
+        if legVA < 0
+        {
+            self.currentDirection = -1
+        }
+        else
+        {
+            self.currentDirection = 1
+        }
+    }
+    
+    /// This function sets the VA of the terminal based on the voltage and current passed in. Note that if 'amps' is negative, the currentDirection property is INVERTED.
     func SetVoltsAndVA(legVolts:Double, amps:Double)
     {
-        let phaseFactor = self.connection == .single_phase_one_leg ? 1.0 : self.connection == .single_phase_two_legs ? 2.0 : 3.0
-        let connFactor = (self.connection == .wye || self.connection == .auto_common || self.connection == .auto_series ? SQRT3 : 1.0)
-        
-        self.nominalLineVolts = legVolts * connFactor
-        self.VA = legVolts * fabs(amps) * phaseFactor
+        self.nominalLineVolts = legVolts * self.connectionFactor
+        self.VA = legVolts * fabs(amps) * self.phaseFactor
         
         if amps < 0.0
         {

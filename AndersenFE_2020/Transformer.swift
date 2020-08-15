@@ -360,7 +360,7 @@ class Transformer:Codable {
                     
                     let availableTerms = self.AvailableTerminals()
                     
-                    var maxNegativeAmpTurns = 0.0
+                    var maxNegativeVoltAmps = 0.0
                     
                     for nextAvailableTerm in availableTerms
                     {
@@ -377,7 +377,7 @@ class Transformer:Codable {
                         if va < 0.0
                         {
                             // yes, there's a reason why I'm converting it to a positve
-                            maxNegativeAmpTurns -= va
+                            maxNegativeVoltAmps -= va
                         }
                         
                         termVoltAmps.append((nextAvailableTerm, va))
@@ -389,12 +389,18 @@ class Transformer:Codable {
                     {
                         checkVA += nextTva.va
                         
-                        niArray[nextTva.termNum - 1] = checkVA / maxNegativeAmpTurns * 100.0
+                        niArray[nextTva.termNum - 1] = nextTva.va / maxNegativeVoltAmps * 100.0
                     }
                     
                     if showDistributionDialog || checkVA != 0
                     {
                         let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray)
+                        
+                        // if we came into the dialog because the amp-turns are unbalanced, then we do not give the user the choice to cancel out of the dialog
+                        if checkVA != 0
+                        {
+                            niDlog.cancelButton!.isHidden = true
+                        }
                         
                         if niDlog.runModal() == .OK
                         {
@@ -403,9 +409,10 @@ class Transformer:Codable {
                         
                         // not sure this is needed any more
                         self.niDistribution = niArray
-                        
-                        
                     }
+                    
+                    // at this point, niArray is guaranteed to be in balance. Set the Terminal VA's accordingly
+                    
                 }
                 catch
                 {

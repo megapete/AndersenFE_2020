@@ -239,18 +239,15 @@ class AppController: NSObject, NSMenuItemValidation {
             let refWdgs = try txfo.WindingsFromAndersenNumber(termNum: txfo.refTermNum!)
             
             let phaseFactor = refWdgs[0].terminal.phaseFactor
-            let connFactor = refWdgs[0].terminal.connectionFactor
             
-            var lineVolts = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!) * vpn
+            var legVolts = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!) * vpn
             var legVA = newMVA * 1.0E6 / phaseFactor
             
-            if lineVolts == 0.0
+            if legVolts == 0.0
             {
-                lineVolts = txfo.NoLoadTurns(terminal: txfo.refTermNum!) * vpn
+                legVolts = txfo.NoLoadTurns(terminal: txfo.refTermNum!) * vpn
                 legVA = 0.0
             }
-            
-            let legVolts = lineVolts / connFactor
             
             let legAmps = legVA / legVolts
             
@@ -423,6 +420,11 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             do
             {
+                if nextTerm == 3
+                {
+                    DLog("got 3")
+                }
+                
                 let terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
                 var isRef = false
                 if let refTerm = txfo.refTermNum
@@ -451,7 +453,8 @@ class AppController: NSObject, NSMenuItemValidation {
             let vpn = try txfo.VoltsPerTurn()
             self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
             
-            let newNI = try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
+            // amp-turns are guaranteed to be 0 if forceAmpTurnsBalance is true
+            let newNI = self.preferences.generalPrefs.forceAmpTurnBalance ? 0.0 : try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
             self.dataView.SetAmpereTurns(newNI: newNI)
         }
         catch

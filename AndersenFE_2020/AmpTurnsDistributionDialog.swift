@@ -75,7 +75,7 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     
     var currentTerminalPercentages:[Double] = Array(repeating: 0.0, count: 6)
     
-    init(termsToShow:Set<Int>, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0)
+    init(termsToShow:Set<Int>, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0, hideCancel:Bool = false)
     {
         self.currentTerminalPercentages[0] = min(maxValue, max(minValue, term1))
         self.currentTerminalPercentages[1] = min(maxValue, max(minValue, term2))
@@ -88,9 +88,9 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         super.init(viewNibFileName: "AmpTurnsDistribution", windowTitle: "AmpTurns Distribution", hideCancel: false)
     }
     
-    convenience init(termsToShow:Set<Int>, termPercentages:[Double])
+    convenience init(termsToShow:Set<Int>, termPercentages:[Double], hideCancel:Bool = false)
     {
-        self.init(termsToShow: termsToShow, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5])
+        self.init(termsToShow: termsToShow, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5], hideCancel:hideCancel)
     }
     
     func CheckAmpTurns() -> Double
@@ -109,6 +109,11 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         if let ok = self.okButton
         {
             ok.isEnabled = ampTurns == 0.0
+            self.enableOK = ampTurns == 0.0
+        }
+        else
+        {
+            self.enableOK = ampTurns == 0.0
         }
         
         return ampTurns
@@ -232,6 +237,27 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         DLog("New value: \(slider.doubleValue)")
     }
     
+    func controlTextDidChange(_ obj: Notification) {
+        
+        if let txFld = obj.object as? NSTextField
+        {
+            let newValue = min(maxValue, max(minValue, txFld.doubleValue))
+            
+            if txFld.tag >= 100 && txFld.tag <= 105
+            {
+                self.sliders[txFld.tag - tagBase].doubleValue = newValue
+                self.currentTerminalPercentages[txFld.tag - tagBase] = newValue
+            }
+            else
+            {
+                return
+            }
+            
+            let _ = self.CheckAmpTurns()
+        }
+    }
+    
+    /*
     func controlTextDidEndEditing(_ obj: Notification) {
         
         if let txFld = obj.object as? NSTextField
@@ -251,5 +277,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             let _ = self.CheckAmpTurns()
         }
     }
+ */
     
 }

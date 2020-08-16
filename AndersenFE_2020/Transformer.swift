@@ -49,7 +49,7 @@ class Transformer:Codable {
         self.refTermNum = refTermNum
         self.niDistribution = niDistribution
         
-        self.terminals = Array(repeating: nil, count: 6)
+        self.terminals = []
         
         var index = 0
         for nextWdg in windings
@@ -335,8 +335,21 @@ class Transformer:Codable {
                         throw TransformerErrors(info: "\(nonRefTerm)", type: .UnexpectedZeroTurns)
                     }
                     
-                    // note that 'amps' is a SIGNED quantity, and can never be equal to zero
-                    let amps = -refTermNI / totalEffectiveTurns
+                    // note that at this point, 'amps' is a SIGNED quantity, and can never be equal to zero
+                    var amps = -refTermNI / totalEffectiveTurns
+                    let ampsSign = amps < 0 ? -1 : 1
+                    let termSign = self.CurrentDirection(terminal: nonRefTerm)
+                    
+                    // the Terminal function SetVoltsAndVA() will invert the currentDirection of a winding if the amps parameter is negative
+                    if termSign == ampsSign
+                    {
+                        amps = fabs(amps)
+                    }
+                    else
+                    {
+                        amps = -fabs(amps)
+                    }
+                    
                     let vpn = try self.VoltsPerTurn()
                     
                     for nextWdg in nonRefWdgs
@@ -392,15 +405,11 @@ class Transformer:Codable {
                         niArray[nextTva.termNum - 1] = nextTva.va / maxNegativeVoltAmps * 100.0
                     }
                     
+                    let oldDistribution = niArray
+                    
                     if showDistributionDialog || checkVA != 0
                     {
-                        let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray)
-                        
-                        // if we came into the dialog because the amp-turns are unbalanced, then we do not give the user the choice to cancel out of the dialog
-                        if checkVA != 0
-                        {
-                            niDlog.cancelButton!.isHidden = true
-                        }
+                        let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray, hideCancel:checkVA != 0)
                         
                         if niDlog.runModal() == .OK
                         {
@@ -411,23 +420,42 @@ class Transformer:Codable {
                         self.niDistribution = niArray
                     }
                     
-                    // At this point, niArray (array of "terminal" NI percentages) is guaranteed to be in balance. Set the Terminal VA's accordingly. The problem here is that the "terminal" VA is actually the _sum_ of the "Terminals" VAs. We assume that the "relative" current directions of the Terminals is maintained. That is, if the overall "terminal" current directions was positive, but after the dialog it is now negative, all of the Terminals currentDirection properties must be reversed.
+                    // At this point, niArray (array of "terminal" NI percentages) is guaranteed to be in balance. Set the Terminal VA's accordingly. The problem here is that the "terminal" VA is actually the _sum_ of the "Terminals" VAs. We assume that the "relative" current directions of the Terminals is maintained. That is, if the overall "terminal" current directions was positive, but after the dialog it is now negative, all of the associated Terminals' currentDirection properties must be reversed.
                     
-                    for maybeTerm in self.terminals
+                    if niArray != oldDistribution
                     {
-                        if let nextTerm = maybeTerm
+                        let vpn = try self.VoltsPerTurn()
+                        
+                        for nextTerm in availableTerms
                         {
-                            let index = nextTerm.andersenNumber - 1
-                            let totalTermVA = niArray[index] / 100.0 * maxNegativeVoltAmps
+                            let termLegVA = maxNegativeVoltAmps * niArray[nextTerm - 1] / 100.0
+                            let termLegV = vpn * self.NoLoadTurns(terminal: nextTerm)
+                            var termAmps = termLegV == 0.0 ? 0.0 : termLegVA / termLegV
+                            let ampsSign = termAmps < 0 ? -1 : 1
+                            let termSign = self.CurrentDirection(terminal: nextTerm)
                             
-                            let windings = try self.WindingsFromAndersenNumber(termNum: nextTerm.andersenNumber)
-                            
-                            for nextWinding in windings
+                            // the Terminal function SetVoltsAndVA() will invert the currentDirection of a winding if the amps parameter is negative. If currentDirection of the Terminal is 0, it will be set to ampSign
+                            if termSign == ampsSign || (termSign == 0 && ampsSign > 0)
                             {
-                                
+                                termAmps = fabs(termAmps)
+                            }
+                            else
+                            {
+                                termAmps = -fabs(termAmps)
+                            }
+                            
+                            for nextWdg in self.windings
+                            {
+                                if nextWdg.terminal.andersenNumber == nextTerm
+                                {
+                                    let wdgLegV = vpn * nextWdg.CurrentCarryingTurns()
+                                    
+                                    nextWdg.terminal.SetVoltsAndVA(legVolts: wdgLegV, amps: termAmps)
+                                }
                             }
                         }
                     }
+                    
                 }
                 catch
                 {
@@ -492,6 +520,31 @@ class Transformer:Codable {
         return result
     }
     
+    /// A SIGNED value indicating the direction of current for the "terminal" (in the andersen sense). This function returns 0 if there are no turns
+    func CurrentDirection(terminal:Int) -> Int
+    {
+        var turns = 0.0
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.terminal.andersenNumber == terminal
+            {
+                turns += nextWdg.CurrentCarryingTurns() * Double(nextWdg.terminal.currentDirection)
+            }
+        }
+        
+        if turns > 0
+        {
+            return 1
+        }
+        else if turns < 0
+        {
+            return -1
+        }
+        
+        return 0
+    }
+    
     /// Unsigned value representing the number of turns associated with the give terminal. These are the effective "active" turns
     func CurrentCarryingTurns(terminal:Int) -> Double
     {
@@ -508,17 +561,25 @@ class Transformer:Codable {
         return fabs(result)
     }
     
-    /// Unsigned value representing the total number of turns associated with the given terminal. These are the effective "total" turns
+    /// Unsigned value representing the total number of turns associated with the given terminal. These are the effective "total" turns.
     func NoLoadTurns(terminal:Int) -> Double
     {
         var result = 0.0
+        var noloadWdgTurns = 0.0
         
         for nextWdg in self.windings
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
+                noloadWdgTurns += nextWdg.NoLoadTurns()
+                
                 result += nextWdg.NoLoadTurns() * Double(nextWdg.terminal.currentDirection)
             }
+        }
+        
+        if result == 0.0
+        {
+            result = noloadWdgTurns
         }
         
         return fabs(result)
@@ -750,6 +811,10 @@ class Transformer:Codable {
                     throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
                 }
                 
+                if currDir == 0
+                {
+                    VA = 0.0
+                }
                 
                 let connString = lineElements[2]
                 var connection:Terminal.TerminalConnection = .wye

@@ -436,8 +436,9 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
                 
                 let termLineVolts = try txfo.TerminalLineVoltage(terminal: nextTerm)
+                let termVA = try txfo.TotalVA(terminal: nextTerm)
                 
-                self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: termLineVolts, VA: terminals[0].VA, connection: terminals[0].connection, isReference: isRef)
+                self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: termLineVolts, VA: termVA, connection: terminals[0].connection, isReference: isRef)
             }
             catch
             {

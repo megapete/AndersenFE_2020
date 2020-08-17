@@ -665,6 +665,12 @@
                                         </textFieldCell>
                                     </textField>
                                 </subviews>
+                                <connections>
+                                    <outlet property="SetNIDistributionMenuItem" destination="5L4-cL-fka" id="QDP-UV-Rmx"/>
+                                    <outlet property="SetRefMVAMenuItem" destination="VZH-bl-orK" id="Yqi-sr-Qjq"/>
+                                    <outlet property="SetRefTermMenuItem" destination="DOj-Px-Yk0" id="r62-Ss-5zx"/>
+                                    <outlet property="contextualMenu" destination="9xV-35-2jM" id="4zf-rA-bcs"/>
+                                </connections>
                             </customView>
                         </subviews>
                         <holdingPriorities>
@@ -677,5 +683,22 @@
             </view>
             <point key="canvasLocation" x="163.5" y="-246"/>
         </window>
+        <menu id="9xV-35-2jM">
+            <items>
+                <menuItem title="Set Reference Terminal" id="DOj-Px-Yk0">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSetRefTerm:" target="-1" id="uLk-As-7OY"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Set Reference MVA" id="VZH-bl-orK">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Set Amp-Turn Distribution" id="5L4-cL-fka">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="228" y="324"/>
+        </menu>
     </objects>
 </document>

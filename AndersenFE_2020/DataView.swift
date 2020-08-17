@@ -74,7 +74,7 @@ class DataView: NSView {
         
         // self.termFields.sort(by: {$0.tag < $1.tag})
         
-        DLog("Textfield count: \(dataFields.count)")
+        // DLog("Textfield count: \(dataFields.count)")
     }
     
 

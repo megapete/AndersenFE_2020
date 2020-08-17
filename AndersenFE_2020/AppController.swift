@@ -83,7 +83,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
     @IBOutlet weak var setNIdistMenuItem: NSMenuItem!
     
-    
+    @IBOutlet weak var TxfoContextMenu:NSMenu!
     
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
@@ -387,6 +387,8 @@ class AppController: NSObject, NSMenuItemValidation {
         // let _ = ampTurnDlog.runModal()
     }
  */
+    // MARK: Contextual Menus
+    
     
     // MARK: Zoom functions
     @IBAction func handleZoomIn(_ sender: Any) {
@@ -417,7 +419,7 @@ class AppController: NSObject, NSMenuItemValidation {
     {
         self.handleZoomAll(self)
         
-        self.termsView.InitializeFields()
+        self.termsView.InitializeFields(appController: self)
         
         self.dataView.InitializeFields()
         
@@ -461,10 +463,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             do
             {
-                if nextTerm == 3
-                {
-                    DLog("got 3")
-                }
+            
                 
                 let terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
                 var isRef = false

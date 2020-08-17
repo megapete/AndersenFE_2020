@@ -689,7 +689,7 @@ class Transformer:Codable {
             do {
                 
                 try nextWdg.InitializeLayers(windingCenter: GetWindingsCenter())
-                DLog("Layer count: \(nextWdg.layers.count)")
+                // DLog("Layer count: \(nextWdg.layers.count)")
             }
             catch
             {

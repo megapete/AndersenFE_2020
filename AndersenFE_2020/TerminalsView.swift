@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class TerminalsView: NSView {
+class TerminalsView: NSView, NSMenuItemValidation {
     
     static let termColors:[NSColor] = [.red, .green, .orange, .blue, .purple, .brown]
     
@@ -16,7 +16,16 @@ class TerminalsView: NSView {
     
     var referenceTerminal = 2
     
-    func InitializeFields()
+    var appController:AppController? = nil
+    
+    // contextual menu
+    // NOTE TO FUTURE ME: You need to create this variable FIRST (as an @IBOutlet) then connect it back to the NSMenu created with IB back in the MainMenu.xib file.
+    @IBOutlet weak var contextualMenu:NSMenu!
+    @IBOutlet weak var SetRefTermMenuItem:NSMenuItem!
+    @IBOutlet weak var SetRefMVAMenuItem:NSMenuItem!
+    @IBOutlet weak var SetNIDistributionMenuItem:NSMenuItem!
+    
+    func InitializeFields(appController:AppController)
     {
         for nextFld in self.termFields
         {
@@ -27,6 +36,8 @@ class TerminalsView: NSView {
                 nextFld.isHidden = true
             }
         }
+        
+        self.appController = appController
     }
     
     func SetTermData(termNum:Int, name:String, displayVolts:Double, VA:Double, connection:Terminal.TerminalConnection, isReference:Bool = false)
@@ -94,6 +105,65 @@ class TerminalsView: NSView {
             
             boxPath.stroke()
         }
+    }
+    
+    // MARK: Contextual Menu handling
+    var rightClickPoint = NSPoint()
+    
+    override func rightMouseDown(with event: NSEvent) {
+        // DLog("Got right-mouse")
+        
+        let eventLocation = event.locationInWindow
+        self.rightClickPoint = self.convert(eventLocation, from: nil)
+        // DLog("\(rightClickPoint)")
+        
+        NSMenu.popUpContextMenu(self.contextualMenu, with: event, for: self)
+    }
+    
+    @IBAction func handleSetRefTerm(_ sender: Any) {
+        // DLog("Got SetRefTerm")
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        for nextFld in self.termFields
+        {
+            if nextFld.frame.contains(self.rightClickPoint)
+            {
+                appCtrl.doSetReferenceTerminal(refTerm: nextFld.tag)
+            }
+        }
+        
+    }
+    
+    // MARK: Menu validation
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        
+        guard let appCtrl = self.appController else
+        {
+            return false
+        }
+        
+        if menuItem == self.SetRefTermMenuItem
+        {
+            if appCtrl.currentTxfo == nil
+            {
+                return false
+            }
+            
+            for nextFld in self.termFields
+            {
+                if !nextFld.isHidden && nextFld.frame.contains(self.rightClickPoint)
+                {
+                    return true
+                }
+            }
+            
+            return false
+        }
+        
+        return true
     }
     
 }

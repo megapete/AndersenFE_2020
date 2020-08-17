@@ -97,7 +97,7 @@ class Terminal: Codable
     /// The connection to use for this Terminal
     let connection:TerminalConnection
     
-    /// The current direction for this Terminal
+    /// The current direction for this Terminal. Note that a value of 0 for this property does NOT mean that there are no active turns. It means that the VA should be zero.
     var currentDirection:Int
     
     /// The Andersen-file Terminal number
@@ -143,6 +143,7 @@ class Terminal: Codable
         else if amps == 0
         {
             self.currentDirection = 0
+            self.VA = 0.0
         }
         else if self.currentDirection == 0
         {

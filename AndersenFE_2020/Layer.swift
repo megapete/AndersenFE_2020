@@ -48,9 +48,14 @@ class Layer:Codable {
     /// The widning material used in the Layer
     let material:ConductorMaterial
     
-    /// The current direction, which comes from the parent Terminal (-1, 1, or 0)
+    /// The current direction, which comes from the parent Terminal unless that value is 0, in which case we simply change it to 1
     var currentDirection:Int {
         get {
+            
+            if self.parentTerminal.currentDirection == 0
+            {
+                return 1
+            }
             
             return self.parentTerminal.currentDirection
         }

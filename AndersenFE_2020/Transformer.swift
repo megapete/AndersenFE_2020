@@ -189,7 +189,30 @@ class Transformer:Codable {
         return result
     }
     
-    /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, the no-load voltage of the sum of all the turns (active or not) of teh terminal is calculated.
+    func TotalVA(terminal:Int) throws -> Double
+    {
+        var terms:[Terminal] = []
+        
+        do
+        {
+            terms = try self.TerminalsFromAndersenNumber(termNum: terminal)
+        }
+        catch
+        {
+            throw error
+        }
+        
+        var result = 0.0
+        
+        for nextTerm in terms
+        {
+            result += nextTerm.VA * Double(nextTerm.currentDirection)
+        }
+        
+        return result
+    }
+    
+    /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, an error is thrown.
     func TerminalLineVoltage(terminal:Int) throws -> Double
     {
         var terms:[Terminal] = []
@@ -248,10 +271,10 @@ class Transformer:Codable {
             }
         }
         
-        var useTurns = CurrentCarryingTurns(terminal: terminal)
+        let useTurns = CurrentCarryingTurns(terminal: terminal)
         if useTurns == 0
         {
-            useTurns = NoLoadTurns(terminal: terminal)
+            throw TransformerErrors(info: "Terminal#\(terminal)", type: .UnexpectedZeroTurns)
         }
         
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
@@ -332,7 +355,8 @@ class Transformer:Codable {
                     
                     if totalEffectiveTurns == 0.0
                     {
-                        throw TransformerErrors(info: "\(nonRefTerm)", type: .UnexpectedZeroTurns)
+                        let terminals = try self.TerminalsFromAndersenNumber(termNum: nonRefTerm)
+                        throw TransformerErrors(info: "\(terminals[0].name)", type: .UnexpectedZeroTurns)
                     }
                     
                     // note that at this point, 'amps' is a SIGNED quantity, and can never be equal to zero
@@ -501,18 +525,23 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == refTerm
             {
-                noloadVoltageSum += nextWdg.terminal.nominalLineVolts * Double(nextWdg.terminal.currentDirection)
+                var currDir = Double(nextWdg.terminal.currentDirection)
+                if currDir == 0.0
+                {
+                    currDir = 1.0
+                }
+                
+                noloadVoltageSum += nextWdg.terminal.nominalLineVolts * currDir
             }
         }
         
         noloadVoltageSum = fabs(noloadVoltageSum)
         
-        var turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
+        let turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
         
         if turnsToUse == 0
         {
-            // use the no-load turns & voltage
-            turnsToUse = self.NoLoadTurns(terminal: refTerm)
+            throw TransformerErrors(info: terminals[0].name, type: .UnexpectedZeroTurns)
         }
         
         result = noloadVoltageSum / legFactor / turnsToUse
@@ -545,7 +574,7 @@ class Transformer:Codable {
         return 0
     }
     
-    /// Unsigned value representing the number of turns associated with the give terminal. These are the effective "active" turns
+    /// Unsigned value representing the number of turns associated with the give terminal. These are the effective "active" turns.
     func CurrentCarryingTurns(terminal:Int) -> Double
     {
         var result = 0.0
@@ -554,7 +583,13 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                result += nextWdg.CurrentCarryingTurns() * Double(nextWdg.terminal.currentDirection)
+                var currDir = Double(nextWdg.terminal.currentDirection)
+                if currDir == 0.0
+                {
+                    currDir = 1.0
+                }
+                
+                result += nextWdg.CurrentCarryingTurns() * currDir
             }
         }
         
@@ -565,21 +600,19 @@ class Transformer:Codable {
     func NoLoadTurns(terminal:Int) -> Double
     {
         var result = 0.0
-        var noloadWdgTurns = 0.0
         
         for nextWdg in self.windings
         {
             if nextWdg.terminal.andersenNumber == terminal
             {
-                noloadWdgTurns += nextWdg.NoLoadTurns()
+                var currDir = Double(nextWdg.terminal.currentDirection)
+                if currDir == 0.0
+                {
+                    currDir = 1.0
+                }
                 
-                result += nextWdg.NoLoadTurns() * Double(nextWdg.terminal.currentDirection)
+                result += nextWdg.NoLoadTurns() * currDir
             }
-        }
-        
-        if result == 0.0
-        {
-            result = noloadWdgTurns
         }
         
         return fabs(result)
@@ -805,15 +838,16 @@ class Transformer:Codable {
                 if let num = Int(lineElements[4])
                 {
                     currDir = num
+                    
+                    // ignore 0-level current directions
+                    if currDir == 0
+                    {
+                        currDir = 1
+                    }
                 }
                 else
                 {
                     throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
-                }
-                
-                if currDir == 0
-                {
-                    VA = 0.0
                 }
                 
                 let connString = lineElements[2]
@@ -1100,7 +1134,7 @@ class Transformer:Codable {
                 let strandInsulation = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
-                // cable insulatiom
+                // cable insulation
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
                 let cableInsulation = Double(lineElements[i])! * mmPerInch
                 

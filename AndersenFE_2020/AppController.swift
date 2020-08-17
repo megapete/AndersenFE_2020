@@ -184,6 +184,30 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    @IBAction func handleSetAmpTurnDistribution(_ sender: Any) {
+        
+        guard let currTxfo = self.currentTxfo else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
+        
+        do
+        {
+            let newTransformer = currTxfo.Copy()
+            let _ = try newTransformer.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: true)
+            
+            self.updateCurrentTransformer(newTransformer: newTransformer)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+    }
+    
+    
     @IBAction func handleSetReferenceMVA(_ sender: Any) {
         
         let refTerm = self.currentTxfo!.refTermNum!
@@ -285,11 +309,12 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 let alert = NSAlert()
                 alert.messageText = "Changing the reference terminal will cause the transformer to be recreated from scratch, using the current terminal voltages, VAs, etc."
-                alert.informativeText = "You may Undo this operation"
+                alert.informativeText = "(You can Undo this operation if necessary)"
                 alert.alertStyle = .warning
+                alert.addButton(withTitle: "Ok")
                 alert.addButton(withTitle: "Cancel")
                 
-                if alert.runModal() == .OK
+                if alert.runModal() == .alertFirstButtonReturn
                 {
                     if refnumDlog.currentRefIndex >= 0
                     {
@@ -302,7 +327,23 @@ class AppController: NSObject, NSMenuItemValidation {
     
     func doSetReferenceTerminal(refTerm:Int)
     {
-        let newTransformer = self.currentTxfo!.Copy()
+        guard let currTxfo = self.currentTxfo else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
+        
+        if let oldRefTerm = currTxfo.refTermNum
+        {
+            if oldRefTerm == refTerm
+            {
+                // The same reference terminal is being selected, do nothing
+                DLog("Attempt to set the same reference terminal - ignoring")
+                return
+            }
+        }
+        
+        let newTransformer = currTxfo.Copy()
         newTransformer.refTermNum = refTerm
         self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
     }

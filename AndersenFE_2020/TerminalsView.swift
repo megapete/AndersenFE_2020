@@ -16,7 +16,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
     
     var referenceTerminal = 2
     
-    var appController:AppController? = nil
+    weak var appController:AppController? = nil
     
     // contextual menu
     // NOTE TO FUTURE ME: You need to create this variable FIRST (as an @IBOutlet) then connect it back to the NSMenu created with IB back in the MainMenu.xib file.
@@ -77,7 +77,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
         
         // self.termFields.sort(by: {$0.tag < $1.tag})
         
-        DLog("Textfield count: \(termFields.count)")
+        // DLog("Textfield count: \(termFields.count)")
     }
 
     override func draw(_ dirtyRect: NSRect) {

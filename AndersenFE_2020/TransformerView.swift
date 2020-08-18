@@ -33,6 +33,16 @@ struct SegmentPath {
         }
     }
     
+    func contains(point:NSPoint) -> Bool
+    {
+        guard let segPath = self.path else
+        {
+            return false
+        }
+        
+        return segPath.contains(point)
+    }
+    
     // constant for showing that a segment is not active
     let nonActiveAlpha:CGFloat = 0.25
     

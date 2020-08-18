@@ -197,14 +197,15 @@ class Winding:Codable {
             return self.center + useTop + useBottom
         }
         
-        func count(assumeSymmetry:Bool) -> Int
+        func count(assumeSymmetry:Bool, doubleAxialStack:Bool) -> Int
         {
             var result = 0
             
-            if self.center > 0.0
+            if self.center > 0.0 || doubleAxialStack
             {
                 result += 1
             }
+            
             
             if assumeSymmetry
             {
@@ -238,6 +239,20 @@ class Winding:Codable {
     
     /// The inner diameter of this winding
     let coilID:Double
+    
+    /// The mean radius of this winding (used for drawing)
+    var meanRadius:Double {
+        
+        var maxLayerOD = self.coilID
+        
+        for nextLayer in self.layers
+        {
+            maxLayerOD = max(maxLayerOD, nextLayer.OD())
+        }
+        
+        // mean diameter / 2
+        return ((self.coilID + maxLayerOD) / 2.0) / 2.0
+    }
     
     /// The radial overbuild factor (usually 1.06)
     let radialOverbuild:Double
@@ -400,7 +415,7 @@ class Winding:Codable {
         let turnsPerLayer = self.numTurns.maxTurns / Double(numLayers)
         
         let assumeGapSymmetry = preferences.upperLowerAxialGapsAreSymmetrical
-        let numSegsPerLayer = 1 + self.axialGaps.count(assumeSymmetry: assumeGapSymmetry)
+        let numSegsPerLayer = 1 + self.axialGaps.count(assumeSymmetry: assumeGapSymmetry, doubleAxialStack: self.isDoubleStack)
         
         // initialize an empty "default" list of Z-values
         var zList:[(min:Double, max:Double)] = []
@@ -459,7 +474,7 @@ class Winding:Codable {
         {
             // more complicated, there are offload taps in there (NOTE: we assume that there are 4 tap steps)
             
-            let gapCount = self.axialGaps.count(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)
+            let gapCount = self.axialGaps.count(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical, doubleAxialStack: self.isDoubleStack)
             
             // first make sure that there are a sufficient number of axial gaps for the taps
             if (self.isDoubleStack && gapCount < 2) || (gapCount < 1)

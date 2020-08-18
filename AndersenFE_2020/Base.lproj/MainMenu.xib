@@ -460,43 +460,8 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Test" id="ZgQ-mA-mBH">
                         <items>
-                            <menuItem title="Init View" id="eyV-pp-gAf">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="testInitView:" target="6yZ-bT-Gps" id="x4a-eK-9Pv"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Zoom In" id="edY-dm-SyR">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="testZoomIn:" target="6yZ-bT-Gps" id="xfa-pV-37b"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Zoom out" id="1U5-xd-6fj">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="testZoomOut:" target="6yZ-bT-Gps" id="yS1-Mz-bqZ"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Zoom all" id="YMW-lI-5Xc">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="testZoomAll:" target="6yZ-bT-Gps" id="72Y-ke-yIc"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="I9M-8p-2Fj"/>
-                            <menuItem title="Test TermView" id="1Jh-fa-Xnf">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="handleTestTermView:" target="6yZ-bT-Gps" id="jPx-Tq-BTY"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="mkK-oO-05k"/>
                             <menuItem title="Test AmpTurns View" id="F1p-V3-IxQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="handleTestAmpereTurnsView:" target="6yZ-bT-Gps" id="sCv-Ik-gWQ"/>
-                                </connections>
                             </menuItem>
                         </items>
                     </menu>
@@ -539,55 +504,55 @@
                     </menu>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="140" y="154"/>
+            <point key="canvasLocation" x="-48" y="294"/>
         </menu>
         <window title="AndersenFE_2020" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="861" height="720"/>
+            <rect key="contentRect" x="335" y="390" width="860" height="871"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="861" height="720"/>
+                <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView fixedFrame="YES" arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="39j-QG-eD5">
-                        <rect key="frame" x="-47" y="0.0" width="908" height="720"/>
+                        <rect key="frame" x="-47" y="0.0" width="907" height="871"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <customView fixedFrame="YES" id="FgI-7N-22l">
-                                <rect key="frame" x="0.0" y="0.0" width="544" height="720"/>
+                                <rect key="frame" x="0.0" y="0.0" width="543" height="871"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q4C-Rl-LJ3">
-                                        <rect key="frame" x="45" y="0.0" width="499" height="721"/>
+                                        <rect key="frame" x="45" y="0.0" width="498" height="872"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="497" height="719"/>
+                                            <rect key="frame" x="1" y="1" width="496" height="870"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="497" height="719"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </customView>
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="704" width="497" height="16"/>
+                                            <rect key="frame" x="1" y="855" width="496" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="482" y="1" width="16" height="719"/>
+                                            <rect key="frame" x="481" y="1" width="16" height="870"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
                                 </subviews>
                             </customView>
                             <customView fixedFrame="YES" id="VHp-aJ-QOo" customClass="DataView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                <rect key="frame" x="554" y="0.0" width="180" height="720"/>
+                                <rect key="frame" x="553" y="0.0" width="180" height="871"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="eFz-0U-JKl">
-                                        <rect key="frame" x="20" y="644" width="140" height="56"/>
+                                        <rect key="frame" x="20" y="795" width="140" height="56"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Volts per Turn" drawsBackground="YES" id="rTb-c6-sLq">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -596,7 +561,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="IXf-LW-In8">
-                                        <rect key="frame" x="20" y="594" width="140" height="40"/>
+                                        <rect key="frame" x="20" y="745" width="140" height="40"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Ampere Turns" drawsBackground="YES" id="Iwe-UW-lIc">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -607,11 +572,11 @@
                                 </subviews>
                             </customView>
                             <customView fixedFrame="YES" id="JKq-ah-7fY" customClass="TerminalsView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                <rect key="frame" x="744" y="0.0" width="164" height="720"/>
+                                <rect key="frame" x="743" y="0.0" width="164" height="871"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="C3c-s3-oU8">
-                                        <rect key="frame" x="14" y="610" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="761" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 1" drawsBackground="YES" id="sA5-mv-gb5">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -620,7 +585,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="1ML-Km-Z3j">
-                                        <rect key="frame" x="14" y="510" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="661" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 2" drawsBackground="YES" id="nsd-Rs-MaM">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -629,7 +594,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="U4R-3a-yqe">
-                                        <rect key="frame" x="14" y="410" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="561" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 3" drawsBackground="YES" id="PoX-TI-Ihi">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -638,7 +603,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="JqP-Yh-eIs">
-                                        <rect key="frame" x="14" y="310" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="461" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 4" drawsBackground="YES" id="Icd-vl-dsg">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -647,7 +612,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="NTg-5n-hsA">
-                                        <rect key="frame" x="14" y="210" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="361" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 5" drawsBackground="YES" id="dIi-NL-YrQ">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -656,7 +621,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="0UE-69-HCv">
-                                        <rect key="frame" x="14" y="110" width="136" height="90"/>
+                                        <rect key="frame" x="14" y="261" width="136" height="90"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Terminal 6" drawsBackground="YES" id="c61-qh-VOV">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -681,7 +646,7 @@
                     </splitView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="163.5" y="-246"/>
+            <point key="canvasLocation" x="163" y="-231.5"/>
         </window>
         <menu id="9xV-35-2jM">
             <items>
@@ -704,7 +669,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="228" y="324"/>
+            <point key="canvasLocation" x="462" y="342"/>
         </menu>
     </objects>
 </document>

@@ -14,6 +14,8 @@
 		D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */; };
 		D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D38833E024CCC1C400A0C7A5 /* Preferences.xib */; };
 		D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */; };
+		D3B8A33624EB4814005AAC87 /* RegulatingWindingDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B8A33524EB4814005AAC87 /* RegulatingWindingDialog.swift */; };
+		D3B8A33824EB4874005AAC87 /* RegulatingWinding.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3B8A33724EB4874005AAC87 /* RegulatingWinding.xib */; };
 		D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */; };
 		D3CF829624E46A2600055311 /* ModifyReferenceTerminal.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */; };
 		D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */; };
@@ -44,6 +46,8 @@
 		D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDialog.swift; sourceTree = "<group>"; };
 		D38833E024CCC1C400A0C7A5 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
+		D3B8A33524EB4814005AAC87 /* RegulatingWindingDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatingWindingDialog.swift; sourceTree = "<group>"; };
+		D3B8A33724EB4874005AAC87 /* RegulatingWinding.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegulatingWinding.xib; sourceTree = "<group>"; };
 		D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceTerminalDialog.swift; sourceTree = "<group>"; };
 		D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceTerminal.xib; sourceTree = "<group>"; };
 		D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceMvaDialog.swift; sourceTree = "<group>"; };
@@ -103,6 +107,8 @@
 				D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */,
 				D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */,
 				D38833E024CCC1C400A0C7A5 /* Preferences.xib */,
+				D3B8A33524EB4814005AAC87 /* RegulatingWindingDialog.swift */,
+				D3B8A33724EB4874005AAC87 /* RegulatingWinding.xib */,
 				F5D9DC4124DF429200D11103 /* AmpTurnsDistributionDialog.swift */,
 				F5D9DC4324DF42D900D11103 /* AmpTurnsDistribution.xib */,
 				D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */,
@@ -193,6 +199,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3B8A33824EB4874005AAC87 /* RegulatingWinding.xib in Resources */,
 				D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */,
 				D3CF829624E46A2600055311 /* ModifyReferenceTerminal.xib in Resources */,
 				D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */,
@@ -225,6 +232,7 @@
 				D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
 				F5ED559124C49074002E7031 /* Transformer.swift in Sources */,
+				D3B8A33624EB4814005AAC87 /* RegulatingWindingDialog.swift in Sources */,
 				F5D9DC4224DF429200D11103 /* AmpTurnsDistributionDialog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -121,7 +121,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
     }
     
     @IBAction func handleSetRefTerm(_ sender: Any) {
-        // DLog("Got SetRefTerm")
+        
         guard let appCtrl = self.appController else
         {
             return
@@ -134,10 +134,30 @@ class TerminalsView: NSView, NSMenuItemValidation {
                 appCtrl.doSetReferenceTerminal(refTerm: nextFld.tag)
             }
         }
-        
     }
     
-    // MARK: Menu validation
+    @IBAction func handleSetRefMVA(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.handleSetReferenceMVA(sender)
+    }
+    
+    @IBAction func handleSetNIDist(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.handleSetAmpTurnDistribution(sender)
+    }
+    
+    
+    // MARK: Context Menu validation
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
         guard let appCtrl = self.appController else
@@ -145,13 +165,18 @@ class TerminalsView: NSView, NSMenuItemValidation {
             return false
         }
         
+        guard let txfo = appCtrl.currentTxfo else
+        {
+            return false
+        }
+        
+        guard txfo.refTermNum != nil else
+        {
+            return false
+        }
+        
         if menuItem == self.SetRefTermMenuItem
         {
-            if appCtrl.currentTxfo == nil
-            {
-                return false
-            }
-            
             for nextFld in self.termFields
             {
                 if !nextFld.isHidden && nextFld.frame.contains(self.rightClickPoint)
@@ -161,6 +186,10 @@ class TerminalsView: NSView, NSMenuItemValidation {
             }
             
             return false
+        }
+        else if menuItem == self.SetNIDistributionMenuItem
+        {
+            return txfo.AvailableTerminals().count > 2
         }
         
         return true

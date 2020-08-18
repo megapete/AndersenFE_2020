@@ -693,9 +693,15 @@
                 </menuItem>
                 <menuItem title="Set Reference MVA" id="VZH-bl-orK">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSetRefMVA:" target="-1" id="nfk-a1-V0C"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Set Amp-Turn Distribution" id="5L4-cL-fka">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSetNIDist:" target="-1" id="LxH-A5-gza"/>
+                    </connections>
                 </menuItem>
             </items>
             <point key="canvasLocation" x="228" y="324"/>

@@ -113,7 +113,29 @@ class TransformerView: NSView {
         case zoomRect
     }
     
-    var mode:Mode = .selectWinding
+    var modeStore:Mode = .selectWinding
+    
+    var mode:Mode {
+        
+        get {
+            
+            return self.modeStore
+        }
+        
+        set {
+            
+            if newValue == .selectWinding
+            {
+                NSCursor.arrow.set()
+            }
+            else if newValue == .zoomRect
+            {
+                NSCursor.crosshair.set()
+            }
+            
+            self.modeStore = newValue
+        }
+    }
     
     var zoomRect:NSRect? = nil
     
@@ -204,6 +226,8 @@ class TransformerView: NSView {
         let eventLocation = event.locationInWindow
         let localLocation = self.convert(eventLocation, from: nil)
         
+        
+        
         self.zoomRect = NSRect(origin: localLocation, size: NSSize())
         self.needsDisplay = true
     }
@@ -217,10 +241,16 @@ class TransformerView: NSView {
         let aspectRatio = self.frame.width / self.frame.height
         let boundsW = windowHt * aspectRatio
         
-        self.bounds = NSRect(x: coreRadius, y: 0.0, width: boundsW, height: windowHt)
+        let newRect = NSRect(x: coreRadius, y: 0.0, width: boundsW, height: windowHt)
+        DLog("NewRect: \(newRect)")
         
+        self.bounds = newRect
+        
+        DLog("Bounds: \(self.bounds)")
         self.boundary = self.bounds
+        
         self.boundary.size.width = tankWallR - coreRadius
+        DLog("Boundary: \(self.boundary)")
         
         self.needsDisplay = true
     }
@@ -241,7 +271,8 @@ class TransformerView: NSView {
     
     func handleZoomRect(zRect:NSRect)
     {
-        self.bounds = zRect
+        self.zoomRect = NSRect()
+        self.bounds = NormalizeRect(srcRect: zRect)
         self.needsDisplay = true
     }
     

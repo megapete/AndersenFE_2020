@@ -81,6 +81,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
+    @IBOutlet weak var setRefVoltageMenuItem: NSMenuItem!
     @IBOutlet weak var setNIdistMenuItem: NSMenuItem!
     
     @IBOutlet weak var TxfoContextMenu:NSMenu!
@@ -183,6 +184,71 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    @IBAction func handleSetRefTermVoltage(_ sender: Any) {
+        
+        let refTerm = self.currentTxfo!.refTermNum!
+        
+        do
+        {
+            let voltage = try self.currentTxfo!.TerminalLineVoltage(terminal: refTerm)
+            
+            let modRefVoltageDlog = ModifyReferenceVoltageDialog(currentVolts: voltage)
+            
+            if modRefVoltageDlog.runModal() == .OK
+            {
+                self.doSetRefTermVoltage(newVoltage: modRefVoltageDlog.voltage)
+            }
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+    }
+    
+    func doSetRefTermVoltage(newVoltage:Double)
+    {
+        // This function is complicated by the fact that a "terminal" can be made up of one or more "Terminals" (ie: Windings)
+        
+        guard let currTxfo = self.currentTxfo else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
+        
+        guard let refTerm = currTxfo.refTermNum else
+        {
+            DLog("No reference terminal defined")
+            return
+        }
+        
+        let totalEffectiveTurns = currTxfo.CurrentCarryingTurns(terminal: refTerm)
+        
+        do
+        {
+            let newTransformer = currTxfo.Copy()
+            
+            let refWdgs = try newTransformer.WindingsFromAndersenNumber(termNum: refTerm)
+            
+            for nextWdg in refWdgs
+            {
+                let wdgTurns = nextWdg.CurrentCarryingTurns()
+                
+                nextWdg.terminal.nominalLineVolts = newVoltage * wdgTurns / totalEffectiveTurns
+            }
+            
+            self.updateCurrentTransformer(newTransformer: newTransformer)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+    }
+    
     
     @IBAction func handleSetAmpTurnDistribution(_ sender: Any) {
         
@@ -530,7 +596,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return currentTxfo != nil
         }
-        else if menuItem == self.setMVAMenuItem
+        else if menuItem == self.setMVAMenuItem || menuItem == self.setRefVoltageMenuItem
         {
             return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.CurrentCarryingTurns(terminal: currentTxfo!.refTermNum!) != 0.0
         }
@@ -538,6 +604,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.AvailableTerminals().count >= 3
         }
+        
         
         return true
     }

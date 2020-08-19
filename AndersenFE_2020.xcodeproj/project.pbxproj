@@ -24,6 +24,8 @@
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
+		D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */; };
+		D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5A0F06224C6231000C4CFE8 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */; };
 		F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC370F24DB0A2A000CEED3 /* DataView.swift */; };
@@ -56,6 +58,8 @@
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
+		D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceVoltageDialog.swift; sourceTree = "<group>"; };
+		D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceVoltage.xib; sourceTree = "<group>"; };
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06124C6231000C4CFE8 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -115,6 +119,8 @@
 				D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */,
 				D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */,
 				D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */,
+				D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */,
+				D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */,
 				F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
@@ -203,6 +209,7 @@
 				D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */,
 				D3CF829624E46A2600055311 /* ModifyReferenceTerminal.xib in Resources */,
 				D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */,
+				D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */,
 				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
@@ -224,6 +231,7 @@
 				D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
 				D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */,
+				D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
 				D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */,

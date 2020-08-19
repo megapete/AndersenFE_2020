@@ -29,6 +29,7 @@
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
                 <outlet property="setRefTerminalMenuItem" destination="Gi5-1S-RQB" id="2Ei-rb-WXd"/>
+                <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
                 <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
@@ -395,6 +396,12 @@
                                     <action selector="handleSetReferenceMVA:" target="6yZ-bT-Gps" id="tjA-PX-wei"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Set Reference Voltage..." id="AKE-S2-Sz1">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetRefTermVoltage:" target="6yZ-bT-Gps" id="Mv4-sW-kOb"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Set Amp-Turn Distribution..." id="5gM-0S-Fyc">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -664,6 +671,9 @@
                     <connections>
                         <action selector="handleSetRefMVA:" target="-1" id="nfk-a1-V0C"/>
                     </connections>
+                </menuItem>
+                <menuItem title="Set Reference Voltage" id="7OC-qC-VVY">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem title="Set Amp-Turn Distribution" id="5L4-cL-fka">
                     <modifierMask key="keyEquivalentModifierMask"/>

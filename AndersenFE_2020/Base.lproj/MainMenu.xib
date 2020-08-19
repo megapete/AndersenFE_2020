@@ -433,6 +433,9 @@
                             </menuItem>
                             <menuItem title="Zoom Rect..." id="pBa-g8-iF6">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleZoomRect:" target="6yZ-bT-Gps" id="XkI-WR-UAP"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Zoom All" id="efm-YQ-pKe">
                                 <modifierMask key="keyEquivalentModifierMask"/>

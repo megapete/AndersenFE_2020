@@ -260,8 +260,24 @@ class Winding:Codable {
     /// The recommended ground clearance for this winding
     let groundClearance:Double
     
+    /// The backing store for the 'terminal' property
+    private var termStore:Terminal? = nil
+    
     /// The Terminal to which this Winding belongs
-    var terminal:Terminal
+    var terminal:Terminal {
+        
+        get {
+            
+            return self.termStore!
+        }
+        
+        set {
+        
+            self.termStore = newValue
+            
+            newValue.winding = self
+        }
+    }
     
     /// The Layers that make up this winding
     var layers:[Layer] = []

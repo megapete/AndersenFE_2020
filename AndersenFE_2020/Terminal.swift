@@ -103,6 +103,9 @@ class Terminal: Codable
     /// The Andersen-file Terminal number
     var andersenNumber:Int
     
+    /// The winding associated with this terminal
+    weak var winding:Winding? = nil
+    
     /// Designated initializer for the Terminal class
     /// - Parameter name: A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     /// - Parameter voltage: The line-line (line-neutral for single-phase) voltage of the terminal in volts

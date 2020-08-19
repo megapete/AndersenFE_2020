@@ -411,6 +411,18 @@ class AppController: NSObject, NSMenuItemValidation {
         self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt), tankWallR: CGFloat(txfo.DistanceFromCoreCenterToTankWall()))
     }
     
+    @IBAction func handleZoomRect(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        self.txfoView.mode = .zoomRect
+        
+    }
+    
+    
     // MARK: View functions
     // This function does the following things:
     // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)

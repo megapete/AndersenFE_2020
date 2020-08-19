@@ -33,6 +33,7 @@ struct SegmentPath {
         }
     }
     
+    // Test whether this segment contains 'point'
     func contains(point:NSPoint) -> Bool
     {
         guard let segPath = self.path else
@@ -106,6 +107,16 @@ class TransformerView: NSView {
     // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity, so I'll just save a weak reference to the AppController here
     weak var appController:AppController? = nil
     
+    enum Mode {
+        
+        case selectWinding
+        case zoomRect
+    }
+    
+    var mode:Mode = .selectWinding
+    
+    var zoomRect:NSRect? = nil
+    
     var segments:[SegmentPath] = []
     var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
     let boundaryColor:NSColor = .gray
@@ -125,14 +136,62 @@ class TransformerView: NSView {
             nextSegment.show()
         }
         
+        if self.mode == .zoomRect
+        {
+            if let rect = self.zoomRect
+            {
+                print("I got here")
+                NSColor.black.set()
+                let zoomPath = NSBezierPath(rect: rect)
+                zoomPath.stroke()
+            }
+        }
+        
         NSBezierPath.defaultLineWidth /= 2.0
     }
     
     // MARK: Mouse Events
-    // Mouse events, all of which are ultimately handled by the AppController
     override func mouseDown(with event: NSEvent) {
         
+        if self.mode == .zoomRect
+        {
+            self.mouseDownWithZoomRect(event: event)
+            return
+        }
+    }
+    
+    override func mouseDragged(with event: NSEvent) {
         
+        if self.mode == .zoomRect
+        {
+            self.mouseDraggedWithZoomRect(event: event)
+            return
+        }
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        
+        self.mode = .selectWinding
+        self.needsDisplay = true
+    }
+    
+    func mouseDraggedWithZoomRect(event:NSEvent)
+    {
+        let endPoint = event.locationInWindow
+        self.convert(endPoint, from: nil)
+        let newSize = NSSize(width: endPoint.x - self.zoomRect!.origin.x, height: endPoint.y - self.zoomRect!.origin.y)
+        self.zoomRect!.size = newSize
+        print(self.zoomRect!)
+        self.needsDisplay = true
+    }
+    
+    func mouseDownWithZoomRect(event:NSEvent)
+    {
+        let eventLocation = event.locationInWindow
+        self.convert(eventLocation, from: nil)
+        
+        self.zoomRect = NSRect(origin: eventLocation, size: NSSize())
+        self.needsDisplay = true
     }
     
     // MARK: Zoom Functions

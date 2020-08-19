@@ -121,6 +121,8 @@ class TransformerView: NSView {
     var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
     let boundaryColor:NSColor = .gray
     
+    let zoomRectLineDash:[CGFloat] = [15.0, 8.0]
+    
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
@@ -140,14 +142,20 @@ class TransformerView: NSView {
         {
             if let rect = self.zoomRect
             {
-                print("I got here")
-                NSColor.black.set()
+                // print(rect)
+                NSColor.gray.set()
                 let zoomPath = NSBezierPath(rect: rect)
+                zoomPath.setLineDash(self.zoomRectLineDash, count: 2, phase: 0.0)
                 zoomPath.stroke()
             }
         }
         
         NSBezierPath.defaultLineWidth /= 2.0
+    }
+    
+    override var acceptsFirstResponder: Bool
+    {
+        return true
     }
     
     // MARK: Mouse Events
@@ -171,32 +179,38 @@ class TransformerView: NSView {
     
     override func mouseUp(with event: NSEvent) {
         
+        if self.mode == .zoomRect
+        {
+            let endPoint = self.convert(event.locationInWindow, from: nil)
+            let newSize = NSSize(width: endPoint.x - self.zoomRect!.origin.x, height: endPoint.y - self.zoomRect!.origin.y)
+            self.zoomRect!.size = newSize
+            self.handleZoomRect(zRect: self.zoomRect!)
+        }
+        
         self.mode = .selectWinding
         self.needsDisplay = true
     }
     
     func mouseDraggedWithZoomRect(event:NSEvent)
     {
-        let endPoint = event.locationInWindow
-        self.convert(endPoint, from: nil)
+        let endPoint = self.convert(event.locationInWindow, from: nil)
         let newSize = NSSize(width: endPoint.x - self.zoomRect!.origin.x, height: endPoint.y - self.zoomRect!.origin.y)
         self.zoomRect!.size = newSize
-        print(self.zoomRect!)
         self.needsDisplay = true
     }
     
     func mouseDownWithZoomRect(event:NSEvent)
     {
         let eventLocation = event.locationInWindow
-        self.convert(eventLocation, from: nil)
+        let localLocation = self.convert(eventLocation, from: nil)
         
-        self.zoomRect = NSRect(origin: eventLocation, size: NSSize())
+        self.zoomRect = NSRect(origin: localLocation, size: NSSize())
         self.needsDisplay = true
     }
     
     // MARK: Zoom Functions
     // transformer display zoom functions
-    func zoomAll(coreRadius:CGFloat, windowHt:CGFloat, tankWallR:CGFloat)
+    func handleZoomAll(coreRadius:CGFloat, windowHt:CGFloat, tankWallR:CGFloat)
     {
         // aspectRatio is defined as width/height
         // it is assumed that the window height (z) is ALWAYS the dominant dimension compared to the "half tank-width" in the r-direction
@@ -213,19 +227,19 @@ class TransformerView: NSView {
     
     // the zoom in/out ratio (maybe consider making this user-settable)
     let zoomRatio:CGFloat = 0.75
-    func zoomOut()
+    func handleZoomOut()
     {
         self.scaleUnitSquare(to: (NSSize(width: zoomRatio, height: zoomRatio)))
         self.needsDisplay = true
     }
     
-    func zoomIn()
+    func handleZoomIn()
     {
         self.scaleUnitSquare(to: NSSize(width: 1.0 / zoomRatio, height: 1.0 / zoomRatio))
         self.needsDisplay = true
     }
     
-    func zoomRect(zRect:NSRect)
+    func handleZoomRect(zRect:NSRect)
     {
         self.bounds = zRect
         self.needsDisplay = true

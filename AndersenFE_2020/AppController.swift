@@ -393,12 +393,12 @@ class AppController: NSObject, NSMenuItemValidation {
     // MARK: Zoom functions
     @IBAction func handleZoomIn(_ sender: Any) {
         
-        self.txfoView.zoomIn()
+        self.txfoView.handleZoomIn()
     }
     
     @IBAction func handleZoomOut(_ sender: Any) {
         
-        self.txfoView.zoomOut()
+        self.txfoView.handleZoomOut()
     }
     
     @IBAction func handleZoomAll(_ sender: Any) {
@@ -408,7 +408,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        self.txfoView.zoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt), tankWallR: CGFloat(txfo.DistanceFromCoreCenterToTankWall()))
+        self.txfoView.handleZoomAll(coreRadius: CGFloat(txfo.core.diameter / 2.0), windowHt: CGFloat(txfo.core.windHt), tankWallR: CGFloat(txfo.DistanceFromCoreCenterToTankWall()))
     }
     
     @IBAction func handleZoomRect(_ sender: Any) {

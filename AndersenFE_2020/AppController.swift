@@ -526,7 +526,9 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 for nextSegment in nextLayer.segments
                 {
-                    let newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
+                    var newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
+                    
+                    newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: &newSegPath)
                     
                     self.txfoView.segments.append(newSegPath)
                 }

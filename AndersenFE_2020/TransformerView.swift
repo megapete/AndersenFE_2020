@@ -12,6 +12,8 @@ struct SegmentPath {
     
     let segment:Segment
     
+    var toolTipTag:NSView.ToolTipTag = 0
+    
     var path:NSBezierPath? {
         get {
             
@@ -22,6 +24,18 @@ struct SegmentPath {
             
             return NSBezierPath(rect: NSRect(x: parentLayer.innerRadius, y: self.segment.minZ, width: parentLayer.radialBuild, height: self.segment.height))
         }
+    }
+    
+    var rect:NSRect {
+        
+        var result = NSRect()
+        
+        if let parentLayer = segment.inLayer
+        {
+            result = NSRect(x: parentLayer.innerRadius, y: self.segment.minZ, width: parentLayer.radialBuild, height: self.segment.height)
+        }
+        
+        return result
     }
         
     let segmentColor:NSColor
@@ -102,18 +116,18 @@ struct SegmentPath {
     }
 }
 
-class TransformerView: NSView {
+class TransformerView: NSView, NSViewToolTipOwner {
 
     // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity, so I'll just save a weak reference to the AppController here
     weak var appController:AppController? = nil
     
     enum Mode {
         
-        case selectWinding
+        case selectSegment
         case zoomRect
     }
     
-    var modeStore:Mode = .selectWinding
+    private var modeStore:Mode = .selectSegment
     
     var mode:Mode {
         
@@ -124,7 +138,7 @@ class TransformerView: NSView {
         
         set {
             
-            if newValue == .selectWinding
+            if newValue == .selectSegment
             {
                 NSCursor.arrow.set()
             }
@@ -137,13 +151,14 @@ class TransformerView: NSView {
         }
     }
     
-    var zoomRect:NSRect? = nil
-    
     var segments:[SegmentPath] = []
     var boundary:NSRect = NSRect(x: 0, y: 0, width: 0, height: 0)
     let boundaryColor:NSColor = .gray
     
+    var zoomRect:NSRect? = nil
     let zoomRectLineDash:[CGFloat] = [15.0, 8.0]
+    
+    var currentSegment:SegmentPath? = nil
     
     // MARK: Draw function override
     override func draw(_ dirtyRect: NSRect) {
@@ -159,6 +174,11 @@ class TransformerView: NSView {
         for nextSegment in self.segments
         {
             nextSegment.show()
+        }
+        
+        if let currSeg = self.currentSegment
+        {
+            self.ShowHandles(segment: currSeg)
         }
         
         if self.mode == .zoomRect
@@ -181,12 +201,67 @@ class TransformerView: NSView {
         return true
     }
     
+    // MARK: Current segment functions
+    
+    func ShowHandles(segment:SegmentPath)
+    {
+        let handleSide = NSBezierPath.defaultLineWidth * 5.0
+        let handleBaseRect = NSRect(x: 0.0, y: 0.0, width: handleSide, height: handleSide)
+        let handleFillColor = NSColor.white
+        let handleStrokeColor = NSColor.darkGray
+        
+        var corners:[NSPoint] = [segment.rect.origin]
+        corners.append(NSPoint(x: segment.rect.origin.x + segment.rect.size.width, y: segment.rect.origin.y))
+        corners.append(NSPoint(x: segment.rect.origin.x + segment.rect.size.width, y: segment.rect.origin.y + segment.rect.size.height))
+        corners.append(NSPoint(x: segment.rect.origin.x, y: segment.rect.origin.y + segment.rect.size.height))
+        
+        for nextPoint in corners
+        {
+            let handleRect = NSRect(origin: NSPoint(x: nextPoint.x - handleSide / 2.0, y: nextPoint.y - handleSide / 2.0), size: handleBaseRect.size)
+            
+            let handlePath = NSBezierPath(rect: handleRect)
+            
+            handleFillColor.set()
+            handlePath.fill()
+            handleStrokeColor.setStroke()
+            handlePath.stroke()
+        }
+    }
+    
+    // MARK: Tooltips to display over segments
+    func view(_ view: NSView, stringForToolTip tag: NSView.ToolTipTag, point: NSPoint, userData data: UnsafeMutableRawPointer?) -> String
+    {
+        var result = "Error!"
+        
+        for nextSegment in self.segments
+        {
+            if nextSegment.toolTipTag == tag
+            {
+                let terminal = nextSegment.segment.inLayer!.parentTerminal
+                var currDir = "+"
+                if terminal.currentDirection < 0
+                {
+                    currDir = "-"
+                }
+                
+                result = "Terminal: \(terminal.name)\nCurrent Direction: \(currDir)"
+            }
+        }
+        
+        return result
+    }
+    
     // MARK: Mouse Events
     override func mouseDown(with event: NSEvent) {
         
         if self.mode == .zoomRect
         {
             self.mouseDownWithZoomRect(event: event)
+            return
+        }
+        else if self.mode == .selectSegment
+        {
+            self.mouseDownWithSelectSegment(event: event)
             return
         }
     }
@@ -210,7 +285,7 @@ class TransformerView: NSView {
             self.handleZoomRect(zRect: self.zoomRect!)
         }
         
-        self.mode = .selectWinding
+        self.mode = .selectSegment
         self.needsDisplay = true
     }
     
@@ -222,26 +297,31 @@ class TransformerView: NSView {
         self.needsDisplay = true
     }
     
+    func mouseDownWithSelectSegment(event:NSEvent)
+    {
+        let clickPoint = self.convert(event.locationInWindow, from: nil)
+        
+        self.currentSegment = nil
+        
+        for nextSegment in self.segments
+        {
+            if nextSegment.contains(point: clickPoint)
+            {
+                self.currentSegment = nextSegment
+                break
+            }
+        }
+        
+        self.needsDisplay = true
+    }
+    
     func mouseDownWithZoomRect(event:NSEvent)
     {
         let eventLocation = event.locationInWindow
         let localLocation = self.convert(eventLocation, from: nil)
         
-        
-        
         self.zoomRect = NSRect(origin: localLocation, size: NSSize())
         self.needsDisplay = true
-    }
-    
-    // MARK: Current-Direction Arrow
-    func drawArrow(centerX:CGFloat)
-    {
-        let arrowHeight:CGFloat = 15.0
-        let arrowHeadWidth:CGFloat = 3.0
-        let arrowHeadHeight:CGFloat = 5.0
-        let arrowBottom:CGFloat = 10.0
-        
-        
     }
     
     // MARK: Zoom Functions
@@ -284,7 +364,11 @@ class TransformerView: NSView {
     func handleZoomRect(zRect:NSRect)
     {
         self.zoomRect = NSRect()
-        self.bounds = NormalizeRect(srcRect: zRect)
+        
+        let aspectRatio = self.frame.width / self.frame.height
+        
+        // Call PCH standard function (in GlobalDefs.swift) to force the current aspect ratio on the zoom rectangle
+        self.bounds = ForceAspectRatioAndNormalize(srcRect: zRect, widthOverHeightRatio: aspectRatio)
         self.needsDisplay = true
     }
     

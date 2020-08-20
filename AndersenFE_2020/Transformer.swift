@@ -37,6 +37,8 @@ class Transformer:Codable {
     
     var niDistribution:[Double]? = nil
     
+    var scResults:ImpedanceAndScData? = nil
+    
     /// Straightforward init function (designed for the copy() function below)
     init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil, niDistribution:[Double]? = nil)
     {

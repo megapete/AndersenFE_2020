@@ -194,6 +194,11 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    func doCalculateImpedanceAndForces(txfo:Transformer) throws {
+        
+        
+    }
+    
     @IBAction func handleSetRefTermVoltage(_ sender: Any) {
         
         let refTerm = self.currentTxfo!.refTermNum!

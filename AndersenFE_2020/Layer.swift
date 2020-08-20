@@ -85,6 +85,23 @@ class Layer:Codable {
         self.segments = segments
     }
     
+    /// function to create a  PCH_FLD12_Layer from self
+    func FLD12layer(layernum:Int, firstSegNum:Int) -> PCH_FLD12_Layer
+    {
+        var nextSegNum = firstSegNum
+        var fld12SegArray:[PCH_FLD12_Segment] = []
+        
+        for nextSeg in self.segments
+        {
+            fld12SegArray.append(nextSeg.FLD12section(segNum: nextSegNum))
+            nextSegNum += 1
+        }
+        
+        let newLayer = PCH_FLD12_Layer(number: Int32(layernum), lastSegment: Int32(nextSegNum - 1), innerRadius: self.innerRadius, radialBuild: self.radialBuild, terminal: Int32(self.parentTerminal.andersenNumber), numParGroups: Int32(self.numberParallelGroups), currentDirection: Int32(self.currentDirection), cuOrAl: 1, numSpacerBlocks: Int32(self.numSpacerBlocks), spBlkWidth: self.spacerBlockWidth, segments: fld12SegArray)
+        
+        return newLayer
+    }
+    
     /// Convenience function to get the OD of a Layer
     func OD() -> Double
     {

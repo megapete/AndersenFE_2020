@@ -66,6 +66,57 @@ class Transformer:Codable {
         }
     }
     
+    /// Function to create a PCH_FLD12_TxfoDetails struct
+    func FLD12transformer() throws -> PCH_FLD12_TxfoDetails
+    {
+        
+        
+        do
+        {
+            var terminals = Array(AvailableTerminals())
+            terminals.sort()
+            
+            var fld12terminals:[PCH_FLD12_Terminal] = []
+            
+            for nextTerm in terminals
+            {
+                let terms = try self.TerminalsFromAndersenNumber(termNum: nextTerm)
+                
+                let termMVA = try self.TotalVA(terminal: nextTerm) * 1.0E-6
+                let termKV = try self.TerminalLineVoltage(terminal: nextTerm) * 1.0E-3
+                
+                let newFld12Term = PCH_FLD12_Terminal(number: Int32(nextTerm), connection: Int32(terms[0].AndersenConnection()), mva: termMVA, kv: termKV)
+                
+                fld12terminals.append(newFld12Term)
+            }
+            
+            var nextLayerNum = 1
+            var nextSegmentNum = 1
+            
+            var fld12Layers:[PCH_FLD12_Layer] = []
+            
+            for nextWdg in self.windings
+            {
+                for nextLayer in nextWdg.layers
+                {
+                    let newFld12Layer = nextLayer.FLD12layer(layernum: nextLayerNum, firstSegNum: nextSegmentNum)
+                    
+                    fld12Layers.append(newFld12Layer)
+                    
+                    nextLayerNum += 1
+                    
+                    nextSegmentNum = Int(newFld12Layer.lastSegment) + 1
+                }
+            }
+            
+            
+        }
+        catch
+        {
+            throw error
+        }
+    }
+    
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {

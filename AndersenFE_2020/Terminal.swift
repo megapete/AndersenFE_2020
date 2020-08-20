@@ -123,6 +123,24 @@ class Terminal: Codable
         self.andersenNumber = termNum
     }
     
+    func AndersenConnection() -> Int
+    {
+        switch self.connection {
+        case .delta:
+            return 2
+        case .auto_common:
+            return 3
+        case .auto_series:
+            return 3
+        case .zag:
+            return 5
+        case .zig:
+            return 6
+        default:
+            return 1
+        }
+    }
+    
     /// This function sets the VA of the terminal based on the voltage and current passed in. Note that if 'amps' is negative, the currentDirection property is INVERTED.
     func SetVoltsAndVA(legVolts:Double, amps:Double)
     {

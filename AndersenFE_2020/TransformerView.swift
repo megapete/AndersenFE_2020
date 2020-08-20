@@ -145,6 +145,7 @@ class TransformerView: NSView {
     
     let zoomRectLineDash:[CGFloat] = [15.0, 8.0]
     
+    // MARK: Draw function override
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
@@ -232,6 +233,17 @@ class TransformerView: NSView {
         self.needsDisplay = true
     }
     
+    // MARK: Current-Direction Arrow
+    func drawArrow(centerX:CGFloat)
+    {
+        let arrowHeight:CGFloat = 15.0
+        let arrowHeadWidth:CGFloat = 3.0
+        let arrowHeadHeight:CGFloat = 5.0
+        let arrowBottom:CGFloat = 10.0
+        
+        
+    }
+    
     // MARK: Zoom Functions
     // transformer display zoom functions
     func handleZoomAll(coreRadius:CGFloat, windowHt:CGFloat, tankWallR:CGFloat)
@@ -242,15 +254,15 @@ class TransformerView: NSView {
         let boundsW = windowHt * aspectRatio
         
         let newRect = NSRect(x: coreRadius, y: 0.0, width: boundsW, height: windowHt)
-        DLog("NewRect: \(newRect)")
+        // DLog("NewRect: \(newRect)")
         
         self.bounds = newRect
         
-        DLog("Bounds: \(self.bounds)")
+        // DLog("Bounds: \(self.bounds)")
         self.boundary = self.bounds
         
         self.boundary.size.width = tankWallR - coreRadius
-        DLog("Boundary: \(self.boundary)")
+        // DLog("Boundary: \(self.boundary)")
         
         self.needsDisplay = true
     }

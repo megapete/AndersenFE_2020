@@ -146,6 +146,16 @@ class TerminalsView: NSView, NSMenuItemValidation {
         appCtrl.handleSetReferenceMVA(sender)
     }
     
+    @IBAction func handleSetRefVoltage(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.handleSetRefTermVoltage(sender)
+    }
+    
     @IBAction func handleSetNIDist(_ sender: Any) {
         
         guard let appCtrl = self.appController else

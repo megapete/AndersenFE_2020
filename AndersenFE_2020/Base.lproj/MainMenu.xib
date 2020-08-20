@@ -674,6 +674,9 @@
                 </menuItem>
                 <menuItem title="Set Reference Voltage" id="7OC-qC-VVY">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSetRefVoltage:" target="JKq-ah-7fY" id="Yda-wH-5vd"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Set Amp-Turn Distribution" id="5L4-cL-fka">
                     <modifierMask key="keyEquivalentModifierMask"/>

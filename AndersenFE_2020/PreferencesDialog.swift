@@ -19,6 +19,7 @@ class PreferencesDialog: PCH_DialogBox {
     @IBOutlet weak var defaultRefTerm2CheckBox: NSButton!
     @IBOutlet weak var useAndersenCheckBox: NSButton!
     @IBOutlet weak var forceAmpTurnBalanceCheckBox: NSButton!
+    @IBOutlet weak var keepImpedancesUpdatedCheckBox: NSButton!
     
     
     var modelRadialDucts:Bool
@@ -30,8 +31,9 @@ class PreferencesDialog: PCH_DialogBox {
     var defaultRefTerm2:Bool
     var useAndersenFLD12:Bool
     var forceAmpTurnBalance:Bool
+    var keepImpedancesUpdated:Bool
     
-    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool, useAndersenFLD12:Bool, forceAmpTurnBalance:Bool) {
+    init(scopeLabel:String, modelRadialDucts:Bool, modelZeroTerms:Bool, modelLayerTaps:Bool, upperLowerGapsAreSymmetric:Bool, multiStartElecHtIsToCenters:Bool, defaultRefTerm2:Bool, useAndersenFLD12:Bool, forceAmpTurnBalance:Bool, keepImpedancesUpdated:Bool) {
         
         self.scopeLabel = scopeLabel
         self.modelRadialDucts = modelRadialDucts
@@ -42,6 +44,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.defaultRefTerm2 = defaultRefTerm2
         self.useAndersenFLD12 = useAndersenFLD12
         self.forceAmpTurnBalance = forceAmpTurnBalance
+        self.keepImpedancesUpdated = keepImpedancesUpdated
         
         super.init(viewNibFileName: "Preferences", windowTitle: "Preferences", hideCancel: true)
     }
@@ -57,6 +60,7 @@ class PreferencesDialog: PCH_DialogBox {
         self.defaultRefTerm2CheckBox.state = (self.defaultRefTerm2 ? .on : .off)
         self.useAndersenCheckBox.state = (self.useAndersenFLD12 ? .on : .off)
         self.forceAmpTurnBalanceCheckBox.state = (self.forceAmpTurnBalance ? .on : .off)
+        self.keepImpedancesUpdatedCheckBox.state = (self.keepImpedancesUpdated ? .on : .off)
     }
     
     @IBAction func handleRadialDucts(_ sender: Any) {
@@ -99,4 +103,8 @@ class PreferencesDialog: PCH_DialogBox {
         self.forceAmpTurnBalance = self.forceAmpTurnBalanceCheckBox.state == .on
     }
     
+    @IBAction func handleKeepImpedancesUpdated(_ sender: Any) {
+        
+        self.keepImpedancesUpdated = self.keepImpedancesUpdatedCheckBox.state == .on
+    }
 }

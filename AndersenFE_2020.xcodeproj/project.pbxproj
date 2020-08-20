@@ -21,6 +21,7 @@
 		D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */; };
 		D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */; };
 		D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */; };
+		D3D2D2D124EF00640072EE96 /* ImpedanceScData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D2D2D024EF00640072EE96 /* ImpedanceScData.swift */; };
 		D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */; };
 		D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E024C242C100FDAA83 /* PCH_Defs.swift */; };
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
@@ -55,6 +56,7 @@
 		D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceMvaDialog.swift; sourceTree = "<group>"; };
 		D3CF829924E4B33B00055311 /* ModifyReferenceMva.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceMva.xib; sourceTree = "<group>"; };
 		D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_BaseClass_DialogBox.swift; path = "../../../../Dropbox/MyProjects/Base Classes/PCH_BaseClass_DialogBox.swift"; sourceTree = "<group>"; };
+		D3D2D2D024EF00640072EE96 /* ImpedanceScData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpedanceScData.swift; sourceTree = "<group>"; };
 		D3E307DF24C242C100FDAA83 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
 		D3E307E024C242C100FDAA83 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				F5BC370F24DB0A2A000CEED3 /* DataView.swift */,
 				D314456624C224650084DEC5 /* Segment.swift */,
 				D3E307E324C2473A00FDAA83 /* Layer.swift */,
+				D3D2D2D024EF00640072EE96 /* ImpedanceScData.swift */,
 				D314455A24C220A00084DEC5 /* Assets.xcassets */,
 				D314455C24C220A00084DEC5 /* MainMenu.xib */,
 				D314455F24C220A00084DEC5 /* Info.plist */,
@@ -229,6 +232,7 @@
 				F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */,
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,
 				D3D1108C24C9047700012C84 /* PCH_BaseClass_DialogBox.swift in Sources */,
+				D3D2D2D124EF00640072EE96 /* ImpedanceScData.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
 				D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */,
 				D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */,

@@ -27,6 +27,8 @@ let DEFAULT_REFERENCE_TERMINAL_2_KEY = "PCH_AFE2020_DefaultReferenceTerminal2"
 let USE_ANDERSEN_FLD12_PROGRAM_KEY = "PCH_AFE2020_UseAndersenFLD12"
 // Key to default to letting the program force Ampere-Turn balance at all times
 let FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY = "PCH_AFE2020_ForceAmpereTurnBalance"
+// Key to default to automatically calculate impedance, etc. after every change
+let KEEP_IMPEDANCE_AND_FORCES_UPDATED_KEY = "PCH_AFE2020_KeepImpedanceAndForcesUpdated"
 
 // Extension for our custonm file type
 let AFE2020_EXTENSION = "afe2020"
@@ -51,6 +53,7 @@ struct PCH_AFE2020_Prefs:Codable {
         var defaultRefTerm2:Bool
         var useAndersenFLD12:Bool
         var forceAmpTurnBalance:Bool
+        var keepImpedanceUpdated:Bool
     }
     
     var generalPrefs:GeneralPrefs
@@ -92,7 +95,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var zoomAllMenuItem: NSMenuItem!
     
     // MARK: Preferences
-    var preferences = PCH_AFE2020_Prefs(wdgPrefs: PCH_AFE2020_Prefs.WindingPrefs(modelRadialDucts: false, model0Terminals: false, modelInternalLayerTaps: false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true), generalPrefs: PCH_AFE2020_Prefs.GeneralPrefs(defaultRefTerm2: true, useAndersenFLD12: true, forceAmpTurnBalance: true))
+    var preferences = PCH_AFE2020_Prefs(wdgPrefs: PCH_AFE2020_Prefs.WindingPrefs(modelRadialDucts: false, model0Terminals: false, modelInternalLayerTaps: false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true), generalPrefs: PCH_AFE2020_Prefs.GeneralPrefs(defaultRefTerm2: true, useAndersenFLD12: true, forceAmpTurnBalance: true, keepImpedanceUpdated: true))
     
     // MARK: UI elements
     @IBOutlet weak var mainWindow: NSWindow!
@@ -138,6 +141,12 @@ class AppController: NSObject, NSMenuItemValidation {
         if UserDefaults.standard.object(forKey: FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY) != nil
         {
             self.preferences.generalPrefs.forceAmpTurnBalance = UserDefaults.standard.bool(forKey: FORCE_AMPERE_TURN_BALANCE_AUTOMATICALLY_KEY)
+        }
+        
+        // The default (original) value for this Bool is true, so test to make sure it exists
+        if UserDefaults.standard.object(forKey: KEEP_IMPEDANCE_AND_FORCES_UPDATED_KEY) != nil
+        {
+            self.preferences.generalPrefs.keepImpedanceUpdated = UserDefaults.standard.bool(forKey: KEEP_IMPEDANCE_AND_FORCES_UPDATED_KEY)
         }
         
         // Set up things for the views
@@ -528,7 +537,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 {
                     var newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
                     
-                    newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: &newSegPath)
+                    newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: nil)
                     
                     self.txfoView.segments.append(newSegPath)
                 }
@@ -619,7 +628,7 @@ class AppController: NSObject, NSMenuItemValidation {
         alert.alertStyle = .informational
         let _ = alert.runModal()
         
-        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.wdgPrefs.modelRadialDucts, modelZeroTerms: self.preferences.wdgPrefs.model0Terminals, modelLayerTaps: self.preferences.wdgPrefs.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.wdgPrefs.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.generalPrefs.defaultRefTerm2, useAndersenFLD12: self.preferences.generalPrefs.useAndersenFLD12, forceAmpTurnBalance: self.preferences.generalPrefs.forceAmpTurnBalance)
+        let prefDlog = PreferencesDialog(scopeLabel: "When loading an Excel-generated design file:", modelRadialDucts: self.preferences.wdgPrefs.modelRadialDucts, modelZeroTerms: self.preferences.wdgPrefs.model0Terminals, modelLayerTaps: self.preferences.wdgPrefs.modelInternalLayerTaps, upperLowerGapsAreSymmetric: self.preferences.wdgPrefs.upperLowerAxialGapsAreSymmetrical, multiStartElecHtIsToCenters: self.preferences.wdgPrefs.multiStartElecHtIsToCenter, defaultRefTerm2: self.preferences.generalPrefs.defaultRefTerm2, useAndersenFLD12: self.preferences.generalPrefs.useAndersenFLD12, forceAmpTurnBalance: self.preferences.generalPrefs.forceAmpTurnBalance, keepImpedancesUpdated: self.preferences.generalPrefs.keepImpedanceUpdated)
         
         let _ = prefDlog.runModal()
         
@@ -672,6 +681,12 @@ class AppController: NSObject, NSMenuItemValidation {
             self.preferences.generalPrefs.useAndersenFLD12 = !self.preferences.generalPrefs.useAndersenFLD12
             UserDefaults.standard.set(self.preferences.generalPrefs.useAndersenFLD12, forKey: USE_ANDERSEN_FLD12_PROGRAM_KEY)
             // don't update the transformer for this
+        }
+        
+        if prefDlog.keepImpedancesUpdated != self.preferences.generalPrefs.keepImpedanceUpdated
+        {
+            self.preferences.generalPrefs.keepImpedanceUpdated = !self.preferences.generalPrefs.keepImpedanceUpdated
+            UserDefaults.standard.set(self.preferences.generalPrefs.keepImpedanceUpdated, forKey: KEEP_IMPEDANCE_AND_FORCES_UPDATED_KEY)
         }
         
         if txfoNeedsUpdate

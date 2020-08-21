@@ -66,11 +66,9 @@ class Transformer:Codable {
         }
     }
     
-    /// Function to create a PCH_FLD12_TxfoDetails struct
-    func FLD12transformer() throws -> PCH_FLD12_TxfoDetails
+    /// Function to create a PCH_FLD12_TxfoDetails struct (intended for use for the "continuous" impedance calculation)
+    func QuickFLD12transformer() throws -> PCH_FLD12_TxfoDetails
     {
-        
-        
         do
         {
             var terminals = Array(AvailableTerminals())
@@ -109,7 +107,11 @@ class Transformer:Codable {
                 }
             }
             
+            let tankDist = self.DistanceFromCoreCenterToTankWall() - self.MaxWindingOD() / 2.0
             
+            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: 3, lowerZ: 0.0, upperZ: self.core.windHt, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
+            
+            return newFld12Txfo
         }
         catch
         {
@@ -167,6 +169,22 @@ class Transformer:Codable {
                 return "An unknown error occurred."
             }
         }
+    }
+    
+    /// return the OD of the outermost winding
+    func MaxWindingOD() -> Double
+    {
+        var result = 0.0
+        
+        for nextWdg in self.windings
+        {
+            if nextWdg.OD() > result
+            {
+                result = nextWdg.OD()
+            }
+        }
+        
+        return result
     }
     
     /// Calculate the distance from the center of the core to the tank wall (used for graphics)
@@ -262,7 +280,7 @@ class Transformer:Codable {
             result += nextTerm.VA * Double(nextTerm.currentDirection)
         }
         
-        return result
+        return fabs(result)
     }
     
     /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, an error is thrown.

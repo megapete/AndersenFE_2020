@@ -355,6 +355,22 @@ class Winding:Codable {
         }
     }
     
+    /// The OD of this Winding
+    func OD() -> Double
+    {
+        var result = 0.0
+        
+        for nextLayer in self.layers
+        {
+            if nextLayer.OD() > result
+            {
+                result = nextLayer.OD()
+            }
+        }
+        
+        return result
+    }
+    
     /// The current-carrying turns are the effective turns, and an UNSIGNED quantity
     func CurrentCarryingTurns() -> Double
     {

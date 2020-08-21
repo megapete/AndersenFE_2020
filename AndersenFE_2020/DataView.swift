@@ -13,6 +13,7 @@ class DataView: NSView {
     enum fieldIDs:Int {
         case vpn = 1
         case NI = 2
+        case impedance = 3
     }
     
     var dataFields:[NSTextField] = []
@@ -20,6 +21,19 @@ class DataView: NSView {
     func InitializeFields()
     {
         SetVpN(newVpN: 0.0, refTerm: nil)
+    }
+    
+    func SetImpedance(newImpPU:Double?)
+    {
+        var impString = "-ERROR-"
+        if let imp = newImpPU
+        {
+            impString = String(format: "%.2f", imp * 100.0)
+        }
+        
+        let impField = "Impedance:\n\(impString)%"
+        
+        self.SetFieldString(fieldID: .impedance, txt: impField)
     }
     
     func SetAmpereTurns(newNI:Double?)

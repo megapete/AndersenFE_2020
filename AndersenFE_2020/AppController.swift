@@ -166,6 +166,26 @@ class AppController: NSObject, NSMenuItemValidation {
         do
         {
             let _ = try newTransformer.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
+            
+            if self.preferences.generalPrefs.keepImpedanceUpdated
+            {
+                if self.preferences.generalPrefs.useAndersenFLD12
+                {
+                    let fld12txfo = try newTransformer.QuickFLD12transformer()
+                    
+                    let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
+                    
+                    newTransformer.scResults = ImpedanceAndScData(andersenOutput: fld12output)
+                }
+                else
+                {
+                    let alert = NSAlert()
+                    alert.messageText = "Calculation of forces by anything other than Andersen FLD12 is not implemented!"
+                    alert.alertStyle = .critical
+                    let _ = alert.runModal()
+                    return
+                }
+            }
         }
         catch
         {
@@ -174,6 +194,8 @@ class AppController: NSObject, NSMenuItemValidation {
             let _ = alert.runModal()
             return
         }
+        
+        
         
         // push old transformer (if any) onto the undo stack
         if let oldTransformer = self.currentTxfo
@@ -194,10 +216,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
-    func doCalculateImpedanceAndForces(txfo:Transformer) throws {
-        
-        
-    }
+    
     
     @IBAction func handleSetRefTermVoltage(_ sender: Any) {
         
@@ -493,7 +512,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleZoomRect(_ sender: Any) {
         
-        guard let txfo = self.currentTxfo else
+        guard self.currentTxfo != nil else
         {
             return
         }
@@ -591,6 +610,15 @@ class AppController: NSObject, NSMenuItemValidation {
             // amp-turns are guaranteed to be 0 if forceAmpTurnsBalance is true
             let newNI = self.preferences.generalPrefs.forceAmpTurnBalance ? 0.0 : try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
             self.dataView.SetAmpereTurns(newNI: newNI)
+            
+            if self.preferences.generalPrefs.keepImpedanceUpdated && txfo.scResults != nil
+            {
+                self.dataView.SetImpedance(newImpPU: txfo.scResults!.puImpedance)
+            }
+            else
+            {
+                self.dataView.SetImpedance(newImpPU: nil)
+            }
         }
         catch
         {

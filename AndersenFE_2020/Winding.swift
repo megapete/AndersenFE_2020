@@ -613,7 +613,7 @@ class Winding:Codable {
                 
                 // coil bottom to tap F
                 zList.append((currentBottomZ, currentTopZ))
-                segmentTurns.append(nonTapSectionTurns)
+                segmentTurns.append(nonTapSectionTurns / 2.0)
                 currentBottomZ = currentTopZ
                 currentTopZ += tapSectionZ
                 // tap F to tap D
@@ -626,7 +626,7 @@ class Winding:Codable {
                 segmentTurns.append(tapSectionTurns)
                 
                 currentBottomZ = currentTopZ + self.axialGaps.center
-                currentTopZ += currentBottomZ + tapSectionZ
+                currentTopZ = currentBottomZ + tapSectionZ
                 // tap A to tap C
                 zList.append((currentBottomZ, currentTopZ))
                 segmentTurns.append(tapSectionTurns)
@@ -639,7 +639,7 @@ class Winding:Codable {
                 currentTopZ = maxLayerZ
                 // tap E to coil center (minus half of the center gap, if any)
                 zList.append((currentBottomZ, currentTopZ))
-                segmentTurns.append(nonTapSectionTurns)
+                segmentTurns.append(nonTapSectionTurns / 2.0)
 
             }
         }

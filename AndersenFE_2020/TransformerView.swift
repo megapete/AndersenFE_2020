@@ -164,7 +164,10 @@ class TransformerView: NSView, NSViewToolTipOwner {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        NSBezierPath.defaultLineWidth *= 2.0
+        let oldLineWidth = NSBezierPath.defaultLineWidth
+        
+        // This is my "simple" way to get a one-pixel (ish) line thickness
+        NSBezierPath.defaultLineWidth = self.bounds.width / self.frame.width
         
         // Drawing code here.
         let boundaryPath = NSBezierPath(rect: boundary)
@@ -193,7 +196,7 @@ class TransformerView: NSView, NSViewToolTipOwner {
             }
         }
         
-        NSBezierPath.defaultLineWidth /= 2.0
+        NSBezierPath.defaultLineWidth = oldLineWidth
     }
     
     override var acceptsFirstResponder: Bool

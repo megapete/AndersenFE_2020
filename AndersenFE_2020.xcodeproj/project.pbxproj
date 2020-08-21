@@ -27,7 +27,7 @@
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
 		D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */; };
 		D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */; };
-		F5486E5424F0201B00D6CD46 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5486E5324F0201B00D6CD46 /* libPCH_FLD12_Library.a */; };
+		F5486E5624F04CC300D6CD46 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC370F24DB0A2A000CEED3 /* DataView.swift */; };
 		F5D9DC4224DF429200D11103 /* AmpTurnsDistributionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9DC4124DF429200D11103 /* AmpTurnsDistributionDialog.swift */; };
@@ -62,7 +62,7 @@
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
 		D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceVoltageDialog.swift; sourceTree = "<group>"; };
 		D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceVoltage.xib; sourceTree = "<group>"; };
-		F5486E5324F0201B00D6CD46 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = "../../../Library/Developer/Xcode/DerivedData/PCH_FLD12_Library-didhmyfzyedblofvjnuzixpycfzd/Build/Products/Debug/libPCH_FLD12_Library.a"; sourceTree = "<group>"; };
+		F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
 		F5BC370F24DB0A2A000CEED3 /* DataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataView.swift; sourceTree = "<group>"; };
@@ -79,7 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5486E5424F0201B00D6CD46 /* libPCH_FLD12_Library.a in Frameworks */,
+				F5486E5624F04CC300D6CD46 /* libPCH_FLD12_Library.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +144,7 @@
 		F5A0F06024C6231000C4CFE8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F5486E5324F0201B00D6CD46 /* libPCH_FLD12_Library.a */,
+				F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -397,7 +397,7 @@
 					"@executable_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"/Users/peterhuber/Library/Developer/Xcode/DerivedData/PCH_FLD12_Library-didhmyfzyedblofvjnuzixpycfzd/Build/Products/Debug",
+					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
@@ -430,7 +430,7 @@
 					"@executable_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"/Users/peterhuber/Library/Developer/Xcode/DerivedData/PCH_FLD12_Library-didhmyfzyedblofvjnuzixpycfzd/Build/Products/Debug",
+					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";

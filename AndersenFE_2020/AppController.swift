@@ -251,7 +251,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        // If the user wants to change the direction of a reference-terminal associated winding, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE ANdersen-terminal
+        // If the user wants to change the direction of a reference-terminal associated winding, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE Andersen-terminal
         if self.preferences.generalPrefs.forceAmpTurnBalance
         {
             if let refTerm = txfo.refTermNum
@@ -260,6 +260,15 @@ class AppController: NSObject, NSMenuItemValidation {
                 {
                     let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
                     let wdgTurns = winding.CurrentCarryingTurns()
+                    
+                    if wdgTurns / totalTerminalTurns >= 0.5
+                    {
+                        let alert = NSAlert()
+                        alert.messageText = "You may not change the direction of the main winding for a terminal unless it is the reference terminal."
+                        alert.alertStyle = .informational
+                        let _ = alert.runModal()
+                        return
+                    }
                 }
             }
         }
@@ -282,9 +291,14 @@ class AppController: NSObject, NSMenuItemValidation {
             let alert = NSAlert()
             alert.messageText = "Could not identify the winding to reverse!!"
             alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+            alert.alertStyle = .critical
             let _ = alert.runModal()
             return
         }
+        
+        newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer)
     }
     
     

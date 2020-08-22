@@ -89,6 +89,10 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBOutlet weak var TxfoContextMenu:NSMenu!
     
+    @IBOutlet weak var windingMenu: NSMenuItem!
+    @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
+    
+    
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
@@ -227,6 +231,14 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    @IBAction func handleReverseCurrentDirection(_ sender: Any) {
+        
+        
+    }
+    
+    func doReverseCurrentDirection(winding:Winding) {
+        
+    }
     
     
     @IBAction func handleSetRefTermVoltage(_ sender: Any) {
@@ -647,15 +659,39 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem
         {
-            return currentTxfo != nil
+            return self.currentTxfo != nil
         }
         else if menuItem == self.setMVAMenuItem || menuItem == self.setRefVoltageMenuItem
         {
-            return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.CurrentCarryingTurns(terminal: currentTxfo!.refTermNum!) != 0.0
+            return self.currentTxfo != nil && self.currentTxfo!.refTermNum != nil && self.currentTxfo!.CurrentCarryingTurns(terminal: self.currentTxfo!.refTermNum!) != 0.0
         }
         else if menuItem == self.setNIdistMenuItem
         {
-            return currentTxfo != nil && currentTxfo!.refTermNum != nil && currentTxfo!.AvailableTerminals().count >= 3
+            return self.currentTxfo != nil && self.currentTxfo!.refTermNum != nil && self.currentTxfo!.AvailableTerminals().count >= 3
+        }
+        else if menuItem == self.windingMenu
+        {
+            return self.currentTxfo != nil && self.txfoView.currentSegment != nil
+        }
+        else if menuItem == self.reverseCurrentMenuItem
+        {
+            guard let txfo = self.currentTxfo, let currSeg = self.txfoView.currentSegment else
+            {
+                return false
+            }
+            
+            let termNum = currSeg.segment.inLayer!.parentTerminal.andersenNumber
+            
+            if let refTerm = txfo.refTermNum
+            {
+                if refTerm != termNum
+                {
+                    if txfo.NumTerminalsFromAndersenNumber(termNum: termNum) < 2
+                    {
+                        return false
+                    }
+                }
+            }
         }
         
         

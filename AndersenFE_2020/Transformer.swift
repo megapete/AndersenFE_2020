@@ -109,7 +109,25 @@ class Transformer:Codable {
             
             let tankDist = self.DistanceFromCoreCenterToTankWall() - self.MaxWindingOD() / 2.0
             
-            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: 3, lowerZ: 0.0, upperZ: self.core.windHt, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
+            var numWoundLimbs = 3
+            if self.numPhases != 3
+            {
+                numWoundLimbs = 1
+                
+                for nextTerm in self.terminals
+                {
+                    if let term = nextTerm
+                    {
+                        if term.connection == .single_phase_two_legs
+                        {
+                            numWoundLimbs = 2
+                            break
+                        }
+                    }
+                }
+            }
+            
+            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: Int32(numWoundLimbs), lowerZ: 0.0, upperZ: self.core.windHt, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
             
             return newFld12Txfo
         }
@@ -195,6 +213,25 @@ class Transformer:Codable {
         for nextWdg in self.windings
         {
             result = max(nextWdg.layers.last!.OD() / 2.0 + nextWdg.groundClearance, result)
+        }
+        
+        return result
+    }
+    
+    /// A quick way of finding the number of Terminals associated with a given Andersen terminal number (quick because it doesn't throw)
+    func NumTerminalsFromAndersenNumber(termNum:Int) -> Int
+    {
+        var result = 0
+        
+        for nextTerm in self.terminals
+        {
+            if let term = nextTerm
+            {
+                if term.andersenNumber == termNum
+                {
+                    result += 1
+                }
+            }
         }
         
         return result

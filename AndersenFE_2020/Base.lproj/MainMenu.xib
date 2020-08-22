@@ -24,6 +24,7 @@
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
                 <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
+                <outlet property="reverseCurrentMenuItem" destination="OAx-Vq-OSe" id="H52-D3-KSC"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
@@ -32,6 +33,7 @@
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
+                <outlet property="windingMenu" destination="ZBh-my-jYk" id="7XU-1d-oWU"/>
                 <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
                 <outlet property="zoomInMenuItem" destination="q4k-Rw-dqx" id="nDA-f7-y7E"/>
                 <outlet property="zoomOutMenuItem" destination="Oxa-g5-7Sq" id="Xuu-xz-jSR"/>
@@ -415,16 +417,19 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Winding" id="Z0d-Nw-0i9">
                         <items>
-                            <menuItem title="Change Winding Name..." id="SkO-4j-PeK">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                            </menuItem>
                             <menuItem title="Reverse Current Direction" id="OAx-Vq-OSe">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleReverseCurrentDirection:" target="6yZ-bT-Gps" id="eio-pr-blL"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Define Regulating Winding..." id="uc8-3v-kQu">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem title="Move Winding Radially..." id="UMp-RI-jDT">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Change Winding Name..." id="SkO-4j-PeK">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5dR-0B-rXc"/>

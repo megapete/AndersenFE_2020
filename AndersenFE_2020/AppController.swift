@@ -89,7 +89,6 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBOutlet weak var TxfoContextMenu:NSMenu!
     
-    @IBOutlet weak var windingMenu: NSMenuItem!
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
     
     
@@ -233,11 +232,59 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleReverseCurrentDirection(_ sender: Any) {
         
+        guard let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
         
+        if let winding = segPath.segment.inLayer!.parentTerminal.winding
+        {
+            self.doReverseCurrentDirection(winding: winding)
+        }
     }
     
     func doReverseCurrentDirection(winding:Winding) {
         
+        // if the calling routine got as far as specifying a winding, it's guaranteed that there's a transformer defined, but who knows what the future holds
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        // If the user wants to change the direction of a reference-terminal associated winding, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE ANdersen-terminal
+        if self.preferences.generalPrefs.forceAmpTurnBalance
+        {
+            if let refTerm = txfo.refTermNum
+            {
+                if winding.terminal.andersenNumber != refTerm
+                {
+                    let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+                    let wdgTurns = winding.CurrentCarryingTurns()
+                }
+            }
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
+        var newWinding:Winding? = nil
+        for nextWdg in newTransformer.windings
+        {
+            if nextWdg.coilID == winding.coilID
+            {
+                newWinding = nextWdg
+                break
+            }
+        }
+        
+        guard let newWdg = newWinding else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Could not identify the winding to reverse!!"
+            alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+            let _ = alert.runModal()
+            return
+        }
     }
     
     
@@ -668,10 +715,6 @@ class AppController: NSObject, NSMenuItemValidation {
         else if menuItem == self.setNIdistMenuItem
         {
             return self.currentTxfo != nil && self.currentTxfo!.refTermNum != nil && self.currentTxfo!.AvailableTerminals().count >= 3
-        }
-        else if menuItem == self.windingMenu
-        {
-            return self.currentTxfo != nil && self.txfoView.currentSegment != nil
         }
         else if menuItem == self.reverseCurrentMenuItem
         {

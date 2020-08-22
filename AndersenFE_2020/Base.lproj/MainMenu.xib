@@ -33,7 +33,6 @@
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
-                <outlet property="windingMenu" destination="ZBh-my-jYk" id="7XU-1d-oWU"/>
                 <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
                 <outlet property="zoomInMenuItem" destination="q4k-Rw-dqx" id="nDA-f7-y7E"/>
                 <outlet property="zoomOutMenuItem" destination="Oxa-g5-7Sq" id="Xuu-xz-jSR"/>
@@ -551,7 +550,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="860" height="871"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -568,21 +567,21 @@
                                         <rect key="frame" x="45" y="0.0" width="498" height="872"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="481" height="855"/>
+                                            <rect key="frame" x="1" y="1" width="496" height="870"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="481" height="855"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </customView>
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="856" width="481" height="15"/>
+                                            <rect key="frame" x="1" y="855" width="496" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="482" y="1" width="15" height="855"/>
+                                            <rect key="frame" x="481" y="1" width="16" height="870"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>

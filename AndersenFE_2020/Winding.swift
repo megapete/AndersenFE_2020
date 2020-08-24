@@ -707,6 +707,8 @@ class Winding:Codable {
             zIndex += 1
         }
         
+        // TODO: Take care of "associated" segments for double-axial stacks and multi-start windings
+        
         self.layers.removeAll()
         
         for _ in 0..<numLayers

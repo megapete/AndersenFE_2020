@@ -194,7 +194,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 else
                 {
                     let alert = NSAlert()
-                    alert.messageText = "Calculation of forces by anything other than Andersen FLD12 is not implemented!"
+                    alert.messageText = "Calculation of impedance & forces by anything other than Andersen FLD12 is not implemented!"
                     alert.alertStyle = .critical
                     let _ = alert.runModal()
                     return
@@ -216,6 +216,8 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             undoStack.insert(PCH_AFE2020_Save_Struct(transformer: oldTransformer), at: 0)
         }
+        
+        DLog("Number of transformers currently on the undo stack: \(undoStack.count)")
         
         self.currentTxfo = newTransformer
         self.currentTxfoIsDirty = true

@@ -730,5 +730,33 @@
             </items>
             <point key="canvasLocation" x="462" y="342"/>
         </menu>
+        <menu id="PKF-ho-E86">
+            <items>
+                <menuItem title="Reverse Current Direction" id="e6b-PR-1Uc">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Define Regulating Winding" id="6rA-xi-Vyd">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Move Winding Radially" id="UyY-Aw-kPH">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Change Winding Name" id="I41-Pp-M7t">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="97k-fr-a3b"/>
+                <menuItem title="Activate All Winding Turns" id="44K-HR-t3v">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Deactivate All Winding Turns" id="Lvc-yc-qYG">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="WzO-8P-7jw"/>
+                <menuItem title="Activate Segment" id="vP2-z4-P39">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="716" y="382"/>
+        </menu>
     </objects>
 </document>

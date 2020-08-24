@@ -33,9 +33,12 @@ class Segment:Codable {
     /// The upper dimesion of the Segment
     let maxZ:Double
     
+    /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is usually a member of this array.
+    var mirrorSegments:[Segment] = []
+    
     var inLayer:Layer? = nil
     
-    init(strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, inLayer:Layer? = nil) {
+    init(strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, mirrorSegments:[Segment] = [], inLayer:Layer? = nil) {
         
         self.strandA = strandA
         self.strandR = strandR
@@ -45,6 +48,7 @@ class Segment:Codable {
         self.totalTurns = totalTurns
         self.minZ = minZ
         self.maxZ = maxZ
+        self.mirrorSegments = mirrorSegments
         self.inLayer = inLayer
     }
     

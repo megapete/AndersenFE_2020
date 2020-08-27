@@ -455,14 +455,28 @@ class Winding:Codable {
         var zList:[(min:Double, max:Double)] = []
         // initialize an empty "default" list of turns per segment
         var segmentTurns:[Double] = []
+        // initialize an empty default list of "associated" segment indices
+        var associatedSegments:[[Int]] = []
         
         if wdgType != .multistart && !self.hasTaps || ((self.wdgType == .layer || self.wdgType == .section) && !preferences.modelInternalLayerTaps) {
             
             if numSegsPerLayer == 1 // no axial gaps
             {
-                zList.append((minLayerZ, maxLayerZ))
+                if self.isDoubleStack
+                {
+                    zList.append((minLayerZ, windingCenter))
+                    zList.append((windingCenter, maxLayerZ))
+                    
+                    segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+                    
+                    associatedSegments = [[0, 1]]
+                }
+                else
+                {
+                    zList.append((minLayerZ, maxLayerZ))
                 
-                segmentTurns = [turnsPerLayer]
+                    segmentTurns = [turnsPerLayer]
+                }
             }
             else if numSegsPerLayer == 2 // one axial gap in the center of the winding
             {
@@ -473,6 +487,11 @@ class Winding:Codable {
                 zList.append((topZmin, maxLayerZ))
                 
                 segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+                
+                if self.isDoubleStack
+                {
+                    associatedSegments = [[0, 1]]
+                }
             }
             else if numSegsPerLayer == 3 // two axial gaps, each 1/4 of the length from the winding ends
             {
@@ -484,11 +503,25 @@ class Winding:Codable {
                 let bottomGapCenter = windingCenter - elecHt / 4.0
                 let topGapCenter = bottomGapCenter + elecHt / 2.0
                 
-                zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
-                zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, topGapCenter - self.axialGaps.top / 2.0))
-                zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
-                
-                segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 2.0, turnsPerLayer / 4.0]
+                if self.isDoubleStack
+                {
+                    zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+                    zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, windingCenter))
+                    zList.append((windingCenter, topGapCenter - self.axialGaps.top / 2.0))
+                    zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+                    
+                    segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 4.0, turnsPerLayer / 4.0, turnsPerLayer / 4.0]
+                    
+                    associatedSegments = [[0, 3], [1, 2]]
+                }
+                else
+                {
+                    zList.append((minLayerZ, bottomGapCenter - self.axialGaps.bottom / 2.0))
+                    zList.append((bottomGapCenter + self.axialGaps.bottom / 2.0, topGapCenter - self.axialGaps.top / 2.0))
+                    zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
+                    
+                    segmentTurns = [turnsPerLayer / 4.0, turnsPerLayer / 2.0, turnsPerLayer / 4.0]
+                }
             }
             else if numSegsPerLayer == 4
             {
@@ -501,6 +534,11 @@ class Winding:Codable {
                 zList.append((topGapCenter + self.axialGaps.top / 2.0, maxLayerZ))
                 
                 segmentTurns = Array(repeating: turnsPerLayer / 4.0, count: 4)
+                
+                if self.isDoubleStack
+                {
+                    associatedSegments = [[0, 3], [1, 2]]
+                }
             }
             
         }
@@ -600,6 +638,13 @@ class Winding:Codable {
                 zList.append((currentBottomZ, currentTopZ))
                 segmentTurns.append(nonTapSectionTurns)
                 
+                var secondIndex = 11
+                for firstIndex in 0..<6
+                {
+                    associatedSegments.append([firstIndex, secondIndex])
+                    
+                    secondIndex -= 1
+                }
             }
             else
             {
@@ -675,6 +720,19 @@ class Winding:Codable {
             
             // I'm not sure this is the way that this whole thing will actually work for regulating windings, but we'll use it for now...
             segmentTurns = Array(repeating: 1.0, count: self.turnDef.numCablesAxial * Int(self.numTurns.maxTurns))
+            
+            for i in 0..<self.turnDef.numCablesAxial
+            {
+                var nextSet = [i]
+                
+                for _ in 1..<Int(self.numTurns.maxTurns)
+                {
+                    let nextIndex = nextSet.last! + Int(self.numTurns.maxTurns)
+                    nextSet.append(nextIndex)
+                }
+                
+                associatedSegments.append(nextSet)
+            }
         }
         else
         {
@@ -708,6 +766,23 @@ class Winding:Codable {
         }
         
         // TODO: Take care of "associated" segments for double-axial stacks and multi-start windings
+        if !associatedSegments.isEmpty
+        {
+            for nextIndexArray in associatedSegments
+            {
+                var assSegs:[Segment] = []
+                
+                for nextSegIndex in nextIndexArray
+                {
+                    assSegs.append(layerSegments[nextSegIndex])
+                }
+                
+                for nextSeg in assSegs
+                {
+                    nextSeg.mirrorSegments = assSegs
+                }
+            }
+        }
         
         self.layers.removeAll()
         

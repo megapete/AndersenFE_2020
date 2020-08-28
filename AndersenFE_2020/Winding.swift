@@ -350,7 +350,7 @@ class Winding:Codable {
             
             for nextSegment in nextLayer.segments
             {
-                newSegs.append(Segment(strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ))
+                newSegs.append(Segment(serialNumber: nextSegment.serialNumber, strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ))
             }
             
             self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: terminal))
@@ -758,7 +758,7 @@ class Winding:Codable {
         var zIndex = 0
         for zPair in zList
         {
-            let newSegment = Segment(strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
+            let newSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
             
             layerSegments.append(newSegment)
             
@@ -770,16 +770,16 @@ class Winding:Codable {
         {
             for nextIndexArray in associatedSegments
             {
-                var assSegs:[Segment] = []
+                var assSegs:Set<Int> = []
                 
                 for nextSegIndex in nextIndexArray
                 {
-                    assSegs.append(layerSegments[nextSegIndex])
+                    assSegs.insert(layerSegments[nextSegIndex].serialNumber)
                 }
                 
-                for nextSeg in assSegs
+                for nextSegIndex in nextIndexArray
                 {
-                    nextSeg.mirrorSegments = assSegs
+                    layerSegments[nextSegIndex].mirrorSegments = Array(assSegs)
                 }
             }
         }

@@ -90,6 +90,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var TxfoContextMenu:NSMenu!
     
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
+    @IBOutlet weak var toggleSegmentActivationMenuItem: NSMenuItem!
     
     
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
@@ -230,6 +231,45 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             self.updateViews()
         }
+    }
+    
+    @IBAction func handleToggleSegmentActivation(_ sender: Any) {
+        
+        guard let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        self.doToggleSegmentActivation(segment: segPath.segment)
+        
+    }
+    
+    func doToggleSegmentActivation(segment:Segment)
+    {
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        for nextWinding in newTransformer.windings
+        {
+            for nextLayer in nextWinding.layers
+            {
+                for nextSegment in nextLayer.segments
+                {
+                    if nextSegment == segment
+                    {
+                        nextSegment.ToggleActivate()
+                        self.updateCurrentTransformer(newTransformer: newTransformer)
+                        return
+                    }
+                }
+            }
+        }
+        
+        
     }
     
     @IBAction func handleReverseCurrentDirection(_ sender: Any) {

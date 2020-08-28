@@ -32,6 +32,7 @@
                 <outlet property="setRefTerminalMenuItem" destination="Gi5-1S-RQB" id="2Ei-rb-WXd"/>
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
+                <outlet property="toggleSegmentActivationMenuItem" destination="dnY-ZC-pao" id="czx-yE-PLz"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
                 <outlet property="zoomAllMenuItem" destination="efm-YQ-pKe" id="iPa-By-45v"/>
                 <outlet property="zoomInMenuItem" destination="q4k-Rw-dqx" id="nDA-f7-y7E"/>
@@ -441,6 +442,9 @@
                             <menuItem isSeparatorItem="YES" id="cNH-46-Ud8"/>
                             <menuItem title="Activate Segment" id="dnY-ZC-pao">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleToggleSegmentActivation:" target="6yZ-bT-Gps" id="eez-WL-gRV"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>

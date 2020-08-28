@@ -11,7 +11,26 @@
 import Foundation
 
 /// A Segment is a collection of turns (made up of a number of strands per turn and strands per layer) with a lower dimension of minZ and an upper dimension of maxZ
-class Segment:Codable {
+class Segment:Codable, Equatable {
+    
+    static func == (lhs: Segment, rhs: Segment) -> Bool {
+        
+        return lhs.serialNumber == rhs.serialNumber
+    }
+    
+    private static var nextSerialNumberStore:Int = 0
+    
+    static var nextSerialNumber:Int {
+        get {
+            
+            let nextNum = Segment.nextSerialNumberStore
+            Segment.nextSerialNumberStore += 1
+            return nextNum
+        }
+    }
+    
+    /// Segment serial number (needed for the mirrorSegment property and to make the "==" operator code simpler
+    let serialNumber:Int
     
     /// Strand Axial Dimension
     let strandA:Double
@@ -24,7 +43,7 @@ class Segment:Codable {
     let strandsPerTurn:Int
     
     /// The number of active turns in the Segment (usually either 0 or totalTurns)
-    let activeTurns:Double
+    var activeTurns:Double
     /// The total number of turns in the Segment
     let totalTurns:Double
     
@@ -33,13 +52,14 @@ class Segment:Codable {
     /// The upper dimesion of the Segment
     let maxZ:Double
     
-    /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is usually a member of this array.
-    var mirrorSegments:[Segment] = []
+    /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is always a member of this set.
+    var mirrorSegments:[Int] = []
     
     var inLayer:Layer? = nil
     
-    init(strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, mirrorSegments:[Segment] = [], inLayer:Layer? = nil) {
+    init(serialNumber:Int, strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, mirrorSegments:[Int] = [], inLayer:Layer? = nil) {
         
+        self.serialNumber = serialNumber
         self.strandA = strandA
         self.strandR = strandR
         self.strandsPerLayer = strandsPerLayer
@@ -83,7 +103,7 @@ class Segment:Codable {
         
         while result.count < numSegs
         {
-            let newSegment = Segment(strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
+            let newSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: turnsPerSegment, totalTurns: turnsPerSegment, minZ: currentZ, maxZ: currentZ + zPerSegment)
             
             result.append(newSegment)
             
@@ -111,9 +131,9 @@ class Segment:Codable {
         let bottomDeltaZ = selfDeltaZ * percentNewBottom / 100.0
         let topDeltaZ = selfDeltaZ - bottomDeltaZ
         
-        let bottomSegment = Segment(/* type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: bottomTurns, totalTurns: bottomTurns, minZ: self.minZ, maxZ: self.minZ + bottomDeltaZ)
+        let bottomSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: bottomTurns, totalTurns: bottomTurns, minZ: self.minZ, maxZ: self.minZ + bottomDeltaZ)
         
-        let topSegment = Segment(/* type: self.type, */strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: topTurns, totalTurns: topTurns, minZ: bottomSegment.maxZ, maxZ: bottomSegment.maxZ + topDeltaZ)
+        let topSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.strandA, strandR: self.strandR, strandsPerLayer: self.strandsPerLayer, strandsPerTurn: self.strandsPerTurn, activeTurns: topTurns, totalTurns: topTurns, minZ: bottomSegment.maxZ, maxZ: bottomSegment.maxZ + topDeltaZ)
         
         return [bottomSegment, topSegment]
     }
@@ -124,5 +144,16 @@ class Segment:Codable {
         return activeTurns != 0
     }
     
+    func ToggleActivate()
+    {
+        if self.activeTurns == 0.0
+        {
+            self.activeTurns = self.totalTurns
+        }
+        else
+        {
+            self.activeTurns = 0.0
+        }
+    }
     
 }

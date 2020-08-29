@@ -350,7 +350,7 @@ class Winding:Codable {
             
             for nextSegment in nextLayer.segments
             {
-                newSegs.append(Segment(serialNumber: nextSegment.serialNumber, strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ))
+                newSegs.append(Segment(serialNumber: nextSegment.serialNumber, strandA: nextSegment.strandA, strandR: nextSegment.strandR, strandsPerLayer: nextSegment.strandsPerLayer, strandsPerTurn: nextSegment.strandsPerTurn, activeTurns: nextSegment.activeTurns, totalTurns: nextSegment.totalTurns, minZ: nextSegment.minZ, maxZ: nextSegment.maxZ, mirrorSegments: nextSegment.mirrorSegments))
             }
             
             self.layers.append(Layer(segments: newSegs, numSpacerBlocks: nextLayer.numSpacerBlocks, spacerBlockWidth: nextLayer.spacerBlockWidth, material: nextLayer.material, numberParallelGroups: nextLayer.numberParallelGroups, radialBuild: nextLayer.radialBuild, innerRadius: nextLayer.innerRadius, parentTerminal: terminal))

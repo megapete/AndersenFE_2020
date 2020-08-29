@@ -52,7 +52,7 @@ class Segment:Codable, Equatable {
     /// The upper dimesion of the Segment
     let maxZ:Double
     
-    /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is always a member of this set.
+    /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is always a member of this array.
     var mirrorSegments:[Int] = []
     
     var inLayer:Layer? = nil
@@ -68,7 +68,12 @@ class Segment:Codable, Equatable {
         self.totalTurns = totalTurns
         self.minZ = minZ
         self.maxZ = maxZ
-        self.mirrorSegments = mirrorSegments
+        
+        // make sure that this Segment's serial number is added to the mirrorSegment array
+        var mirrorSet:Set<Int> = Set(mirrorSegments)
+        mirrorSet.insert(serialNumber)
+        self.mirrorSegments = Array(mirrorSet)
+        
         self.inLayer = inLayer
     }
     
@@ -146,13 +151,19 @@ class Segment:Codable, Equatable {
     
     func ToggleActivate()
     {
-        if self.activeTurns == 0.0
+        guard let layer = self.inLayer else
         {
-            self.activeTurns = self.totalTurns
+            return
         }
-        else
+        
+        let newTurns = (self.activeTurns == 0.0 ? self.totalTurns : 0.0)
+        
+        for nextSegment in layer.segments
         {
-            self.activeTurns = 0.0
+            if self.mirrorSegments.contains(nextSegment.serialNumber)
+            {
+                nextSegment.activeTurns = newTurns
+            }
         }
     }
     

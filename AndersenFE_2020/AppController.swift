@@ -240,7 +240,11 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
+        let newTitle = segPath.segment.IsActive() ? "Activate Segment" : "Deactivate Segment"
+        
         self.doToggleSegmentActivation(segment: segPath.segment)
+        
+        self.toggleSegmentActivationMenuItem.title = newTitle
         
     }
     
@@ -790,6 +794,22 @@ class AppController: NSObject, NSMenuItemValidation {
                         return false
                     }
                 }
+            }
+        }
+        else if menuItem == self.toggleSegmentActivationMenuItem
+        {
+            guard let txfo = self.currentTxfo, let currSeg = self.txfoView.currentSegment else
+            {
+                return false
+            }
+            
+            if currSeg.isActive
+            {
+                menuItem.title = "Deactivate segment"
+            }
+            else
+            {
+                menuItem.title = "Activate segment"
             }
         }
         

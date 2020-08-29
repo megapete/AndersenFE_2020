@@ -357,6 +357,17 @@ class Winding:Codable {
         }
     }
     
+    func SetTurnsActivation(activate:Bool)
+    {
+        for nextLayer in self.layers
+        {
+            for nextSegment in nextLayer.segments
+            {
+                nextSegment.activeTurns = activate ? nextSegment.totalTurns : 0.0
+            }
+        }
+    }
+    
     /// The OD of this Winding
     func OD() -> Double
     {

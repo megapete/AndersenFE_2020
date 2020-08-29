@@ -78,10 +78,12 @@ class AppController: NSObject, NSMenuItemValidation {
     var redoStack:[PCH_AFE2020_Save_Struct] = []
     
     // MARK: Menu outlets
+    // File Menu
     @IBOutlet weak var saveMenuItem: NSMenuItem!
     @IBOutlet weak var saveAndersenFileMenuItem: NSMenuItem!
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
+    // Transformer Menu
     @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
     @IBOutlet weak var setRefVoltageMenuItem: NSMenuItem!
@@ -89,10 +91,15 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBOutlet weak var TxfoContextMenu:NSMenu!
     
+    // Winding Menu
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
+    
+    
+    @IBOutlet weak var activateAllWdgTurnsMenuItem: NSMenuItem!
+    @IBOutlet weak var deactivateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var toggleSegmentActivationMenuItem: NSMenuItem!
     
-    
+    // View Menu
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
@@ -231,6 +238,81 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    @IBAction func handleActivateAllWdgTurns(_ sender: Any) {
+        
+        guard let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        self.doSetActivation(winding: segPath.segment.inLayer!.parentTerminal.winding!, activate: true)
+    }
+    
+    
+    @IBAction func handleDeactivateAllWdgTurns(_ sender: Any) {
+        
+        guard let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        self.doSetActivation(winding: segPath.segment.inLayer!.parentTerminal.winding!, activate: false)
+    }
+    
+    func doSetActivation(winding:Winding, activate:Bool)
+    {
+        guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        let winding = segPath.segment.inLayer!.parentTerminal.winding!
+        let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+        let wdgTurns = winding.CurrentCarryingTurns()
+        
+        if fabs(totalTerminalTurns - wdgTurns) < 0.5
+        {
+            let alert = NSAlert()
+            alert.messageText = "It is illegal deactivate ALL the turns for any terminal!"
+            alert.informativeText = "You may change the ampere-distribution for transformers with 3 or more terminals."
+            if txfo.AvailableTerminals().count < 3
+            {
+                alert.informativeText = ""
+            }
+            alert.alertStyle = .critical
+            let _ = alert.runModal()
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
+        var newWinding:Winding? = nil
+        for nextWdg in newTransformer.windings
+        {
+            if nextWdg.coilID == winding.coilID
+            {
+                newWinding = nextWdg
+                break
+            }
+        }
+        
+        guard let newWdg = newWinding else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Could not identify the winding to reverse!!"
+            alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+            alert.alertStyle = .critical
+            let _ = alert.runModal()
+            return
+        }
+        
+        newWdg.SetTurnsActivation(activate: activate)
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer)
+    }
+    
+    
     @IBAction func handleToggleSegmentActivation(_ sender: Any) {
         
         guard let segPath = self.txfoView.currentSegment else
@@ -270,8 +352,6 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
             }
         }
-        
-        
     }
     
     @IBAction func handleReverseCurrentDirection(_ sender: Any) {
@@ -807,9 +887,44 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
             }
         }
-        else if menuItem == self.toggleSegmentActivationMenuItem
+        else if menuItem == self.activateAllWdgTurnsMenuItem
         {
             guard  self.currentTxfo != nil, self.txfoView.currentSegment != nil else
+            {
+                return false
+            }
+        }
+        else if menuItem == self.toggleSegmentActivationMenuItem
+        {
+            guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+            {
+                return false
+            }
+            
+            if segPath.isActive
+            {
+                let winding = segPath.segment.inLayer!.parentTerminal.winding!
+                let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+                let wdgTurns = winding.CurrentCarryingTurns()
+                
+                if fabs(totalTerminalTurns - wdgTurns) < 0.5
+                {
+                    return false
+                }
+            }
+        }
+        else if menuItem == self.deactivateAllWdgTurnsMenuItem
+        {
+            guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+            {
+                return false
+            }
+            
+            let winding = segPath.segment.inLayer!.parentTerminal.winding!
+            let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+            let wdgTurns = winding.CurrentCarryingTurns()
+            
+            if fabs(totalTerminalTurns - wdgTurns) < 0.5
             {
                 return false
             }

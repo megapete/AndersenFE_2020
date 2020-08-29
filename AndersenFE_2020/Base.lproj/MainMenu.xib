@@ -21,8 +21,10 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
+                <outlet property="activateAllWdgTurnsMenuItem" destination="XfI-aw-bW1" id="zWf-IQ-LzA"/>
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
                 <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
+                <outlet property="deactivateAllWdgTurnsMenuItem" destination="3cl-q1-BRW" id="HY4-kW-3FO"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="reverseCurrentMenuItem" destination="OAx-Vq-OSe" id="H52-D3-KSC"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
@@ -435,9 +437,15 @@
                             <menuItem isSeparatorItem="YES" id="5dR-0B-rXc"/>
                             <menuItem title="Activate All Winding Turns" id="XfI-aw-bW1">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleActivateAllWdgTurns:" target="6yZ-bT-Gps" id="FVi-rU-tbH"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Deactivate All Winding Turns" id="3cl-q1-BRW">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleDeactivateAllWdgTurns:" target="6yZ-bT-Gps" id="Xwf-Rk-TDj"/>
+                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="cNH-46-Ud8"/>
                             <menuItem title="Deactivate Segment" id="dnY-ZC-pao">

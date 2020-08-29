@@ -519,7 +519,8 @@ class Transformer:Codable {
                             }
                         }
                         
-                        va = round(va * 1000.0) / 1000.0
+                        // avoid things like 25999999 when it should be 26000000
+                        va = round(va)
                         
                         if va < 0.0
                         {

@@ -519,6 +519,8 @@ class Transformer:Codable {
                             }
                         }
                         
+                        va = round(va * 1000.0) / 1000.0
+                        
                         if va < 0.0
                         {
                             // yes, there's a reason why I'm converting it to a positve

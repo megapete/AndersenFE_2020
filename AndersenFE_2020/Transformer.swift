@@ -13,6 +13,8 @@ let PCH_AFE2020_SupportedFileVersion = 4
 /// The Transformer struct is the encompassing Andersen-oriented data for the model. All of its fields are self-explanatory.
 class Transformer:Codable {
     
+    var txfoDesc:String = ""
+    
     let numPhases:Int
     
     let frequency:Double

@@ -31,8 +31,8 @@
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
-                <outlet property="setRefTerminalMenuItem" destination="Gi5-1S-RQB" id="2Ei-rb-WXd"/>
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
+                <outlet property="setTxfoDescriptionMenuItem" destination="Gi5-1S-RQB" id="6q6-nM-agC"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
                 <outlet property="toggleSegmentActivationMenuItem" destination="dnY-ZC-pao" id="czx-yE-PLz"/>
                 <outlet property="txfoView" destination="tyn-iH-4KA" id="bDI-1P-pbp"/>
@@ -388,10 +388,16 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Transformer" id="GEO-Iw-cKr">
                         <items>
-                            <menuItem title="Set Reference Terminal..." id="Gi5-1S-RQB">
+                            <menuItem title="Set Transformer Description..." id="Gi5-1S-RQB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleSetReferenceTerminal:" target="6yZ-bT-Gps" id="QrB-zF-Rd9"/>
+                                    <action selector="handleSetTxfoDesc:" target="6yZ-bT-Gps" id="C65-RK-DCD"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Set Reference Terminal..." id="CsF-zD-wyS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetReferenceTerminal:" target="6yZ-bT-Gps" id="oi4-d7-d6c"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Set Reference MVA..." id="SUT-qo-38h">
@@ -566,7 +572,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="860" height="871"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -583,21 +589,21 @@
                                         <rect key="frame" x="45" y="0.0" width="498" height="872"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="481" height="855"/>
+                                            <rect key="frame" x="1" y="1" width="496" height="870"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="481" height="855"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </customView>
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="856" width="481" height="15"/>
+                                            <rect key="frame" x="1" y="855" width="496" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="482" y="1" width="15" height="855"/>
+                                            <rect key="frame" x="481" y="1" width="16" height="870"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>

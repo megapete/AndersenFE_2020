@@ -11,6 +11,8 @@
 		D314455B24C220A00084DEC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D314455A24C220A00084DEC5 /* Assets.xcassets */; };
 		D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D314455C24C220A00084DEC5 /* MainMenu.xib */; };
 		D314456724C224650084DEC5 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314456624C224650084DEC5 /* Segment.swift */; };
+		D3275F8224FADB0B005D9F5A /* TransformerDescriptionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3275F8124FADB0A005D9F5A /* TransformerDescriptionDialog.swift */; };
+		D3275F8424FADB22005D9F5A /* TransformerDescription.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3275F8324FADB22005D9F5A /* TransformerDescription.xib */; };
 		D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */; };
 		D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D38833E024CCC1C400A0C7A5 /* Preferences.xib */; };
 		D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */; };
@@ -46,6 +48,8 @@
 		D314455F24C220A00084DEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D314456024C220A00084DEC5 /* AndersenFE_2020.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AndersenFE_2020.entitlements; sourceTree = "<group>"; };
 		D314456624C224650084DEC5 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
+		D3275F8124FADB0A005D9F5A /* TransformerDescriptionDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformerDescriptionDialog.swift; sourceTree = "<group>"; };
+		D3275F8324FADB22005D9F5A /* TransformerDescription.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransformerDescription.xib; sourceTree = "<group>"; };
 		D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDialog.swift; sourceTree = "<group>"; };
 		D38833E024CCC1C400A0C7A5 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
@@ -113,6 +117,8 @@
 				D3D1108B24C9047700012C84 /* PCH_BaseClass_DialogBox.swift */,
 				D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */,
 				D38833E024CCC1C400A0C7A5 /* Preferences.xib */,
+				D3275F8124FADB0A005D9F5A /* TransformerDescriptionDialog.swift */,
+				D3275F8324FADB22005D9F5A /* TransformerDescription.xib */,
 				D3B8A33524EB4814005AAC87 /* RegulatingWindingDialog.swift */,
 				D3B8A33724EB4874005AAC87 /* RegulatingWinding.xib */,
 				F5D9DC4124DF429200D11103 /* AmpTurnsDistributionDialog.swift */,
@@ -214,6 +220,7 @@
 				D3CF829A24E4B33B00055311 /* ModifyReferenceMva.xib in Resources */,
 				D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */,
 				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
+				D3275F8424FADB22005D9F5A /* TransformerDescription.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
 			);
@@ -238,6 +245,7 @@
 				D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
+				D3275F8224FADB0B005D9F5A /* TransformerDescriptionDialog.swift in Sources */,
 				D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
 				F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */,

@@ -84,6 +84,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var closeTransformerMenuItem: NSMenuItem!
     
     // Transformer Menu
+    @IBOutlet weak var setTxfoDescriptionMenuItem: NSMenuItem!
     @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
     @IBOutlet weak var setRefVoltageMenuItem: NSMenuItem!
@@ -237,6 +238,25 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    
+    
+    
+    @IBAction func handleSetTxfoDesc(_ sender: Any) {
+        
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        let descDlog = TransformerDescriptionDialog(description: txfo.txfoDesc)
+        
+        if descDlog.runModal() == .OK
+        {
+            txfo.txfoDesc = descDlog.desc
+        }
+    }
+    
     
     @IBAction func handleActivateAllWdgTurns(_ sender: Any) {
         
@@ -855,7 +875,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
-        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem
+        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem || menuItem == self.setTxfoDescriptionMenuItem
         {
             return self.currentTxfo != nil
         }
@@ -1029,6 +1049,47 @@ class AppController: NSObject, NSMenuItemValidation {
     // MARK: Saving and Loading functions
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        if txfo.txfoDesc == ""
+        {
+            self.handleSetTxfoDesc(self)
+        }
+        
+        let descString = txfo.txfoDesc == "" ? " " : String(txfo.txfoDesc.prefix(80))
+        
+        do
+        {
+            let txfoDetails = try txfo.QuickFLD12transformer()
+            
+            txfoDetails.identification = descString
+            
+            let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: txfoDetails)
+            
+            let savePanel = NSSavePanel()
+            savePanel.title = "Andersen FLD12 file"
+            savePanel.message = "Save Andersen FLD12 Input file"
+            savePanel.allowedFileTypes = ["inp"]
+            savePanel.allowsOtherFileTypes = false
+            
+            if savePanel.runModal() == .OK
+            {
+                if let fileUrl = savePanel.url
+                {
+                    try fileString.write(to: fileUrl, atomically: false, encoding: .utf8)
+                }
+            }
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
     }
     
     @IBAction func handleSaveAFE2020File(_ sender: Any) {

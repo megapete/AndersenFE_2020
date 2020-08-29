@@ -74,19 +74,37 @@ struct ImpedanceAndScData:Codable {
         self.totalThrustLower = andersenOutput.totalThrustLower
         self.totalThrustUpper = andersenOutput.totalThrustUpper
         
+        guard let andersenSegDataArray:[SegmentData] = ConvertDataArray(dataArray: andersenOutput.segmentData! as! [Data]) else
+        {
+            DLog("Could not open segment data array")
+            return
+        }
+        /*
         guard let andersenSegDataArray = andersenOutput.segmentData else
         {
             return
         }
+ */
         
-        for nextEntry in andersenSegDataArray
+        for nextData in andersenSegDataArray
         {
-            if let nextData = nextEntry as? SegmentData
+            
+            let newSegScData = SegmentScData(number: Int(nextData.number), ampTurns: nextData.ampTurns, kVA: nextData.kVA, dcLoss: nextData.dcLoss, eddyLossAxialFlux: nextData.eddyLossAxialFlux, eddyLossRadialFlux: nextData.eddyLossRadialFlux, eddyPUaverage: nextData.eddyPUaverage, eddyPUmax: nextData.eddyPUmax, eddyMaxRect: nextData.eddyMaxRect, scForceTotalRadial: nextData.scForceTotalRadial, scForceTotalAxial: nextData.scForceTotalAxial, scMinRadially: nextData.scMinRadially, scMaxRadially: nextData.scMaxRadially, scMaxAccumAxially: nextData.scMaxAccumAxially, scAxially: nextData.scAxially, scMaxTensionCompression: nextData.scMaxTensionCompression, scMinSpacerBars: nextData.scMinSpacerBars, scForceInSpacerBars: nextData.scForceInSpacerBlocks, scCombinedForce: nextData.scCombinedForce)
+            
+            self.segDataArray.append(newSegScData)
+        }
+    }
+    
+    func SegmentData(andersenSegNum:Int) -> ImpedanceAndScData.SegmentScData?
+    {
+        for nextSegmentData in self.segDataArray
+        {
+            if nextSegmentData.number == andersenSegNum
             {
-                let newSegScData = SegmentScData(number: Int(nextData.number), ampTurns: nextData.ampTurns, kVA: nextData.kVA, dcLoss: nextData.dcLoss, eddyLossAxialFlux: nextData.eddyLossAxialFlux, eddyLossRadialFlux: nextData.eddyLossRadialFlux, eddyPUaverage: nextData.eddyPUaverage, eddyPUmax: nextData.eddyPUmax, eddyMaxRect: nextData.eddyMaxRect, scForceTotalRadial: nextData.scForceTotalRadial, scForceTotalAxial: nextData.scForceTotalAxial, scMinRadially: nextData.scMinRadially, scMaxRadially: nextData.scMaxRadially, scMaxAccumAxially: nextData.scMaxAccumAxially, scAxially: nextData.scAxially, scMaxTensionCompression: nextData.scMaxTensionCompression, scMinSpacerBars: nextData.scMinSpacerBars, scForceInSpacerBars: nextData.scForceInSpacerBlocks, scCombinedForce: nextData.scCombinedForce)
-                
-                self.segDataArray.append(newSegScData)
+                return nextSegmentData
             }
         }
+        
+        return nil
     }
 }

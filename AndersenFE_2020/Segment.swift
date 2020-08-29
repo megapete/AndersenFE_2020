@@ -57,6 +57,9 @@ class Segment:Codable, Equatable {
     
     var inLayer:Layer? = nil
     
+    /// The FLD12 segment number of this segment from the last time FLD12Section() was called. A negative number means that Andersen has not yet been called
+    var andersenSegNum = -1
+    
     init(serialNumber:Int, strandA:Double, strandR:Double, strandsPerLayer:Int, strandsPerTurn:Int, activeTurns:Double, totalTurns:Double, minZ:Double, maxZ:Double, mirrorSegments:[Int] = [], inLayer:Layer? = nil) {
         
         self.serialNumber = serialNumber
@@ -80,6 +83,8 @@ class Segment:Codable, Equatable {
     /// Function to create a PCH_FLD12_Segment from this Segment
     func FLD12section(segNum:Int) -> PCH_FLD12_Segment
     {
+        self.andersenSegNum = segNum
+        
         let fld12Seg = PCH_FLD12_Segment(number: Int32(segNum), zMin: self.minZ, zMax: self.maxZ, turns: self.totalTurns, activeTurns: self.activeTurns, strandsPerTurn: Int32(self.strandsPerTurn), strandsPerLayer: Int32(self.strandsPerLayer), strandR: self.strandR, strandA: self.strandA)
         
         return fld12Seg

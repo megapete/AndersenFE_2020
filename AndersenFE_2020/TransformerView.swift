@@ -248,7 +248,26 @@ class TransformerView: NSView, NSViewToolTipOwner {
                     currDir = "-"
                 }
                 
-                result = "Terminal: \(terminal.name)\nCurrent Direction: \(currDir)"
+                var andersenData = ""
+                if let andersenResults = self.appController!.GetSCdataForSegment(andersenSegNum: nextSegment.segment.andersenSegNum)
+                {
+                    andersenData = "\nAve. Eddy p.u.: \(andersenResults.eddyPUaverage)\n"
+                    
+                    let maxOrigin = andersenResults.eddyMaxRect.origin
+                    let maxOuter = NSPoint(x: maxOrigin.x + andersenResults.eddyMaxRect.width, y: maxOrigin.y + andersenResults.eddyMaxRect.height)
+                    let maxRectString = String(format: "(%.1f, %.1f, %.1f, %.1f)", maxOrigin.x, maxOrigin.y, maxOuter.x, maxOuter.y)
+                    andersenData += "Max. Eddy p.u. : \(andersenResults.eddyPUmax)\n In Rect: \(maxRectString)\n"
+                    if andersenResults.scMinSpacerBars > 0.0
+                    {
+                        let actualSpacerBars = nextSegment.segment.inLayer!.parentTerminal.winding!.numRadialSupports
+                        andersenData += "Min. Spacer Bars: \(andersenResults.scMinSpacerBars) (Actual: \(actualSpacerBars))\n"
+                    }
+                    andersenData += "Compression in Radial Spacers: \(andersenResults.scForceInSpacerBars) MPa\n"
+                    andersenData += "Combined Axial Force: \(andersenResults.scCombinedForce) MPa"
+                    
+                }
+                
+                result = "Terminal: \(terminal.name)\nCurrent Direction: \(currDir)\(andersenData)"
             }
         }
         

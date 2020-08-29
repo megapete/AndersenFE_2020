@@ -210,8 +210,6 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        
-        
         // push old transformer (if any) onto the undo stack
         if let oldTransformer = self.currentTxfo
         {
@@ -577,6 +575,17 @@ class AppController: NSObject, NSMenuItemValidation {
         self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
     }
     
+    // MARK: Transformer SC Information
+    func GetSCdataForSegment(andersenSegNum:Int) -> ImpedanceAndScData.SegmentScData?
+    {
+        guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
+        {
+            DLog("Current transformer is not defined")
+            return nil
+        }
+        
+        return results.SegmentData(andersenSegNum: andersenSegNum)
+    }
     
     /*
     // Code for testing View-related drawing stuff (will eventually be commented out)

@@ -163,6 +163,7 @@ class Segment:Codable, Equatable {
             if self.mirrorSegments.contains(nextSegment.serialNumber)
             {
                 nextSegment.activeTurns = newTurns
+                // DLog("Segment: \(nextSegment.serialNumber) is now \(nextSegment.IsActive() ? "ON" : "OFF")")
             }
         }
     }

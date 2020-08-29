@@ -236,6 +236,7 @@ class TransformerView: NSView, NSViewToolTipOwner {
     {
         var result = "Error!"
         
+        // DLog("Tooltip tag to display: \(tag)")
         for nextSegment in self.segments
         {
             if nextSegment.toolTipTag == tag
@@ -311,6 +312,7 @@ class TransformerView: NSView, NSViewToolTipOwner {
             if nextSegment.contains(point: clickPoint)
             {
                 self.currentSegment = nextSegment
+                self.appController!.UpdateToggleActivationMenu(deactivate: nextSegment.isActive)
                 break
             }
         }

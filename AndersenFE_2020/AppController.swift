@@ -164,7 +164,7 @@ class AppController: NSObject, NSMenuItemValidation {
     // MARK: Model Modification & Update functions
     func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false) {
         
-        DLog("Updating transformer model...")
+        // DLog("Updating transformer model...")
         
         // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
         do
@@ -218,7 +218,7 @@ class AppController: NSObject, NSMenuItemValidation {
             undoStack.insert(PCH_AFE2020_Save_Struct(transformer: oldTransformer), at: 0)
         }
         
-        DLog("Number of transformers currently on the undo stack: \(undoStack.count)")
+        // DLog("Number of transformers currently on the undo stack: \(undoStack.count)")
         
         self.currentTxfo = newTransformer
         self.currentTxfoIsDirty = true
@@ -675,6 +675,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         self.txfoView.segments = []
+        self.txfoView.removeAllToolTips()
         
         for nextWdg in txfo.windings
         {
@@ -692,6 +693,7 @@ class AppController: NSObject, NSMenuItemValidation {
                     var newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
                     
                     newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: nil)
+                    // DLog("New ToolTag: \(newSegPath.toolTipTag)")
                     
                     self.txfoView.segments.append(newSegPath)
                 }
@@ -798,23 +800,26 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         else if menuItem == self.toggleSegmentActivationMenuItem
         {
-            guard let txfo = self.currentTxfo, let currSeg = self.txfoView.currentSegment else
+            guard  self.currentTxfo != nil, self.txfoView.currentSegment != nil else
             {
                 return false
             }
-            
-            if currSeg.isActive
-            {
-                menuItem.title = "Deactivate segment"
-            }
-            else
-            {
-                menuItem.title = "Activate segment"
-            }
         }
         
-        
         return true
+    }
+    
+    /// Function to update the activation toggle. The calling function should pass the current state of isActive.
+    func UpdateToggleActivationMenu(deactivate:Bool)
+    {
+        if deactivate
+        {
+            self.toggleSegmentActivationMenuItem.title = "Deactivate segment"
+        }
+        else
+        {
+            self.toggleSegmentActivationMenuItem.title = "Activate segment"
+        }
     }
     
     // MARK: Preference functions

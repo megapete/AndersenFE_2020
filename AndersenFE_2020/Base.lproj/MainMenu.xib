@@ -440,7 +440,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="cNH-46-Ud8"/>
-                            <menuItem title="Activate Segment" id="dnY-ZC-pao">
+                            <menuItem title="Deactivate Segment" id="dnY-ZC-pao">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleToggleSegmentActivation:" target="6yZ-bT-Gps" id="eez-WL-gRV"/>
@@ -756,7 +756,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="WzO-8P-7jw"/>
-                <menuItem title="Activate Segment" id="vP2-z4-P39">
+                <menuItem title="Deactivate Segment" id="vP2-z4-P39">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
             </items>

@@ -175,7 +175,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
         // DLog("Updating transformer model...")
         
-        if runAndersen
+        if runAndersen || reinitialize
         {
             // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
             do
@@ -976,8 +976,9 @@ class AppController: NSObject, NSMenuItemValidation {
                 let winding = segPath.segment.inLayer!.parentTerminal.winding!
                 let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
                 let wdgTurns = winding.CurrentCarryingTurns()
+                let segTurns = segPath.segment.activeTurns
                 
-                if fabs(totalTerminalTurns - wdgTurns) < 0.5
+                if wdgTurns == segTurns && fabs(totalTerminalTurns - wdgTurns) < 0.5
                 {
                     return false
                 }

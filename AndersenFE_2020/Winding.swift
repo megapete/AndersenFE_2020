@@ -720,25 +720,41 @@ class Winding:Codable {
             
             var currentBottomZ = minLayerZ - helixAddition / 2.0
             
-            for _ in 0..<Int(self.numTurns.maxTurns)
+            let electricalTurns = Int(self.numTurns.maxTurns)
+            let physicalTurns = electricalTurns + 1
+            
+            // we're going to cheat and fill any axial gaps into the turn dimensions
+            let totalAxialGapDimnPerTurn = self.axialGaps.overallGapZ(assumeSymmetry: self.preferences.upperLowerAxialGapsAreSymmetrical) / self.numTurns.maxTurns
+            
+            for turn in 0..<physicalTurns
             {
+                var segTurn = 1.0
+                if turn == 0 || turn == physicalTurns - 1
+                {
+                    segTurn = 0.5
+                }
+                
                 for _ in 0..<self.turnDef.numCablesAxial
                 {
                     zList.append((currentBottomZ, currentBottomZ + oneStartAxialDimn))
                     currentBottomZ += oneStartAxialDimn
+                    
+                    segmentTurns.append(segTurn)
                 }
+                
+                currentBottomZ += totalAxialGapDimnPerTurn
             }
             
             // I'm not sure this is the way that this whole thing will actually work for regulating windings, but we'll use it for now...
-            segmentTurns = Array(repeating: 1.0, count: self.turnDef.numCablesAxial * Int(self.numTurns.maxTurns))
+            // segmentTurns = Array(repeating: 1.0, count: self.turnDef.numCablesAxial * Int(self.numTurns.maxTurns))
             
             for i in 0..<self.turnDef.numCablesAxial
             {
                 var nextSet = [i]
                 
-                for _ in 1..<Int(self.numTurns.maxTurns)
+                for _ in 1..<physicalTurns
                 {
-                    let nextIndex = nextSet.last! + Int(self.numTurns.maxTurns)
+                    let nextIndex = nextSet.last! + self.turnDef.numCablesAxial
                     nextSet.append(nextIndex)
                 }
                 
@@ -776,7 +792,6 @@ class Winding:Codable {
             zIndex += 1
         }
         
-        // TODO: Take care of "associated" segments for double-axial stacks and multi-start windings
         if !associatedSegments.isEmpty
         {
             for nextIndexArray in associatedSegments

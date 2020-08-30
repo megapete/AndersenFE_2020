@@ -314,9 +314,62 @@ class Transformer:Codable {
         
         var result = 0.0
         
+        var autoFactor = 1.0
+        
+        if terms[0].connection == .auto_series
+        {
+            for nextTerm in self.terminals
+            {
+                if let cTerm = nextTerm
+                {
+                    if cTerm.connection == .auto_common
+                    {
+                        var commonTurns = CurrentCarryingTurns(terminal: cTerm.andersenNumber)
+                        if commonTurns == 0
+                        {
+                            commonTurns = NoLoadTurns(terminal: cTerm.andersenNumber)
+                        }
+                        
+                        var seriesTurns = CurrentCarryingTurns(terminal: terminal)
+                        if seriesTurns == 0
+                        {
+                            seriesTurns = NoLoadTurns(terminal: terminal)
+                        }
+                        
+                        autoFactor = (seriesTurns + commonTurns) / seriesTurns
+                    }
+                }
+            }
+        }
+        else if terms[0].connection == .auto_common
+        {
+            for nextTerm in self.terminals
+            {
+                if let sTerm = nextTerm
+                {
+                    if sTerm.connection == .auto_series
+                    {
+                        var seriesTurns = CurrentCarryingTurns(terminal: sTerm.andersenNumber)
+                        if seriesTurns == 0
+                        {
+                            seriesTurns = NoLoadTurns(terminal: sTerm.andersenNumber)
+                        }
+                        
+                        var commonTurns = CurrentCarryingTurns(terminal: terminal)
+                        if commonTurns == 0
+                        {
+                            commonTurns = NoLoadTurns(terminal: terminal)
+                        }
+                        
+                        autoFactor = (seriesTurns + commonTurns) / seriesTurns
+                    }
+                }
+            }
+        }
+        
         for nextTerm in terms
         {
-            result += nextTerm.VA * Double(nextTerm.currentDirection)
+            result += nextTerm.VA * autoFactor * Double(nextTerm.currentDirection)
         }
         
         return fabs(result)
@@ -375,7 +428,7 @@ class Transformer:Codable {
                             seriesTurns = NoLoadTurns(terminal: terminal)
                         }
                         
-                        autoFactor = (seriesTurns + commonTurns) / commonTurns
+                        autoFactor = (seriesTurns + commonTurns) / seriesTurns
                     }
                 }
             }
@@ -1258,6 +1311,10 @@ class Transformer:Codable {
                 {
                     wdgType = .sheet
                 }
+                else if isMultistart
+                {
+                    wdgType = .multistart
+                }
                 else if isSpiral && numAxialSections == 1 && numRadialSections == 1
                 {
                     wdgType = .helix
@@ -1270,10 +1327,7 @@ class Transformer:Codable {
                 {
                     wdgType = .layer
                 }
-                else if isMultistart
-                {
-                    wdgType = .multistart
-                }
+                
                 
                 let internalRadialTurnIns = (wdgType == .helix && numRadialDucts > 0 ? radialDuctDimn * Double(numRadialDucts) : 0.0)
                 

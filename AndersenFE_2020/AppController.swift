@@ -589,8 +589,25 @@ class AppController: NSObject, NSMenuItemValidation {
         
         let refTerm = self.currentTxfo!.refTermNum!
         
-        var currentMVA = 0.0
-        
+        do
+        {
+            let va = try self.currentTxfo!.TotalVA(terminal: refTerm)
+            let currentMVA = va / 1.0E6
+            
+            let mvaDlog = ModifyReferenceMvaDialog(currentMVA: currentMVA)
+            
+            if mvaDlog.runModal() == .OK
+            {
+                doSetReferenceMVA(newMVA: mvaDlog.MVA)
+            }
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+        /*
         var va = 0.0
         let txfo = self.currentTxfo!
         for nextTerm in txfo.terminals
@@ -603,15 +620,9 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
             }
         }
+         */
         
-        currentMVA = va / 1.0E6
         
-        let mvaDlog = ModifyReferenceMvaDialog(currentMVA: currentMVA)
-        
-        if mvaDlog.runModal() == .OK
-        {
-            doSetReferenceMVA(newMVA: mvaDlog.MVA)
-        }
     }
     
     func doSetReferenceMVA(newMVA:Double)
@@ -642,7 +653,64 @@ class AppController: NSObject, NSMenuItemValidation {
             let phaseFactor = refWdgs[0].terminal.phaseFactor
             
             var legVolts = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!) * vpn
-            var legVA = newMVA * 1.0E6 / phaseFactor
+            
+            var autoFactor = 1.0
+            
+            let terms = try txfo.TerminalsFromAndersenNumber(termNum: txfo.refTermNum!)
+            
+            if terms[0].connection == .auto_series
+            {
+                for nextTerm in txfo.terminals
+                {
+                    if let cTerm = nextTerm
+                    {
+                        if cTerm.connection == .auto_common
+                        {
+                            var commonTurns = txfo.CurrentCarryingTurns(terminal: cTerm.andersenNumber)
+                            if commonTurns == 0
+                            {
+                                commonTurns = txfo.NoLoadTurns(terminal: cTerm.andersenNumber)
+                            }
+                            
+                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!)
+                            if seriesTurns == 0
+                            {
+                                seriesTurns = txfo.NoLoadTurns(terminal: txfo.refTermNum!)
+                            }
+                            
+                            autoFactor = (seriesTurns + commonTurns) / seriesTurns
+                        }
+                    }
+                }
+            }
+            else if terms[0].connection == .auto_common
+            {
+                for nextTerm in txfo.terminals
+                {
+                    if let sTerm = nextTerm
+                    {
+                        if sTerm.connection == .auto_series
+                        {
+                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: sTerm.andersenNumber)
+                            if seriesTurns == 0
+                            {
+                                seriesTurns = txfo.NoLoadTurns(terminal: sTerm.andersenNumber)
+                            }
+                            
+                            var commonTurns = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!)
+                            if commonTurns == 0
+                            {
+                                commonTurns = txfo.NoLoadTurns(terminal: txfo.refTermNum!)
+                            }
+                            
+                            autoFactor = (seriesTurns + commonTurns) / seriesTurns
+                        }
+                    }
+                }
+            }
+            
+            
+            var legVA = newMVA * 1.0E6 / phaseFactor / autoFactor
             
             if legVolts == 0.0
             {

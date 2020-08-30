@@ -42,7 +42,7 @@ class Transformer:Codable {
     var scResults:ImpedanceAndScData? = nil
     
     /// Straightforward init function (designed for the copy() function below)
-    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil, niDistribution:[Double]? = nil)
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil, niDistribution:[Double]? = nil, scResults:ImpedanceAndScData? = nil)
     {
         self.numPhases = numPhases
         self.frequency = frequency
@@ -52,7 +52,7 @@ class Transformer:Codable {
         self.systemGVA = systemGVA
         self.refTermNum = refTermNum
         self.niDistribution = niDistribution
-        
+        self.scResults = scResults
         self.terminals = []
         
         var index = 0
@@ -142,7 +142,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum, niDistribution: self.niDistribution)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum, niDistribution: self.niDistribution, scResults: self.scResults)
     }
     
     /// Some errors that can be thrown by various routines

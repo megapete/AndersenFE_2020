@@ -120,6 +120,17 @@ class TerminalsView: NSView, NSMenuItemValidation {
         NSMenu.popUpContextMenu(self.contextualMenu, with: event, for: self)
     }
     
+    @IBAction func handleSetTxfoDescription(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.handleSetTxfoDesc(sender)
+    }
+    
+    
     @IBAction func handleSetRefTerm(_ sender: Any) {
         
         guard let appCtrl = self.appController else

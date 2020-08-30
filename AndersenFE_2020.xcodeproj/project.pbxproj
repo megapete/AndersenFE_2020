@@ -38,6 +38,8 @@
 		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 		F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558E24C46BE5002E7031 /* Winding.swift */; };
 		F5ED559124C49074002E7031 /* Transformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED559024C49074002E7031 /* Transformer.swift */; };
+		F5F971C424FBCBF600267AAC /* ModifyWindingNameDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F971C324FBCBF600267AAC /* ModifyWindingNameDialog.swift */; };
+		F5F971C624FBCC0700267AAC /* ModifyWindingName.xib in Resources */ = {isa = PBXBuildFile; fileRef = F5F971C524FBCC0700267AAC /* ModifyWindingName.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +78,8 @@
 		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 		F5ED558E24C46BE5002E7031 /* Winding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Winding.swift; sourceTree = "<group>"; };
 		F5ED559024C49074002E7031 /* Transformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformer.swift; sourceTree = "<group>"; };
+		F5F971C324FBCBF600267AAC /* ModifyWindingNameDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyWindingNameDialog.swift; sourceTree = "<group>"; };
+		F5F971C524FBCC0700267AAC /* ModifyWindingName.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyWindingName.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +127,8 @@
 				D3B8A33724EB4874005AAC87 /* RegulatingWinding.xib */,
 				F5D9DC4124DF429200D11103 /* AmpTurnsDistributionDialog.swift */,
 				F5D9DC4324DF42D900D11103 /* AmpTurnsDistribution.xib */,
+				F5F971C324FBCBF600267AAC /* ModifyWindingNameDialog.swift */,
+				F5F971C524FBCC0700267AAC /* ModifyWindingName.xib */,
 				D3CF829324E46A0200055311 /* ModifyReferenceTerminalDialog.swift */,
 				D3CF829524E46A2600055311 /* ModifyReferenceTerminal.xib */,
 				D3CF829724E4B30700055311 /* ModifyReferenceMvaDialog.swift */,
@@ -221,6 +227,7 @@
 				D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */,
 				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
 				D3275F8424FADB22005D9F5A /* TransformerDescription.xib in Resources */,
+				F5F971C624FBCC0700267AAC /* ModifyWindingName.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
 			);
@@ -242,6 +249,7 @@
 				D3D2D2D124EF00640072EE96 /* ImpedanceScData.swift in Sources */,
 				D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */,
 				D3CF829824E4B30700055311 /* ModifyReferenceMvaDialog.swift in Sources */,
+				F5F971C424FBCBF600267AAC /* ModifyWindingNameDialog.swift in Sources */,
 				D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,

@@ -96,6 +96,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
     
     
+    @IBOutlet weak var changeWdgNameMenuItem: NSMenuItem!
     @IBOutlet weak var activateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var deactivateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var toggleSegmentActivationMenuItem: NSMenuItem!
@@ -170,52 +171,55 @@ class AppController: NSObject, NSMenuItemValidation {
     }
     
     // MARK: Model Modification & Update functions
-    func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false) {
+    func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false, runAndersen:Bool = true) {
         
         // DLog("Updating transformer model...")
         
-        // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
-        do
+        if runAndersen
         {
-            let _ = try newTransformer.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
-            
-            if self.preferences.generalPrefs.keepImpedanceUpdated
+            // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
+            do
             {
-                if self.preferences.generalPrefs.useAndersenFLD12
+                let _ = try newTransformer.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
+                
+                if self.preferences.generalPrefs.keepImpedanceUpdated
                 {
-                    let fld12txfo = try newTransformer.QuickFLD12transformer()
-                    
-                    // Next few lines used to debug the Andersen file - uncomment them to save the file somewhere
-                    /*
-                    let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
-            
-                    let savePanel = NSSavePanel()
-                    if (savePanel.runModal() == .OK)
+                    if self.preferences.generalPrefs.useAndersenFLD12
                     {
-                        try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                        let fld12txfo = try newTransformer.QuickFLD12transformer()
+                        
+                        // Next few lines used to debug the Andersen file - uncomment them to save the file somewhere
+                        /*
+                         let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                         
+                         let savePanel = NSSavePanel()
+                         if (savePanel.runModal() == .OK)
+                         {
+                         try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                         }
+                         */
+                        
+                        let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
+                        
+                        newTransformer.scResults = ImpedanceAndScData(andersenOutput: fld12output)
                     }
-                    */
-                    
-                    let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
-                    
-                    newTransformer.scResults = ImpedanceAndScData(andersenOutput: fld12output)
-                }
-                else
-                {
-                    let alert = NSAlert()
-                    alert.messageText = "Calculation of impedance & forces by anything other than Andersen FLD12 is not implemented!"
-                    alert.alertStyle = .critical
-                    let _ = alert.runModal()
-                    return
+                    else
+                    {
+                        let alert = NSAlert()
+                        alert.messageText = "Calculation of impedance & forces by anything other than Andersen FLD12 is not implemented!"
+                        alert.alertStyle = .critical
+                        let _ = alert.runModal()
+                        return
+                    }
                 }
             }
-        }
-        catch
-        {
-            // An error occurred
-            let alert = NSAlert(error: error)
-            let _ = alert.runModal()
-            return
+            catch
+            {
+                // An error occurred
+                let alert = NSAlert(error: error)
+                let _ = alert.runModal()
+                return
+            }
         }
         
         // push old transformer (if any) onto the undo stack
@@ -240,6 +244,48 @@ class AppController: NSObject, NSMenuItemValidation {
     }
     
     
+    @IBAction func handleChangeWindingName(_ sender: Any) {
+        
+        guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        let oldName = segPath.segment.inLayer!.parentTerminal.name
+        let winding = segPath.segment.inLayer!.parentTerminal.winding!
+        
+        let wdgNameDlog = ModifyWindingNameDialog(oldName: oldName)
+        
+        if wdgNameDlog.runModal() == .OK
+        {
+            let newTransformer = txfo.Copy()
+            
+            // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
+            var newWinding:Winding? = nil
+            for nextWdg in newTransformer.windings
+            {
+                if nextWdg.coilID == winding.coilID
+                {
+                    newWinding = nextWdg
+                    break
+                }
+            }
+            
+            guard let newWdg = newWinding else
+            {
+                let alert = NSAlert()
+                alert.messageText = "Could not identify the winding to reverse!!"
+                alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+                alert.alertStyle = .critical
+                let _ = alert.runModal()
+                return
+            }
+            
+            newWdg.terminal.name = wdgNameDlog.windingName
+            
+            self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: false)
+        }
+    }
     
     
     @IBAction func handleSetTxfoDesc(_ sender: Any) {
@@ -253,7 +299,11 @@ class AppController: NSObject, NSMenuItemValidation {
         
         if descDlog.runModal() == .OK
         {
-            txfo.txfoDesc = descDlog.desc
+            let newTransformer = txfo.Copy()
+            
+            newTransformer.txfoDesc = descDlog.desc
+            
+            self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: false)
         }
     }
     
@@ -907,7 +957,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
             }
         }
-        else if menuItem == self.activateAllWdgTurnsMenuItem
+        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem
         {
             guard  self.currentTxfo != nil, self.txfoView.currentSegment != nil else
             {
@@ -953,7 +1003,7 @@ class AppController: NSObject, NSMenuItemValidation {
         return true
     }
     
-    /// Function to update the activation toggle. The calling function should pass the current state of isActive.
+    /// Function to update the activation toggle menu item title. The calling function should pass the current state of isActive.
     func UpdateToggleActivationMenu(deactivate:Bool)
     {
         if deactivate

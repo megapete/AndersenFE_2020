@@ -12,7 +12,7 @@ import Foundation
 class Terminal: Codable
 {
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
-    let name:String
+    var name:String
     
     /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings)
     var nominalLineVolts:Double

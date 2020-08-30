@@ -189,15 +189,15 @@ class AppController: NSObject, NSMenuItemValidation {
                         let fld12txfo = try newTransformer.QuickFLD12transformer()
                         
                         // Next few lines used to debug the Andersen file - uncomment them to save the file somewhere
-                        /*
+                        
                          let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
                          
                          let savePanel = NSSavePanel()
                          if (savePanel.runModal() == .OK)
                          {
-                         try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                            try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
                          }
-                         */
+                         
                         
                         let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                         

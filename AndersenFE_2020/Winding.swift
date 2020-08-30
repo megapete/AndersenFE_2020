@@ -129,6 +129,7 @@ class Winding:Codable {
         let cableInsulation:Double // total
         let internalRadialInsulation:Double // ie: space between EACH cable
         let internalAxialInsulation:Double
+        let multiStartWindingLoops:Int // this will be 0 for non-multistart windings
         
         /// Function to get the overall (shrunk) dimensions of a single turn. Note that this routine assumes a 0.8 shrinkage factor for paper, and 1.0 for epoxy. It also assumes that all insulation is paper, except for the strand insulation of CTC, which is assumed to be epoxy.
         /// - Returns: The axial and radial dimensions of the turn after shrinking
@@ -165,7 +166,9 @@ class Winding:Codable {
         {
             let strandsPerCable = (self.type == .single ? 1 : (self.type == .twin ? 2 : numStrands))
             
-            return strandsPerCable * self.numCablesRadial * self.numCablesAxial
+            let multiStartFactor = self.multiStartWindingLoops == 0 ? 1 : self.multiStartWindingLoops
+            
+            return strandsPerCable * self.numCablesRadial * self.numCablesAxial / multiStartFactor
         }
         
         func NumStrandsRadially() -> Int
@@ -785,6 +788,12 @@ class Winding:Codable {
         var zIndex = 0
         for zPair in zList
         {
+            if self.wdgType == .multistart
+            {
+                print("Turn Dimn: \(self.turnDef.Dimensions())")
+                
+            }
+            
             let newSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
             
             layerSegments.append(newSegment)

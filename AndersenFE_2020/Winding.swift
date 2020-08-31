@@ -161,7 +161,7 @@ class Winding:Codable {
             
             let multiStartFactor = self.multiStartWindingLoops == 0 ? 1 : self.multiStartWindingLoops
             
-            return (cableDim.axial * Double(numCablesAxial / multiStartFactor) + internalAxialInsulation * Double(numCablesAxial / multiStartFactor - 1), cableDim.radial * Double(numCablesRadial) + internalRadialInsulation * Double(numCablesRadial - 1))
+            return (cableDim.axial * Double(numCablesAxial / multiStartFactor) + internalAxialInsulation * Double(numCablesAxial - 1) / Double(multiStartFactor), cableDim.radial * Double(numCablesRadial) + internalRadialInsulation * Double(numCablesRadial - 1))
         }
         
         func NumStrandsPerTurn() -> Int
@@ -716,10 +716,10 @@ class Winding:Codable {
             // Take a stab at the helix dimension by assuming that the number of 'loops' is equal to the number of axial cables.
             // This means that multi-start windings default to regulating windings
             // This can always be changed later by the user.
-            // let loops = Double(self.turnDef.numCablesAxial)
+            let loops = Double(self.turnDef.numCablesAxial)
             self.regulatingWindingLoops = self.turnDef.numCablesAxial
             
-            let helixAddition = self.preferences.multiStartElecHtIsToCenter ? self.turnDef.Dimensions().axial : 0.0
+            let helixAddition = self.preferences.multiStartElecHtIsToCenter ? self.turnDef.Dimensions().axial * loops : 0.0
             
             let oneStartAxialDimn = self.turnDef.Dimensions().axial
             

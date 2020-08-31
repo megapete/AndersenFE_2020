@@ -154,6 +154,7 @@ class Transformer:Codable {
             case NoSuchTerminalNumber
             case UnexpectedZeroTurns
             case UnexpectedAmpTurnsOutOfBalance
+            case MissingComplementConnection
             case UnimplementedFeature
         }
         
@@ -183,6 +184,10 @@ class Transformer:Codable {
                 else if self.type == .UnimplementedFeature
                 {
                     return "This feature has not been implemented: \(info)"
+                }
+                else if self.type == .MissingComplementConnection
+                {
+                    return "A\(self.info) connection is missing one of its parts"
                 }
                 
                 
@@ -373,6 +378,54 @@ class Transformer:Codable {
         }
         
         return fabs(result)
+    }
+    
+    /// Autofactor returns the ratio (seriesTurns + commonTurns) / seriesTurns IFF Andersen terminal 1 is auto-series and terminal 2 is auto-common. Otherwise, it returns 1.0. If any terminal other than 1 is auto-series (or any terminal other than 2 is auto-common, this function throws an error.
+    func Autofactor() throws -> Double
+    {
+        do
+        {
+            let term1 = try self.TerminalsFromAndersenNumber(termNum: 1)
+            var autoSeriesCount = 0
+            
+            for nextTerm in term1
+            {
+                if nextTerm.connection == .auto_series
+                {
+                    autoSeriesCount += 1
+                }
+            }
+            
+            let term2 = try self.TerminalsFromAndersenNumber(termNum: 2)
+            var autoCommonCount = 0
+            
+            for nextTerm in term2
+            {
+                if nextTerm.connection == .auto_common
+                {
+                    autoCommonCount += 1
+                }
+            }
+            
+            if autoCommonCount == 0 && autoSeriesCount == 0
+            {
+                return 1.0
+            }
+            
+            if autoCommonCount == 0 || autoCommonCount == 0
+            {
+                throw TransformerErrors(info: "n auto", type: .MissingComplementConnection)
+            }
+            
+            let seriesTurns = self.CurrentCarryingTurns(terminal: 1)
+            let commonTurns = self.CurrentCarryingTurns(terminal: 2)
+            
+            return (seriesTurns + commonTurns) / seriesTurns
+        }
+        catch
+        {
+            throw error
+        }
     }
     
     /// The terminal line voltage is one of two possible voltages. If there are active (current-carrying) turns making up the terminal, then the line voltage is calculated using the current V/N and the active turns. If no turns are active, an error is thrown.
@@ -574,8 +627,19 @@ class Transformer:Codable {
                             }
                         }
                         
+                        // we need to check if the main windings are connected in auto, and if so, we need to multiply the volt-amps of any non-auto terminal by the autofactor to get the correct amps. We don't do too much error checking because the call to Autofactor() throws if something is fishy
+                        var autoFactor = try self.Autofactor()
+                        if autoFactor != 1.0
+                        {
+                            // terminals 1 and 2 are auto
+                            if nextAvailableTerm == 1 || nextAvailableTerm == 2
+                            {
+                                autoFactor = 1.0
+                            }
+                        }
+                        
                         // avoid things like 25999999 when it should be 26000000
-                        va = round(va)
+                        va = round(va / autoFactor / 1000.0) * 1000.0
                         
                         if va < 0.0
                         {
@@ -620,7 +684,19 @@ class Transformer:Codable {
                         {
                             let termLegVA = maxNegativeVoltAmps * niArray[nextTerm - 1] / 100.0
                             let termLegV = vpn * self.NoLoadTurns(terminal: nextTerm)
-                            var termAmps = termLegV == 0.0 ? 0.0 : termLegVA / termLegV
+                            
+                            // we need to check if the main windings are connected in auto, and if so, we need to multiply the volt-amps of any non-auto terminal by the autofactor to get the correct amps. We don't do too much error checking because the call to Autofactor() throws if something is fishy
+                            var autoFactor = try self.Autofactor()
+                            if autoFactor != 1.0
+                            {
+                                // terminals 1 and 2 are auto
+                                if nextTerm == 1 || nextTerm == 2
+                                {
+                                    autoFactor = 1.0
+                                }
+                            }
+                            
+                            var termAmps = termLegV == 0.0 ? 0.0 : termLegVA / termLegV * autoFactor
                             let ampsSign = termAmps < 0 ? -1 : 1
                             let termSign = self.CurrentDirection(terminal: nextTerm)
                             

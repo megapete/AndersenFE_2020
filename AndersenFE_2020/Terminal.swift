@@ -42,6 +42,18 @@ class Terminal: Codable
         }
     }
     
+    var autoFactor:Double {
+        get {
+            
+            if self.connection == .auto_common || self.connection == .auto_series
+            {
+                
+            }
+            
+            return 1.0
+        }
+    }
+    
     /// The nominal ONAN leg amps of the Terminal (winding)
     var NominalOnanAmps:Double {
         get {

@@ -312,6 +312,8 @@ class TransformerView: NSView, NSViewToolTipOwner {
         self.needsDisplay = true
     }
     
+    
+    
     func mouseDraggedWithZoomRect(event:NSEvent)
     {
         let endPoint = self.convert(event.locationInWindow, from: nil)
@@ -333,6 +335,15 @@ class TransformerView: NSView, NSViewToolTipOwner {
                 self.currentSegment = nextSegment
                 self.appController!.UpdateToggleActivationMenu(deactivate: nextSegment.isActive)
                 break
+            }
+        }
+        
+        // check if it was actually a double-click
+        if event.clickCount == 2
+        {
+            if let segmentPath = self.currentSegment
+            {
+                self.appController!.doToggleSegmentActivation(segment: segmentPath.segment)
             }
         }
         

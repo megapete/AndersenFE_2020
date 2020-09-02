@@ -496,7 +496,7 @@ class Transformer:Codable {
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
-    /// This is a SIGNED quantity.
+    /// This is a SIGNED quantity. It may be equal to 0.
     func ReferenceOnanAmpTurns() throws -> Double
     {
         guard let refTerm = self.refTermNum else

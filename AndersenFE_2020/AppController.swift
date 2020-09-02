@@ -464,6 +464,16 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
+        if winding.CurrentCarryingTurns() == 0.0
+        {
+            let alert = NSAlert()
+            alert.messageText = "Cannot reverse the current direction of a winding that has NO active turns!"
+            alert.informativeText = "Either activate some turns or select a different winding."
+            alert.alertStyle = .informational
+            let _ = alert.runModal()
+            return
+        }
+        
         // If the user wants to change the direction of a reference-terminal associated winding, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE Andersen-terminal
         if self.preferences.generalPrefs.forceAmpTurnBalance
         {
@@ -488,42 +498,6 @@ class AppController: NSObject, NSMenuItemValidation {
         
         let newTransformer = txfo.Copy()
         
-        if let refTerm = newTransformer.refTermNum
-        {
-            if winding.terminal.andersenNumber != refTerm
-            {
-                do
-                {
-                    // if it IS the reference terminal, we need to fix its amps before we call the AmpTurns routine
-                    let oldNI = try newTransformer.ReferenceOnanAmpTurns()
-                    let oldTurns = newTransformer.CurrentCarryingTurns(terminal: refTerm)
-                    let oldAmps = oldNI / oldTurns
-                    
-                    let refTerminals = try newTransformer.TerminalsFromAndersenNumber(termNum: refTerm)
-                    
-                    var newTurns = 0.0
-                    for nextTerminal in refTerminals
-                    {
-                        var windingTurns = nextTerminal.winding!.CurrentCarryingTurns()
-                        
-                        if nextTerminal.winding!.coilID == winding.coilID
-                        {
-                            windingTurns = -windingTurns
-                        }
-                        
-                        newTurns += windingTurns
-                    }
-                    
-                }
-                catch
-                {
-                    let alert = NSAlert(error: error)
-                    let _ = alert.runModal()
-                    return
-                }
-            }
-        }
-        
         // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
         var newWinding:Winding? = nil
         for nextWdg in newTransformer.windings
@@ -543,6 +517,53 @@ class AppController: NSObject, NSMenuItemValidation {
             alert.alertStyle = .critical
             let _ = alert.runModal()
             return
+        }
+        
+        let termCount = newTransformer.AvailableTerminals().count
+        
+        // For terminal counts that are greater than 2, and with a winding that is part of the reference terminal, we need to calculate the 
+        if termCount > 2
+        {
+            if let refTerm = newTransformer.refTermNum
+            {
+                if newWdg.terminal.andersenNumber == refTerm
+                {
+                    do
+                    {
+                        // if it IS the reference terminal, we need to fix its amps BEFORE we call the AmpTurns routine
+                        let oldNI = try newTransformer.ReferenceOnanAmpTurns()
+                        var oldTurns = newTransformer.CurrentCarryingTurns(terminal: refTerm)
+                        if oldTurns == 0.0
+                        {
+                            oldTurns = newTransformer.NoLoadTurns(terminal: refTerm)
+                        }
+                        
+                        let oldAmps = oldNI / oldTurns
+                        
+                        let refTerminals = try newTransformer.TerminalsFromAndersenNumber(termNum: refTerm)
+                        
+                        var newTurns = 0.0
+                        for nextTerminal in refTerminals
+                        {
+                            var windingTurns = nextTerminal.winding!.CurrentCarryingTurns()
+                            
+                            if nextTerminal.winding!.coilID == newWdg.coilID
+                            {
+                                windingTurns = -windingTurns
+                            }
+                            
+                            newTurns += windingTurns
+                        }
+                        
+                    }
+                    catch
+                    {
+                        let alert = NSAlert(error: error)
+                        let _ = alert.runModal()
+                        return
+                    }
+                }
+            }
         }
         
         newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
@@ -1079,6 +1100,8 @@ class AppController: NSObject, NSMenuItemValidation {
                     }
                 }
             }
+            
+            return currSeg.segment.inLayer!.parentTerminal.winding!.CurrentCarryingTurns() != 0.0
         }
         else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem
         {

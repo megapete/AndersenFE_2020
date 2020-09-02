@@ -23,15 +23,22 @@ class DataView: NSView {
         SetVpN(newVpN: 0.0, refTerm: nil)
     }
     
-    func SetImpedance(newImpPU:Double?)
+    func SetImpedance(newImpPU:Double?, baseMVA:Double?)
     {
         var impString = "-ERROR-"
+        var mvaString = ""
+        
         if let imp = newImpPU
         {
             impString = String(format: "%.2f", imp * 100.0)
+            
+            if let mva = baseMVA
+            {
+                mvaString = String(format: "\n@ %.3f MVA", mva)
+            }
         }
         
-        let impField = "Impedance:\n\(impString)%"
+        let impField = "Impedance:\n\(impString)%\(mvaString)"
         
         self.SetFieldString(fieldID: .impedance, txt: impField)
     }

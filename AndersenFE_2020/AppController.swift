@@ -209,6 +209,16 @@ class AppController: NSObject, NSMenuItemValidation {
                             alert.messageText = "Calculation of impedance & forces failed!"
                             alert.alertStyle = .critical
                             let _ = alert.runModal()
+                            
+                            let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                            
+                            let savePanel = NSSavePanel()
+                            savePanel.message = "Save the Andersen Input File"
+                            if (savePanel.runModal() == .OK)
+                            {
+                               try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                            }
+                            
                             return
                         }
                     }
@@ -477,6 +487,42 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         let newTransformer = txfo.Copy()
+        
+        if let refTerm = newTransformer.refTermNum
+        {
+            if winding.terminal.andersenNumber != refTerm
+            {
+                do
+                {
+                    // if it IS the reference terminal, we need to fix its amps before we call the AmpTurns routine
+                    let oldNI = try newTransformer.ReferenceOnanAmpTurns()
+                    let oldTurns = newTransformer.CurrentCarryingTurns(terminal: refTerm)
+                    let oldAmps = oldNI / oldTurns
+                    
+                    let refTerminals = try newTransformer.TerminalsFromAndersenNumber(termNum: refTerm)
+                    
+                    var newTurns = 0.0
+                    for nextTerminal in refTerminals
+                    {
+                        var windingTurns = nextTerminal.winding!.CurrentCarryingTurns()
+                        
+                        if nextTerminal.winding!.coilID == winding.coilID
+                        {
+                            windingTurns = -windingTurns
+                        }
+                        
+                        newTurns += windingTurns
+                    }
+                    
+                }
+                catch
+                {
+                    let alert = NSAlert(error: error)
+                    let _ = alert.runModal()
+                    return
+                }
+            }
+        }
         
         // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
         var newWinding:Winding? = nil
@@ -979,11 +1025,11 @@ class AppController: NSObject, NSMenuItemValidation {
             
             if self.preferences.generalPrefs.keepImpedanceUpdated && txfo.scResults != nil
             {
-                self.dataView.SetImpedance(newImpPU: txfo.scResults!.puImpedance)
+                self.dataView.SetImpedance(newImpPU: txfo.scResults!.puImpedance, baseMVA: txfo.scResults!.baseMVA)
             }
             else
             {
-                self.dataView.SetImpedance(newImpPU: nil)
+                self.dataView.SetImpedance(newImpPU: nil, baseMVA: nil)
             }
         }
         catch

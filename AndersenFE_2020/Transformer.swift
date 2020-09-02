@@ -683,7 +683,7 @@ class Transformer:Codable {
                         for nextTerm in availableTerms
                         {
                             let termLegVA = maxNegativeVoltAmps * niArray[nextTerm - 1] / 100.0
-                            let termLegV = vpn * self.NoLoadTurns(terminal: nextTerm)
+                            let termLegV = vpn * self.CurrentCarryingTurns(terminal: nextTerm)
                             
                             // we need to check if the main windings are connected in auto, and if so, we need to multiply the volt-amps of any non-auto terminal by the autofactor to get the correct amps. We don't do too much error checking because the call to Autofactor() throws if something is fishy
                             var autoFactor = try self.Autofactor()
@@ -928,10 +928,9 @@ class Transformer:Codable {
             
             nextWdg.preferences = prefs.wdgPrefs
             
-            do {
-                
+            do
+            {
                 try nextWdg.InitializeLayers(windingCenter: GetWindingsCenter())
-                // DLog("Layer count: \(nextWdg.layers.count)")
             }
             catch
             {

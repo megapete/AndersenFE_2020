@@ -17,6 +17,8 @@ class Terminal: Codable
     /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings)
     var nominalLineVolts:Double
     
+    let noloadLegVoltage:Double
+    
     /// The total (1-ph or 3-ph) VA for the Terminal
     var VA:Double
     
@@ -120,19 +122,21 @@ class Terminal: Codable
     
     /// Designated initializer for the Terminal class
     /// - Parameter name: A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
-    /// - Parameter voltage: The line-line (line-neutral for single-phase) voltage of the terminal in volts
+    /// - Parameter lineVoltage: The current line-line (line-neutral for single-phase) voltage of the terminal in volts
+    /// - Parameter noloadLegVoltage: The initial (unmutable) no-load voltage per leg for the terminal
     /// - Parameter VA: The total (1-ph or 3-ph) VA for the Terminal
     /// - Parameter connection: The connection to use for this Terminal
     /// - Parameter termNum: The Andersen-file Terminal number
     /// - Returns: An initialized Terminal object
-    init(name:String, voltage:Double, VA:Double, connection:TerminalConnection, currDir:Int, termNum:Int)
+    init(name:String, lineVoltage:Double, noloadLegVoltage:Double, VA:Double, connection:TerminalConnection, currDir:Int, termNum:Int)
     {
         self.name = name
-        self.nominalLineVolts = voltage
+        self.nominalLineVolts = lineVoltage
         self.VA = VA
         self.connection = connection
         self.currentDirection = currDir
         self.andersenNumber = termNum
+        self.noloadLegVoltage = noloadLegVoltage
     }
     
     func AndersenConnection() -> Int

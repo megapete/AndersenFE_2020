@@ -474,12 +474,12 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        // If the user wants to change the direction of a reference-terminal associated winding, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE Andersen-terminal
+        // If the user wants to change the direction of a reference-terminal associated winding, and there are only two terminals, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE Andersen-terminal
         if self.preferences.generalPrefs.forceAmpTurnBalance
         {
             if let refTerm = txfo.refTermNum
             {
-                if winding.terminal.andersenNumber != refTerm
+                if winding.terminal.andersenNumber != refTerm && txfo.AvailableTerminals().count == 2
                 {
                     let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
                     let wdgTurns = winding.CurrentCarryingTurns()
@@ -519,56 +519,36 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        let termCount = newTransformer.AvailableTerminals().count
-        
-        // For terminal counts that are greater than 2, and with a winding that is part of the reference terminal, we need to calculate the 
-        if termCount > 2
+        // we need to fix the amps if the current reversal causes a change of turns
+        do
         {
-            if let refTerm = newTransformer.refTermNum
+            let termNum = newWdg.terminal.andersenNumber
+            let terminals = try newTransformer.TerminalsFromAndersenNumber(termNum: termNum)
+            
+            if terminals.count > 1
             {
-                if newWdg.terminal.andersenNumber == refTerm
-                {
-                    do
-                    {
-                        // if it IS the reference terminal, we need to fix its amps BEFORE we call the AmpTurns routine
-                        let oldNI = try newTransformer.ReferenceOnanAmpTurns()
-                        var oldTurns = newTransformer.CurrentCarryingTurns(terminal: refTerm)
-                        if oldTurns == 0.0
-                        {
-                            oldTurns = newTransformer.NoLoadTurns(terminal: refTerm)
-                        }
-                        
-                        let oldAmps = oldNI / oldTurns
-                        
-                        let refTerminals = try newTransformer.TerminalsFromAndersenNumber(termNum: refTerm)
-                        
-                        var newTurns = 0.0
-                        for nextTerminal in refTerminals
-                        {
-                            var windingTurns = nextTerminal.winding!.CurrentCarryingTurns()
-                            
-                            if nextTerminal.winding!.coilID == newWdg.coilID
-                            {
-                                windingTurns = -windingTurns
-                            }
-                            
-                            newTurns += windingTurns
-                        }
-                        
-                    }
-                    catch
-                    {
-                        let alert = NSAlert(error: error)
-                        let _ = alert.runModal()
-                        return
-                    }
-                }
+                let oldTurns = newWdg.CurrentCarryingTurns()
+                let oldAmps = newWdg.terminal.NominalOnanAmps
+                let vpn = try newTransformer.VoltsPerTurn()
+                
+                
+                
             }
+            
+            newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
+            self.updateCurrentTransformer(newTransformer: newTransformer)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
         }
         
-        newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
         
-        self.updateCurrentTransformer(newTransformer: newTransformer)
+        
+        
+        
     }
     
     

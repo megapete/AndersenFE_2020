@@ -17,6 +17,15 @@ class Transformer:Codable {
     
     let numPhases:Int
     
+    private var mvaStore:Double = 0.0
+    
+    var MVA:Double {
+        get {
+            
+            return self.mvaStore
+        }
+    }
+    
     let frequency:Double
     
     let tempRise:Double
@@ -35,7 +44,11 @@ class Transformer:Codable {
     
     var terminals:[Terminal?] = []
     
+    /// V/N reference terminal
     var refTermNum:Int? = nil
+    
+    /// NI reference termonal
+    var niRefTerm:Int? = nil
     
     var niDistribution:[Double]? = nil
     
@@ -59,7 +72,7 @@ class Transformer:Codable {
         for nextWdg in windings
         {
             let oldTerm = nextWdg.terminal
-            let newTerm = Terminal(name: oldTerm.name, voltage: oldTerm.nominalLineVolts, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
+            let newTerm = Terminal(name: oldTerm.name, lineVoltage: oldTerm.nominalLineVolts, noloadLegVoltage: oldTerm.noloadLegVoltage, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
             
             self.windings.append(Winding(srcWdg: nextWdg, terminal: newTerm))
             self.terminals.append(newTerm)
@@ -302,6 +315,24 @@ class Transformer:Codable {
         }
         
         return result
+    }
+    
+    func SetMVA(newMVA:Double, forceNIbalance:Bool) throws
+    {
+        if !forceNIbalance
+        {
+            self.mvaStore = newMVA
+            return
+        }
+        
+        do
+        {
+            
+        }
+        catch
+        {
+            
+        }
     }
     
     func TotalVA(terminal:Int) throws -> Double
@@ -614,6 +645,7 @@ class Transformer:Codable {
                     let availableTerms = self.AvailableTerminals()
                     
                     var maxNegativeVoltAmps = 0.0
+                    var maxPositiveVoltAmps = 0.0
                     
                     for nextAvailableTerm in availableTerms
                     {
@@ -643,12 +675,18 @@ class Transformer:Codable {
                         
                         if va < 0.0
                         {
-                            // yes, there's a reason why I'm converting it to a positve
+                            // yes, there's a reason why I'm reversing this
                             maxNegativeVoltAmps -= va
+                        }
+                        else
+                        {
+                            maxPositiveVoltAmps += va
                         }
                         
                         termVoltAmps.append((nextAvailableTerm, va))
                     }
+                    
+                    let maxVoltAmps = max(maxNegativeVoltAmps, maxPositiveVoltAmps)
                     
                     var checkVA = 0.0
                     var niArray:[Double] = Array(repeating: 0.0, count: 6)
@@ -656,7 +694,7 @@ class Transformer:Codable {
                     {
                         checkVA += nextTva.va
                         
-                        niArray[nextTva.termNum - 1] = nextTva.va / maxNegativeVoltAmps * 100.0
+                        niArray[nextTva.termNum - 1] = nextTva.va / maxVoltAmps * 100.0
                     }
                     
                     let oldDistribution = niArray
@@ -740,7 +778,7 @@ class Transformer:Codable {
         
     }
     
-    /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the SUM of all the voltages for the terminal. Note that in the event that the reference terminal has 0 active turns, its no-load voltage sum (and turns) are used.
+    /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the VECTOR SUM of the voltages assigned to the Terminals that make up the reference terminal. The turns are the VECTOR SUM of the no-load turns of the Terminals that make up the terminal.
     func VoltsPerTurn() throws -> Double
     {
         guard let refTerm = self.refTermNum else
@@ -760,7 +798,7 @@ class Transformer:Codable {
         
         var result = 0.0
         
-        let legFactor = terminals[0].connectionFactor
+        // let legFactor = terminals[0].connectionFactor
         
         var noloadVoltageSum = 0.0
         for nextWdg in self.windings
@@ -773,20 +811,20 @@ class Transformer:Codable {
                     currDir = 1.0
                 }
                 
-                noloadVoltageSum += nextWdg.terminal.nominalLineVolts * currDir
+                noloadVoltageSum += nextWdg.terminal.noloadLegVoltage * currDir
             }
         }
         
         noloadVoltageSum = fabs(noloadVoltageSum)
         
-        let turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
+        let turnsToUse = self.NoLoadTurns(terminal: refTerm)
         
         if turnsToUse == 0
         {
             throw TransformerErrors(info: terminals[0].name, type: .UnexpectedZeroTurns)
         }
         
-        result = noloadVoltageSum / legFactor / turnsToUse
+        result = noloadVoltageSum / turnsToUse
         
         return result
     }
@@ -1146,7 +1184,10 @@ class Transformer:Codable {
                     throw DesignFileError(info: "\(newTermNum)", type: .InvalidConnection)
                 }
                 
-                let newTerm = Terminal(name: termName, voltage: voltage, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
+                let connectionFactor = connection == .wye || connection == .auto_series || connection == .auto_common ? SQRT3 : 1.0
+                let nlv = voltage / connectionFactor
+                
+                let newTerm = Terminal(name: termName, lineVoltage: voltage, noloadLegVoltage: nlv, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
                 
                 terminals.append(newTerm)
             }

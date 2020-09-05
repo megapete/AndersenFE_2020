@@ -86,7 +86,15 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         self.currentTerminalPercentages[4] = min(maxValue, max(minValue, term5))
         self.currentTerminalPercentages[5] = min(maxValue, max(minValue, term6))
         self.fixedTerm = fixedTerm
-        self.autoCalcTerm = autoCalcTerm
+        if fixedTerm != nil && autoCalcTerm != nil && fixedTerm! == autoCalcTerm!
+        {
+            DLog("It is illegal to set a terminal as both FIXED and AUTOCALCULATE. Defaulting to FIXED")
+            self.autoCalcTerm = nil
+        }
+        else
+        {
+            self.autoCalcTerm = autoCalcTerm
+        }
         self.termsToShow = termsToShow
         
         super.init(viewNibFileName: "AmpTurnsDistribution", windowTitle: "AmpTurns Distribution", hideCancel: false)
@@ -255,7 +263,7 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         
         let _ = self.CheckAmpTurns()
         
-        DLog("New value: \(slider.doubleValue)")
+        // DLog("New value: \(slider.doubleValue)")
     }
     
     func controlTextDidChange(_ obj: Notification) {

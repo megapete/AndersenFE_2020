@@ -14,16 +14,34 @@ class Terminal: Codable
     /// A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
     var name:String
     
-    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts (note that this should be the "corrected" value for parallel-stacked windings)
-    var nominalLineVolts:Double
+    private var nominalLegVoltsStore:Double
     
+    /// The line-line (line-neutral for single-phase) voltage of the terminal in volts.
+    /// Note 1) This should be the "corrected" value for parallel-stacked windings).
+    /// Note 2) This should be maintained as the current voltage based on the current V/N by calling the "SetNominalVoltsAndVA() routine
+    var nominalLineVolts:Double {
+        
+        get {
+            
+            if self.connection == .auto_series
+            {
+                return self.nominalLegVoltsStore * self.connectionFactor * self.autoFactor
+            }
+            
+            return self.nominalLegVoltsStore * self.connectionFactor
+        }
+    }
+    
+    /// The original no-load voltage for the terminal (usually whatever was in the XL design file, corrected for double axial stacks)
     let noloadLegVoltage:Double
     
-    /// The total (1-ph or 3-ph) VA for the Terminal
+    /// The total (1-ph or 3-ph) VA for the Terminal. This is the THROUGHPUT VA for auto-connected windings
     var VA:Double
     
+    /// The leg VA for the Terminal. This is the ACTUAL VA flowing in the winding.
     var legVA:Double {
         get {
+            
             
             return self.VA / self.phaseFactor
         }
@@ -44,19 +62,10 @@ class Terminal: Codable
         }
     }
     
-    var autoFactor:Double {
-        get {
-            
-            if self.connection == .auto_common || self.connection == .auto_series
-            {
-                
-            }
-            
-            return 1.0
-        }
-    }
+    /// It is the calling routine's (the one that creates the Terminal) responsibility to set this factor for either auto_series or auto_common connected windings. The ratio is (seriesTurns + commonTurns) / seriesTurns
+    var autoFactor:Double = 1.0
     
-    /// The nominal  leg amps of the Terminal (winding)
+    /// The nominal leg amps of the Terminal (winding). These are the ACTUAL amps flowing in the winding.
     var nominalAmps:Double {
         get {
             
@@ -111,7 +120,7 @@ class Terminal: Codable
     /// The connection to use for this Terminal
     let connection:TerminalConnection
     
-    /// The current direction for this Terminal. Note that a value of 0 for this property does NOT mean that there are no active turns. It means that the VA should be zero.
+    /// The current direction for this Terminal. Note that a value of 0 for this property is ILLEGAL.
     var currentDirection:Int
     
     /// The Andersen-file Terminal number
@@ -122,7 +131,7 @@ class Terminal: Codable
     
     /// Designated initializer for the Terminal class
     /// - Parameter name: A descriptive String for easily identifying the Terminal (ie: "LV", "HV", etc)
-    /// - Parameter lineVoltage: The current line-line (line-neutral for single-phase) voltage of the terminal in volts
+    /// - Parameter lineVoltage: The current line-line (line-neutral for single-phase) voltage of the terminal in volts. This may be zero if there are no active turns.
     /// - Parameter noloadLegVoltage: The initial (unmutable) no-load voltage per leg for the terminal
     /// - Parameter VA: The total (1-ph or 3-ph) VA for the Terminal
     /// - Parameter connection: The connection to use for this Terminal
@@ -131,7 +140,7 @@ class Terminal: Codable
     init(name:String, lineVoltage:Double, noloadLegVoltage:Double, VA:Double, connection:TerminalConnection, currDir:Int, termNum:Int)
     {
         self.name = name
-        self.nominalLineVolts = lineVoltage
+        self.nominalLegVoltsStore = lineVoltage / (connection == .wye || connection == .auto_common || connection == .auto_series ? SQRT3 : 1.0)
         self.VA = VA
         self.connection = connection
         self.currentDirection = currDir
@@ -157,8 +166,8 @@ class Terminal: Codable
         }
     }
     
-    /// This function sets the VA of the terminal based on the voltage and current passed in. Note that if 'amps' is negative, the currentDirection property is INVERTED.
-    func SetVoltsAndVA(legVolts:Double, amps:Double)
+    /// This function sets the VA of the terminal based on the voltage and current passed in. Note that if 'amps' is negative, the currentDirection property is INVERTED. If 'amps' is equal to nil, it is assumed that the VA does not change. For auto-connected windings, the amps are the ACTUAL amps flowing in the winding.
+    func SetVoltsAndVA(legVolts:Double, amps:Double? = nil)
     {
         if legVolts == 0.0
         {
@@ -167,21 +176,27 @@ class Terminal: Codable
             return
         }
         
-        self.nominalLineVolts = legVolts * self.connectionFactor
-        self.VA = legVolts * fabs(amps) * self.phaseFactor
+        self.nominalLegVoltsStore = legVolts
         
-        if amps < 0 && self.currentDirection != 0
+        guard let newAmps = amps else
+        {
+            return
+        }
+        
+        self.VA = legVolts * fabs(newAmps) * self.phaseFactor
+        
+        if newAmps < 0 && self.currentDirection != 0
         {
             self.currentDirection = -self.currentDirection
         }
-        else if amps == 0
+        else if newAmps == 0
         {
             self.currentDirection = 0
             self.VA = 0.0
         }
         else if self.currentDirection == 0
         {
-            self.currentDirection = amps < 0.0 ? -1 : 1
+            self.currentDirection = newAmps < 0.0 ? -1 : 1
         }
         
         

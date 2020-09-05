@@ -601,6 +601,52 @@ class Transformer:Codable {
             
             let nonRefTerms = self.AvailableTerminals().subtracting([refTerm])
             
+            var niArray:[Double] = Array(repeating: 0.0, count: 6)
+            let refTermNIPercent = (refTermNI > 0.0 ? 100.0 : -100.0)
+            niArray[refTerm - 1] = refTermNIPercent
+            var niSum = refTermNI
+            
+            if nonRefTerms.count == 1
+            {
+                niArray[nonRefTerms.first! - 1] = -refTermNIPercent
+                niSum = 0.0
+            }
+            else
+            {
+                for nextTerm in nonRefTerms
+                {
+                    var niTermLeg = 0.0
+                    
+                    for nextWdg in self.windings
+                    {
+                        if nextWdg.terminal.andersenNumber == nextTerm
+                        {
+                            let niTerm = nextWdg.terminal
+                            
+                            niTermLeg += nextWdg.CurrentCarryingTurns() * niTerm.nominalAmps * Double(niTerm.currentDirection)
+                        }
+                    }
+                    
+                    niArray[nextTerm - 1] = niTermLeg / fabs(refTermNI) * 100.0
+                    niSum += niTermLeg
+                }
+            }
+            
+            let oldDistribution = niArray
+            let availableTerms = self.AvailableTerminals()
+            
+            if showDistributionDialog || niSum != 0
+            {
+                let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray, hideCancel:niSum != 0)
+                
+                if niDlog.runModal() == .OK
+                {
+                    niArray = niDlog.currentTerminalPercentages
+                }
+            }
+            
+            /*
+            
             if nonRefTerms.count == 1
             {
                 do
@@ -777,6 +823,8 @@ class Transformer:Codable {
                 }
             }
             
+            */
+            
             return 0.0
         }
         else
@@ -788,7 +836,7 @@ class Transformer:Codable {
         
     }
     
-    /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the VECTOR SUM of the voltages assigned to the Terminals that make up the reference terminal. The turns are the VECTOR SUM of the no-load turns of the Terminals that make up the terminal.
+    /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the VECTOR SUM of the voltages assigned to the Terminals that make up the reference terminal. The turns are the VECTOR SUM of the current-carrying turns of the Terminals that make up the terminal. This function throws an error if the reference terminal has 0 active turns.
     func VoltsPerTurn() throws -> Double
     {
         guard let refTerm = self.vpnRefTerm else
@@ -815,19 +863,18 @@ class Transformer:Codable {
         {
             if nextWdg.terminal.andersenNumber == refTerm
             {
-                var currDir = Double(nextWdg.terminal.currentDirection)
-                if currDir == 0.0
-                {
-                    currDir = 1.0
-                }
+                let currDir = Double(nextWdg.terminal.currentDirection)
                 
-                noloadVoltageSum += nextWdg.terminal.noloadLegVoltage * currDir
+                if nextWdg.CurrentCarryingTurns() != 0.0
+                {
+                    noloadVoltageSum += nextWdg.terminal.noloadLegVoltage * currDir
+                }
             }
         }
         
         noloadVoltageSum = fabs(noloadVoltageSum)
         
-        let turnsToUse = self.NoLoadTurns(terminal: refTerm)
+        let turnsToUse = self.CurrentCarryingTurns(terminal: refTerm)
         
         if turnsToUse == 0
         {
@@ -918,6 +965,8 @@ class Transformer:Codable {
             case InvalidValue
             case InvalidConnection
             case MissingComplementConnection
+            case TooManySpecialTypes
+            case IllegalTerminalNumber
         }
         
         let info:String
@@ -946,6 +995,14 @@ class Transformer:Codable {
                 else if self.type == .MissingComplementConnection
                 {
                     return "A\(self.info) connection is missing one of its parts"
+                }
+                else if self.type == .TooManySpecialTypes
+                {
+                    return "Cannot assign more than one \(self.info)-connected terminal."
+                }
+                else if self.type == .IllegalTerminalNumber
+                {
+                    return "Could not assign an Andersen terminal number to winding: \(self.info)"
                 }
                 
                 return "An unknown error occurred."
@@ -1088,11 +1145,13 @@ class Transformer:Codable {
         var gotAutoSeries = false
         var gotAutoCommon = false
         
+        var availableAndersenNumbers:Set<Int> = [1, 2, 3, 4, 5, 6]
+        
         while currIndex < 9
         {
             lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
             
-            if let voltage = Double(lineElements[0])
+            if var voltage = Double(lineElements[0])
             {
                 if voltage == 0.0
                 {
@@ -1116,7 +1175,25 @@ class Transformer:Codable {
                 var newTermNum:Int = 0
                 if let num = Int(lineElements[3])
                 {
-                    newTermNum = num
+                    if availableAndersenNumbers.contains(num)
+                    {
+                        newTermNum = num
+                        availableAndersenNumbers.remove(newTermNum)
+                    }
+                    else
+                    {
+                        newTermNum = -1
+                        while availableAndersenNumbers.count > 0
+                        {
+                            newTermNum = availableAndersenNumbers.first!
+                            break
+                        }
+                        
+                        if newTermNum < 0
+                        {
+                            throw DesignFileError(info: "\(currIndex - 1)", type: .IllegalTerminalNumber)
+                        }
+                    }
                 }
                 else
                 {
@@ -1127,12 +1204,6 @@ class Transformer:Codable {
                 if let num = Int(lineElements[4])
                 {
                     currDir = num
-                    
-                    // ignore 0-level current directions
-                    if currDir == 0
-                    {
-                        currDir = 1
-                    }
                 }
                 else
                 {
@@ -1165,28 +1236,86 @@ class Transformer:Codable {
                 }
                 else if connString == "ZIG"
                 {
+                    if gotZig
+                    {
+                        throw DesignFileError(info: "Zig", type: .TooManySpecialTypes)
+                    }
+                    
                     connection = .zig
                     gotZig = true
                     termName = "ZIG"
                 }
                 else if connString == "ZAG"
                 {
+                    if gotZag
+                    {
+                        throw DesignFileError(info: "Zag", type: .TooManySpecialTypes)
+                    }
+                    
                     connection = .zag
                     gotZag = true
                     termName = "ZAG"
                 }
                 else if connString == "AS" // auto series
                 {
+                    if gotAutoSeries
+                    {
+                        throw DesignFileError(info: "Auto-Series", type: .TooManySpecialTypes)
+                    }
+                    
                     connection = .auto_series
                     gotAutoSeries = true
-                    newTermNum = 1
+                    
+                    // we require that the series winding of an autotransformer be terminal number 1
+                    if newTermNum != 1
+                    {
+                        // find the already saved terminal that was assigned to number 1 and swap its number for whatever the idiot user set in the XL file
+                        for nextMaybeTerm in self.terminals
+                        {
+                            if let nextTerm = nextMaybeTerm
+                            {
+                                if nextTerm.andersenNumber == 1
+                                {
+                                    nextTerm.andersenNumber = newTermNum
+                                    break
+                                }
+                            }
+                        }
+                        
+                        newTermNum = 1
+                    }
+                    
                     termName = "Auto-S"
                 }
                 else if connString == "AC" // auto common
                 {
+                    if gotAutoCommon
+                    {
+                        throw DesignFileError(info: "Auto-Common", type: .TooManySpecialTypes)
+                    }
+                    
                     connection = .auto_common
                     gotAutoCommon = true
-                    newTermNum = 2
+                    
+                    // we require that the common winding of an auttransformer be terminal number 2
+                    if newTermNum != 2
+                    {
+                        // find the already saved terminal that was assigned to number 1 and swap its number for whatever the idiot user set in the XL file
+                        for nextMaybeTerm in self.terminals
+                        {
+                            if let nextTerm = nextMaybeTerm
+                            {
+                                if nextTerm.andersenNumber == 2
+                                {
+                                    nextTerm.andersenNumber = newTermNum
+                                    break
+                                }
+                            }
+                        }
+                        
+                        newTermNum = 2
+                    }
+                    
                     termName = "Auto-C"
                 }
                 else if connString != "Y"
@@ -1196,6 +1325,13 @@ class Transformer:Codable {
                 
                 let connectionFactor = connection == .wye || connection == .auto_series || connection == .auto_common ? SQRT3 : 1.0
                 let nlv = voltage / connectionFactor
+                
+                // ignore 0-level current directions, but set the current line voltage to zero
+                if currDir == 0
+                {
+                    voltage = 0.0
+                    currDir = 1
+                }
                 
                 let newTerm = Terminal(name: termName, lineVoltage: voltage, noloadLegVoltage: nlv, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
                 
@@ -1463,7 +1599,10 @@ class Transformer:Codable {
                 // fix the terminal voltage for double-stacked windings
                 if (isDoubleStack)
                 {
-                    terminals[termIndex - 1]!.nominalLineVolts /= 2.0
+                    let theTerm = terminals[termIndex - 1]!
+                    let legV = theTerm.nominalLineVolts / theTerm.connectionFactor
+                    theTerm.SetVoltsAndVA(legVolts: legV / 2.0, amps: nil)
+                    // terminals[termIndex - 1]!.nominalLineVolts /= 2.0
                 }
                 
                 let newWinding = Winding(preferences: prefs.wdgPrefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)

@@ -74,8 +74,10 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     @IBOutlet weak var warningLabel: NSTextField!
     
     var currentTerminalPercentages:[Double] = Array(repeating: 0.0, count: 6)
+    let fixedTerm:Int?
+    let autoCalcTerm:Int?
     
-    init(termsToShow:Set<Int>, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0, hideCancel:Bool = false)
+    init(termsToShow:Set<Int>, fixedTerm:Int?, autoCalcTerm:Int?, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0, hideCancel:Bool = false)
     {
         self.currentTerminalPercentages[0] = min(maxValue, max(minValue, term1))
         self.currentTerminalPercentages[1] = min(maxValue, max(minValue, term2))
@@ -83,14 +85,16 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         self.currentTerminalPercentages[3] = min(maxValue, max(minValue, term4))
         self.currentTerminalPercentages[4] = min(maxValue, max(minValue, term5))
         self.currentTerminalPercentages[5] = min(maxValue, max(minValue, term6))
+        self.fixedTerm = fixedTerm
+        self.autoCalcTerm = autoCalcTerm
         self.termsToShow = termsToShow
         
         super.init(viewNibFileName: "AmpTurnsDistribution", windowTitle: "AmpTurns Distribution", hideCancel: false)
     }
     
-    convenience init(termsToShow:Set<Int>, termPercentages:[Double], hideCancel:Bool = false)
+    convenience init(termsToShow:Set<Int>, fixedTerm:Int? = nil, autoCalcTerm:Int? = nil, termPercentages:[Double], hideCancel:Bool = false)
     {
-        self.init(termsToShow: termsToShow, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5], hideCancel:hideCancel)
+        self.init(termsToShow: termsToShow, fixedTerm:fixedTerm, autoCalcTerm:autoCalcTerm, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5], hideCancel:hideCancel)
     }
     
     func CheckAmpTurns() -> Double
@@ -186,6 +190,23 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
                 self.balanceButtons[i].isHidden = false
                 self.labels[i].isHidden = false
                 self.percentLabels[i].isHidden = false
+                
+                var disableTerminal = -1
+                if let fixedDisable = self.fixedTerm
+                {
+                    disableTerminal = fixedDisable
+                }
+                else if let calcDisable = self.autoCalcTerm
+                {
+                    disableTerminal = calcDisable
+                }
+                
+                if i + 1 == disableTerminal
+                {
+                    self.sliders[i].isEnabled = false
+                    self.niTextFields[i].isEnabled = false
+                }
+                
             }
             else
             {

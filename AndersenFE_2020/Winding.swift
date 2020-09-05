@@ -790,7 +790,7 @@ class Winding:Codable {
         var zIndex = 0
         for zPair in zList
         {
-            let newSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
+            let newSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: self.turnDef.strandA, strandR: self.turnDef.strandR, strandsPerLayer: strandsRadiallyPerLayer, strandsPerTurn: self.turnDef.NumStrandsPerTurn(), activeTurns: self.terminal.nominalLineVolts == 0.0 ? 0.0 : segmentTurns[zIndex], totalTurns: segmentTurns[zIndex], minZ: zPair.min, maxZ: zPair.max)
             
             layerSegments.append(newSegment)
             

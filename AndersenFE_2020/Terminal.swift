@@ -56,8 +56,8 @@ class Terminal: Codable
         }
     }
     
-    /// The nominal ONAN leg amps of the Terminal (winding)
-    var NominalOnanAmps:Double {
+    /// The nominal  leg amps of the Terminal (winding)
+    var nominalAmps:Double {
         get {
             
             let result = self.legVA / (self.nominalLineVolts / self.connectionFactor)

@@ -45,7 +45,7 @@ class Transformer:Codable {
     var terminals:[Terminal?] = []
     
     /// V/N reference terminal
-    var refTermNum:Int? = nil
+    var vpnRefTerm:Int? = nil
     
     /// NI reference termonal
     var niRefTerm:Int? = nil
@@ -63,7 +63,7 @@ class Transformer:Codable {
         self.core = core
         self.scFactor = scFactor
         self.systemGVA = systemGVA
-        self.refTermNum = refTermNum
+        self.vpnRefTerm = refTermNum
         self.niDistribution = niDistribution
         self.scResults = scResults
         self.terminals = []
@@ -155,7 +155,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.refTermNum, niDistribution: self.niDistribution, scResults: self.scResults)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.vpnRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
     }
     
     /// Some errors that can be thrown by various routines
@@ -166,6 +166,7 @@ class Transformer:Codable {
             case NoReferenceTerminalDefined
             case NoSuchTerminalNumber
             case UnexpectedZeroTurns
+            case UnexpectedZeroVA
             case UnexpectedAmpTurnsOutOfBalance
             case MissingComplementConnection
             case UnimplementedFeature
@@ -180,7 +181,7 @@ class Transformer:Codable {
             {
                 if self.type == .NoReferenceTerminalDefined
                 {
-                    return "The reference terminal has not been defined!"
+                    return "The reference VPN terminal has not been defined!"
                 }
                 else if self.type == .NoSuchTerminalNumber
                 {
@@ -189,6 +190,10 @@ class Transformer:Codable {
                 else if self.type == .UnexpectedZeroTurns
                 {
                     return "The winding \(info) has zero effective turns (illegal situation)."
+                }
+                else if self.type == .UnexpectedZeroVA
+                {
+                    return "The terminal \(info) has an effective VA of 0 (illegal situation)."
                 }
                 else if self.type == .UnexpectedAmpTurnsOutOfBalance
                 {
@@ -527,10 +532,10 @@ class Transformer:Codable {
         return  fabs(VpN * useTurns * phaseFactor * autoFactor)
     }
     
-    /// This is a SIGNED quantity. It may be equal to 0.
-    func ReferenceOnanAmpTurns() throws -> Double
+    /// This is a SIGNED quantity. It CANNOT be equal to 0.
+    func ReferenceAmpTurns() throws -> Double
     {
-        guard let refTerm = self.refTermNum else
+        guard let refTerm = self.niRefTerm else
         {
             throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
         }
@@ -563,6 +568,11 @@ class Transformer:Codable {
         {
             va += nextTerm.legVA * Double(nextTerm.currentDirection)
         }
+        
+        guard va != 0.0 else
+        {
+            throw TransformerErrors(info: "\(refTerm)", type: .UnexpectedZeroVA)
+        }
                 
         return va / vpn
     }
@@ -571,7 +581,7 @@ class Transformer:Codable {
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage','VA', and 'currentDirection' fields to force amp-turns to be equal to 0.
     func AmpTurns(forceBalance:Bool, showDistributionDialog:Bool) throws -> Double
     {
-        guard let refTerm = self.refTermNum else {
+        guard let refTerm = self.niRefTerm else {
             
             throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
         }
@@ -582,7 +592,7 @@ class Transformer:Codable {
             do
             {
                 // refTermNI is a SIGNED quantity
-                refTermNI = try self.ReferenceOnanAmpTurns()
+                refTermNI = try self.ReferenceAmpTurns()
             }
             catch
             {
@@ -781,7 +791,7 @@ class Transformer:Codable {
     /// Calculate the V/N for the transformer given the reference terminal number. The voltage is the VECTOR SUM of the voltages assigned to the Terminals that make up the reference terminal. The turns are the VECTOR SUM of the no-load turns of the Terminals that make up the terminal.
     func VoltsPerTurn() throws -> Double
     {
-        guard let refTerm = self.refTermNum else
+        guard let refTerm = self.vpnRefTerm else
         {
             throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
         }
@@ -789,7 +799,7 @@ class Transformer:Codable {
         var terminals:[Terminal] = []
         do
         {
-            terminals = try self.TerminalsFromAndersenNumber(termNum: self.refTermNum!)
+            terminals = try self.TerminalsFromAndersenNumber(termNum: self.vpnRefTerm!)
         }
         catch
         {

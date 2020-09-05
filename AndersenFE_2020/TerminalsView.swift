@@ -191,7 +191,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
             return false
         }
         
-        guard txfo.refTermNum != nil else
+        guard txfo.vpnRefTerm != nil else
         {
             return false
         }

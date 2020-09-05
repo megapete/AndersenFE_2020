@@ -477,7 +477,7 @@ class AppController: NSObject, NSMenuItemValidation {
         // If the user wants to change the direction of a reference-terminal associated winding, and there are only two terminals, that's okay, but if he wants to change the direction of any other winding, we only allow it if it does not reverse the direction of the ENTIRE Andersen-terminal
         if self.preferences.generalPrefs.forceAmpTurnBalance
         {
-            if let refTerm = txfo.refTermNum
+            if let refTerm = txfo.vpnRefTerm
             {
                 if winding.terminal.andersenNumber != refTerm && txfo.AvailableTerminals().count == 2
                 {
@@ -528,7 +528,7 @@ class AppController: NSObject, NSMenuItemValidation {
             if terminals.count > 1
             {
                 let oldTurns = newWdg.CurrentCarryingTurns()
-                let oldAmps = newWdg.terminal.NominalOnanAmps
+                let oldAmps = newWdg.terminal.nominalAmps
                 let vpn = try newTransformer.VoltsPerTurn()
                 
                 
@@ -554,7 +554,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSetRefTermVoltage(_ sender: Any) {
         
-        let refTerm = self.currentTxfo!.refTermNum!
+        let refTerm = self.currentTxfo!.vpnRefTerm!
         
         do
         {
@@ -585,7 +585,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        guard let refTerm = currTxfo.refTermNum else
+        guard let refTerm = currTxfo.vpnRefTerm else
         {
             DLog("No reference terminal defined")
             return
@@ -643,7 +643,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSetReferenceMVA(_ sender: Any) {
         
-        let refTerm = self.currentTxfo!.refTermNum!
+        let refTerm = self.currentTxfo!.vpnRefTerm!
         
         do
         {
@@ -689,7 +689,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        guard currTxfo.CurrentCarryingTurns(terminal: currTxfo.refTermNum!) != 0.0 else
+        guard currTxfo.CurrentCarryingTurns(terminal: currTxfo.vpnRefTerm!) != 0.0 else
         {
             let alert = NSAlert()
             alert.messageText = "Reference Terminal has no effective turns!"
@@ -704,15 +704,15 @@ class AppController: NSObject, NSMenuItemValidation {
             
             let vpn = try txfo.VoltsPerTurn()
             
-            let refWdgs = try txfo.WindingsFromAndersenNumber(termNum: txfo.refTermNum!)
+            let refWdgs = try txfo.WindingsFromAndersenNumber(termNum: txfo.vpnRefTerm!)
             
             let phaseFactor = refWdgs[0].terminal.phaseFactor
             
-            var legVolts = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!) * vpn
+            var legVolts = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!) * vpn
             
             var autoFactor = 1.0
             
-            let terms = try txfo.TerminalsFromAndersenNumber(termNum: txfo.refTermNum!)
+            let terms = try txfo.TerminalsFromAndersenNumber(termNum: txfo.vpnRefTerm!)
             
             if terms[0].connection == .auto_series
             {
@@ -728,10 +728,10 @@ class AppController: NSObject, NSMenuItemValidation {
                                 commonTurns = txfo.NoLoadTurns(terminal: cTerm.andersenNumber)
                             }
                             
-                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!)
+                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!)
                             if seriesTurns == 0
                             {
-                                seriesTurns = txfo.NoLoadTurns(terminal: txfo.refTermNum!)
+                                seriesTurns = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!)
                             }
                             
                             autoFactor = (seriesTurns + commonTurns) / seriesTurns
@@ -753,10 +753,10 @@ class AppController: NSObject, NSMenuItemValidation {
                                 seriesTurns = txfo.NoLoadTurns(terminal: sTerm.andersenNumber)
                             }
                             
-                            var commonTurns = txfo.CurrentCarryingTurns(terminal: txfo.refTermNum!)
+                            var commonTurns = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!)
                             if commonTurns == 0
                             {
-                                commonTurns = txfo.NoLoadTurns(terminal: txfo.refTermNum!)
+                                commonTurns = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!)
                             }
                             
                             autoFactor = (seriesTurns + commonTurns) / seriesTurns
@@ -770,7 +770,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             if legVolts == 0.0
             {
-                legVolts = txfo.NoLoadTurns(terminal: txfo.refTermNum!) * vpn
+                legVolts = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!) * vpn
                 legVA = 0.0
             }
             
@@ -796,10 +796,10 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSetReferenceTerminal(_ sender: Any) {
         
-        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.refTermNum)
+        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.vpnRefTerm)
         
         var oldRefNumIndex = -1
-        if let refNum = self.currentTxfo!.refTermNum
+        if let refNum = self.currentTxfo!.vpnRefTerm
         {
             oldRefNumIndex = refNum - 1
         }
@@ -834,7 +834,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        if let oldRefTerm = currTxfo.refTermNum
+        if let oldRefTerm = currTxfo.vpnRefTerm
         {
             if oldRefTerm == refTerm
             {
@@ -845,7 +845,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         let newTransformer = currTxfo.Copy()
-        newTransformer.refTermNum = refTerm
+        newTransformer.vpnRefTerm = refTerm
         self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
     }
     
@@ -993,7 +993,7 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 let terminals = try txfo.TerminalsFromAndersenNumber(termNum: nextTerm)
                 var isRef = false
-                if let refTerm = txfo.refTermNum
+                if let refTerm = txfo.vpnRefTerm
                 {
                     if refTerm == nextTerm
                     {
@@ -1018,7 +1018,7 @@ class AppController: NSObject, NSMenuItemValidation {
         do
         {
             let vpn = try txfo.VoltsPerTurn()
-            self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.refTermNum)
+            self.dataView.SetVpN(newVpN: vpn, refTerm: txfo.vpnRefTerm)
             
             // amp-turns are guaranteed to be 0 if forceAmpTurnsBalance is true
             let newNI = self.preferences.generalPrefs.forceAmpTurnBalance ? 0.0 : try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
@@ -1055,11 +1055,11 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         else if menuItem == self.setMVAMenuItem || menuItem == self.setRefVoltageMenuItem
         {
-            return self.currentTxfo != nil && self.currentTxfo!.refTermNum != nil && self.currentTxfo!.CurrentCarryingTurns(terminal: self.currentTxfo!.refTermNum!) != 0.0
+            return self.currentTxfo != nil && self.currentTxfo!.vpnRefTerm != nil && self.currentTxfo!.CurrentCarryingTurns(terminal: self.currentTxfo!.vpnRefTerm!) != 0.0
         }
         else if menuItem == self.setNIdistMenuItem
         {
-            return self.currentTxfo != nil && self.currentTxfo!.refTermNum != nil && self.currentTxfo!.AvailableTerminals().count >= 3
+            return self.currentTxfo != nil && self.currentTxfo!.vpnRefTerm != nil && self.currentTxfo!.AvailableTerminals().count >= 3
         }
         else if menuItem == self.reverseCurrentMenuItem
         {
@@ -1070,7 +1070,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             let termNum = currSeg.segment.inLayer!.parentTerminal.andersenNumber
             
-            if let refTerm = txfo.refTermNum
+            if let refTerm = txfo.vpnRefTerm
             {
                 if refTerm != termNum
                 {
@@ -1455,7 +1455,8 @@ class AppController: NSObject, NSMenuItemValidation {
                 
                 if self.preferences.generalPrefs.defaultRefTerm2
                 {
-                    newTxfo.refTermNum = 2
+                    newTxfo.vpnRefTerm = 2
+                    newTxfo.niRefTerm = 2
                 }
             
                 self.lastOpenedTxfoFile = nil

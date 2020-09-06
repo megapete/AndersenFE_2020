@@ -630,7 +630,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="IXf-LW-In8">
-                                        <rect key="frame" x="20" y="745" width="140" height="40"/>
+                                        <rect key="frame" x="20" y="729" width="140" height="56"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Ampere Turns" drawsBackground="YES" id="Iwe-UW-lIc">
                                             <font key="font" usesAppearanceFont="YES"/>
@@ -639,7 +639,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="F0l-3g-bwg">
-                                        <rect key="frame" x="20" y="678" width="140" height="57"/>
+                                        <rect key="frame" x="20" y="663" width="140" height="56"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Impedance" drawsBackground="YES" id="uhv-P7-Jfp">
                                             <font key="font" usesAppearanceFont="YES"/>

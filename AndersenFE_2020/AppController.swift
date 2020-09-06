@@ -1004,7 +1004,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 }
                 
                 let termLineVolts = try txfo.TerminalLineVoltage(terminal: nextTerm)
-                let termVA = try txfo.TotalVA(terminal: nextTerm)
+                let termVA = try round(txfo.TotalVA(terminal: nextTerm) / 1.0E5) * 1.0E5
                 
                 self.termsView.SetTermData(termNum: nextTerm, name: terminals[0].name, displayVolts: termLineVolts, VA: termVA, connection: terminals[0].connection, isReference: isRef)
             }
@@ -1024,7 +1024,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             // amp-turns are guaranteed to be 0 if forceAmpTurnsBalance is true
             let newNI = self.preferences.generalPrefs.forceAmpTurnBalance ? 0.0 : try txfo.AmpTurns(forceBalance: self.preferences.generalPrefs.forceAmpTurnBalance, showDistributionDialog: false)
-            self.dataView.SetAmpereTurns(newNI: newNI)
+            self.dataView.SetAmpereTurns(newNI: newNI, refTerm: txfo.niRefTerm)
             
             if self.preferences.generalPrefs.keepImpedanceUpdated && txfo.scResults != nil
             {

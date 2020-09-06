@@ -43,15 +43,21 @@ class DataView: NSView {
         self.SetFieldString(fieldID: .impedance, txt: impField)
     }
     
-    func SetAmpereTurns(newNI:Double?)
+    func SetAmpereTurns(newNI:Double?, refTerm:Int?)
     {
+        var refTermString = "Unassigned"
+        if let terminal = refTerm
+        {
+            refTermString = "\(terminal)"
+        }
+        
         var niString = "-ERROR-"
         if let NI = newNI
         {
             niString = String(format: "%.1f", NI)
         }
         
-        let niField = "Ampere Turns\nNI: \(niString)"
+        let niField = "Ampere Turns\nRef. Terminal: \(refTermString)\nNI: \(niString)"
         
         self.SetFieldString(fieldID: .NI, txt: niField)
     }

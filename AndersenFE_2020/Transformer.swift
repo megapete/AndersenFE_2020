@@ -55,7 +55,7 @@ class Transformer:Codable {
     var scResults:ImpedanceAndScData? = nil
     
     /// Straightforward init function (designed for the copy() function below)
-    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], refTermNum:Int? = nil, niDistribution:[Double]? = nil, scResults:ImpedanceAndScData? = nil)
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], vpnRefTermNum:Int? = nil, niRefTermNum:Int? = nil, niDistribution:[Double]? = nil, scResults:ImpedanceAndScData? = nil)
     {
         self.numPhases = numPhases
         self.frequency = frequency
@@ -63,7 +63,8 @@ class Transformer:Codable {
         self.core = core
         self.scFactor = scFactor
         self.systemGVA = systemGVA
-        self.vpnRefTerm = refTermNum
+        self.vpnRefTerm = vpnRefTermNum
+        self.niRefTerm = niRefTermNum
         self.niDistribution = niDistribution
         self.scResults = scResults
         self.terminals = []
@@ -155,7 +156,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, refTermNum: self.vpnRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, vpnRefTermNum: self.vpnRefTerm, niRefTermNum: self.niRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
     }
     
     /// Some errors that can be thrown by various routines
@@ -280,7 +281,7 @@ class Transformer:Codable {
         
         if result.count == 0
         {
-            throw TransformerErrors.init(info: "\(termNum)", type: .NoSuchTerminalNumber)
+            throw TransformerErrors(info: "\(termNum)", type: .NoSuchTerminalNumber)
         }
         
         return result
@@ -300,7 +301,7 @@ class Transformer:Codable {
         
         if result.count == 0
         {
-            throw TransformerErrors.init(info: "\(termNum)", type: .NoSuchTerminalNumber)
+            throw TransformerErrors(info: "\(termNum)", type: .NoSuchTerminalNumber)
         }
         
         return result
@@ -537,7 +538,7 @@ class Transformer:Codable {
     {
         guard let refTerm = self.niRefTerm else
         {
-            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
+            throw TransformerErrors(info: "", type: .NoReferenceTerminalDefined)
         }
         
         var vpn = 0.0
@@ -583,7 +584,7 @@ class Transformer:Codable {
     {
         guard let refTerm = self.niRefTerm else {
             
-            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
+            throw TransformerErrors(info: "", type: .NoReferenceTerminalDefined)
         }
         
         if forceBalance
@@ -632,205 +633,83 @@ class Transformer:Codable {
                 }
             }
             
-            let oldDistribution = niArray
             let availableTerms = self.AvailableTerminals()
+            
+            // check for an auto-connection, which requires that we jump in hoops to figure out amp-turns
+            var gotAuto = false
+            for nextWdg in self.windings
+            {
+                if nextWdg.terminal.connection == .auto_common || nextWdg.terminal.connection == .auto_series
+                {
+                    gotAuto = true
+                    break
+                }
+            }
             
             if showDistributionDialog || niSum != 0
             {
-                let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray, hideCancel:niSum != 0)
+                let fixedTerm:Int? = gotAuto ? 1 : nil
+                let calcTerm:Int? = gotAuto ? 2 : nil
                 
+                let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, fixedTerm: fixedTerm, autoCalcTerm: calcTerm, termPercentages: niArray, hideCancel:niSum != 0)
+                
+                // This HAS to be OK on return, but we test anyway
                 if niDlog.runModal() == .OK
                 {
                     niArray = niDlog.currentTerminalPercentages
                 }
             }
             
-            /*
+            DLog("NI-array: \(niArray)")
             
-            if nonRefTerms.count == 1
+            do
             {
-                do
+                let vpn = try self.VoltsPerTurn()
+                
+                for nextTerm in nonRefTerms
                 {
-                    let nonRefTerm = nonRefTerms.first!
-                    let nonRefWdgs = try self.WindingsFromAndersenNumber(termNum: nonRefTerm)
+                    let termsToFix = try TerminalsFromAndersenNumber(termNum: nextTerm)
                     
-                    let totalEffectiveTurns = self.CurrentCarryingTurns(terminal: nonRefTerm)
-                    
-                    if totalEffectiveTurns == 0.0
+                    if niArray[nextTerm - 1] < 1.0
                     {
-                        let terminals = try self.TerminalsFromAndersenNumber(termNum: nonRefTerm)
-                        throw TransformerErrors(info: "\(terminals[0].name)", type: .UnexpectedZeroTurns)
-                    }
-                    
-                    // note that at this point, 'amps' is a SIGNED quantity, and can never be equal to zero
-                    var amps = -refTermNI / totalEffectiveTurns
-                    let ampsSign = amps < 0 ? -1 : 1
-                    let termSign = self.CurrentDirection(terminal: nonRefTerm)
-                    
-                    // the Terminal function SetVoltsAndVA() will invert the currentDirection of a winding if the amps parameter is negative
-                    if termSign == ampsSign
-                    {
-                        amps = fabs(amps)
-                    }
-                    else
-                    {
-                        amps = -fabs(amps)
-                    }
-                    
-                    let vpn = try self.VoltsPerTurn()
-                    
-                    for nextWdg in nonRefWdgs
-                    {
-                        let voltage = nextWdg.CurrentCarryingTurns() * vpn
+                        for nextTermToZero in termsToFix
+                        {
+                            nextTermToZero.SetVoltsAndVA(legVolts: 0.0)
+                        }
                         
-                        nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: amps)
+                        continue
                     }
-                }
-                catch
-                {
-                    throw error
+                    
+                    let niAbsolute = niArray[nextTerm - 1] / 100.0 * -refTermNI
+                    
+                    let effectiveTurns = CurrentCarryingTurns(terminal: nextTerm)
+                    
+                    guard effectiveTurns > 0.1  else
+                    {
+                        throw TransformerErrors(info: "terminal \(nextTerm)", type: .UnexpectedZeroTurns)
+                    }
+                    
+                    let amps = niAbsolute / effectiveTurns
+                    
+                    for nextTermToFix in termsToFix
+                    {
+                        let volts = nextTermToFix.winding!.CurrentCarryingTurns() * vpn
+                        nextTermToFix.SetVoltsAndVA(legVolts: volts, amps: amps)
+                    }
                 }
             }
-            else // there's more than just two terminals, which complicates things considerably
+            catch
             {
-                do
-                {
-                    // first we'll check what the current VA's for the various terminals come up with as amp-turns, and if they don't balance we'll bring up the AmpTurnsDistributionDialog
-                    var termVoltAmps:[(termNum:Int, va:Double)] = []
-                    
-                    let availableTerms = self.AvailableTerminals()
-                    
-                    var maxNegativeVoltAmps = 0.0
-                    var maxPositiveVoltAmps = 0.0
-                    
-                    for nextAvailableTerm in availableTerms
-                    {
-                        var va = 0.0
-                        
-                        for nextWdg in self.windings
-                        {
-                            if nextWdg.terminal.andersenNumber == nextAvailableTerm
-                            {
-                                va += nextWdg.terminal.legVA * Double(nextWdg.terminal.currentDirection)
-                            }
-                        }
-                        
-                        // we need to check if the main windings are connected in auto, and if so, we need to multiply the volt-amps of any non-auto terminal by the autofactor to get the correct amps. We don't do too much error checking because the call to Autofactor() throws if something is fishy
-                        var autoFactor = try self.Autofactor()
-                        if autoFactor != 1.0
-                        {
-                            // terminals 1 and 2 are auto
-                            if nextAvailableTerm == 1 || nextAvailableTerm == 2
-                            {
-                                autoFactor = 1.0
-                            }
-                        }
-                        
-                        // avoid things like 25999999 when it should be 26000000
-                        va = round(va / autoFactor / 1000.0) * 1000.0
-                        
-                        if va < 0.0
-                        {
-                            // yes, there's a reason why I'm reversing this
-                            maxNegativeVoltAmps -= va
-                        }
-                        else
-                        {
-                            maxPositiveVoltAmps += va
-                        }
-                        
-                        termVoltAmps.append((nextAvailableTerm, va))
-                    }
-                    
-                    let maxVoltAmps = max(maxNegativeVoltAmps, maxPositiveVoltAmps)
-                    
-                    var checkVA = 0.0
-                    var niArray:[Double] = Array(repeating: 0.0, count: 6)
-                    for nextTva in termVoltAmps
-                    {
-                        checkVA += nextTva.va
-                        
-                        niArray[nextTva.termNum - 1] = nextTva.va / maxVoltAmps * 100.0
-                    }
-                    
-                    let oldDistribution = niArray
-                    
-                    if showDistributionDialog || checkVA != 0
-                    {
-                        let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termPercentages: niArray, hideCancel:checkVA != 0)
-                        
-                        if niDlog.runModal() == .OK
-                        {
-                            niArray = niDlog.currentTerminalPercentages
-                        }
-                        
-                        // not sure this is needed any more
-                        self.niDistribution = niArray
-                    }
-                    
-                    // At this point, niArray (array of "terminal" NI percentages) is guaranteed to be in balance. Set the Terminal VA's accordingly. The problem here is that the "terminal" VA is actually the _sum_ of the "Terminals" VAs. We assume that the "relative" current directions of the Terminals is maintained. That is, if the overall "terminal" current directions was positive, but after the dialog it is now negative, all of the associated Terminals' currentDirection properties must be reversed.
-                    
-                    if niArray != oldDistribution
-                    {
-                        let vpn = try self.VoltsPerTurn()
-                        
-                        for nextTerm in availableTerms
-                        {
-                            let termLegVA = maxNegativeVoltAmps * niArray[nextTerm - 1] / 100.0
-                            let termLegV = vpn * self.CurrentCarryingTurns(terminal: nextTerm)
-                            
-                            // we need to check if the main windings are connected in auto, and if so, we need to multiply the volt-amps of any non-auto terminal by the autofactor to get the correct amps. We don't do too much error checking because the call to Autofactor() throws if something is fishy
-                            var autoFactor = try self.Autofactor()
-                            if autoFactor != 1.0
-                            {
-                                // terminals 1 and 2 are auto
-                                if nextTerm == 1 || nextTerm == 2
-                                {
-                                    autoFactor = 1.0
-                                }
-                            }
-                            
-                            var termAmps = termLegV == 0.0 ? 0.0 : termLegVA / termLegV * autoFactor
-                            let ampsSign = termAmps < 0 ? -1 : 1
-                            let termSign = self.CurrentDirection(terminal: nextTerm)
-                            
-                            // the Terminal function SetVoltsAndVA() will invert the currentDirection of a winding if the amps parameter is negative. If currentDirection of the Terminal is 0, it will be set to ampSign
-                            if termSign == ampsSign || (termSign == 0 && ampsSign > 0)
-                            {
-                                termAmps = fabs(termAmps)
-                            }
-                            else
-                            {
-                                termAmps = -fabs(termAmps)
-                            }
-                            
-                            for nextWdg in self.windings
-                            {
-                                if nextWdg.terminal.andersenNumber == nextTerm
-                                {
-                                    let wdgLegV = vpn * nextWdg.CurrentCarryingTurns()
-                                    
-                                    nextWdg.terminal.SetVoltsAndVA(legVolts: wdgLegV, amps: termAmps)
-                                }
-                            }
-                        }
-                    }
-                    
-                }
-                catch
-                {
-                    throw error
-                }
+                throw error
             }
             
-            */
             
             return 0.0
         }
         else
         {
             // This branch simply uses the current VA and voltage (calculated using the current V/N, if any) to calculate total amp-turns and allows non-zero results (ie: the user has to figure it out)
-            throw TransformerErrors.init(info: "Manual (user) calculation of terminal VAs to balance AmpTurns", type: .UnimplementedFeature)
+            throw TransformerErrors(info: "Manual (user) calculation of terminal VAs to balance AmpTurns", type: .UnimplementedFeature)
         }
         
         
@@ -841,7 +720,7 @@ class Transformer:Codable {
     {
         guard let refTerm = self.vpnRefTerm else
         {
-            throw TransformerErrors.init(info: "", type: .NoReferenceTerminalDefined)
+            throw TransformerErrors(info: "", type: .NoReferenceTerminalDefined)
         }
         
         var terminals:[Terminal] = []
@@ -967,6 +846,7 @@ class Transformer:Codable {
             case MissingComplementConnection
             case TooManySpecialTypes
             case IllegalTerminalNumber
+            case IllegalAutoTerminalNumber
         }
         
         let info:String
@@ -999,6 +879,10 @@ class Transformer:Codable {
                 else if self.type == .TooManySpecialTypes
                 {
                     return "Cannot assign more than one \(self.info)-connected terminal."
+                }
+                else if self.type == .IllegalAutoTerminalNumber
+                {
+                    return "Auto-Series terminals must be assigned number 1; Auto-Common must be assigned number 2"
                 }
                 else if self.type == .IllegalTerminalNumber
                 {
@@ -1145,7 +1029,8 @@ class Transformer:Codable {
         var gotAutoSeries = false
         var gotAutoCommon = false
         
-        var availableAndersenNumbers:Set<Int> = [1, 2, 3, 4, 5, 6]
+        var zigTerm = -1
+        var zagTerm = -1
         
         while currIndex < 9
         {
@@ -1175,25 +1060,7 @@ class Transformer:Codable {
                 var newTermNum:Int = 0
                 if let num = Int(lineElements[3])
                 {
-                    if availableAndersenNumbers.contains(num)
-                    {
-                        newTermNum = num
-                        availableAndersenNumbers.remove(newTermNum)
-                    }
-                    else
-                    {
-                        newTermNum = -1
-                        while availableAndersenNumbers.count > 0
-                        {
-                            newTermNum = availableAndersenNumbers.first!
-                            break
-                        }
-                        
-                        if newTermNum < 0
-                        {
-                            throw DesignFileError(info: "\(currIndex - 1)", type: .IllegalTerminalNumber)
-                        }
-                    }
+                    newTermNum = num
                 }
                 else
                 {
@@ -1236,86 +1103,48 @@ class Transformer:Codable {
                 }
                 else if connString == "ZIG"
                 {
-                    if gotZig
+                    if gotZig && newTermNum != zigTerm
                     {
                         throw DesignFileError(info: "Zig", type: .TooManySpecialTypes)
                     }
                     
+                    zigTerm = newTermNum
                     connection = .zig
                     gotZig = true
                     termName = "ZIG"
                 }
                 else if connString == "ZAG"
                 {
-                    if gotZag
+                    if gotZag && newTermNum != zagTerm
                     {
                         throw DesignFileError(info: "Zag", type: .TooManySpecialTypes)
                     }
                     
+                    zagTerm = newTermNum
                     connection = .zag
                     gotZag = true
                     termName = "ZAG"
                 }
                 else if connString == "AS" // auto series
                 {
-                    if gotAutoSeries
+                    if newTermNum != 1
                     {
-                        throw DesignFileError(info: "Auto-Series", type: .TooManySpecialTypes)
+                        throw DesignFileError(info: "", type: .IllegalAutoTerminalNumber)
                     }
                     
                     connection = .auto_series
                     gotAutoSeries = true
-                    
-                    // we require that the series winding of an autotransformer be terminal number 1
-                    if newTermNum != 1
-                    {
-                        // find the already saved terminal that was assigned to number 1 and swap its number for whatever the idiot user set in the XL file
-                        for nextMaybeTerm in self.terminals
-                        {
-                            if let nextTerm = nextMaybeTerm
-                            {
-                                if nextTerm.andersenNumber == 1
-                                {
-                                    nextTerm.andersenNumber = newTermNum
-                                    break
-                                }
-                            }
-                        }
-                        
-                        newTermNum = 1
-                    }
-                    
                     termName = "Auto-S"
                 }
                 else if connString == "AC" // auto common
                 {
-                    if gotAutoCommon
+                    if newTermNum != 2
                     {
-                        throw DesignFileError(info: "Auto-Common", type: .TooManySpecialTypes)
+                        throw DesignFileError(info: "", type: .IllegalAutoTerminalNumber)
                     }
                     
                     connection = .auto_common
                     gotAutoCommon = true
-                    
-                    // we require that the common winding of an auttransformer be terminal number 2
-                    if newTermNum != 2
-                    {
-                        // find the already saved terminal that was assigned to number 1 and swap its number for whatever the idiot user set in the XL file
-                        for nextMaybeTerm in self.terminals
-                        {
-                            if let nextTerm = nextMaybeTerm
-                            {
-                                if nextTerm.andersenNumber == 2
-                                {
-                                    nextTerm.andersenNumber = newTermNum
-                                    break
-                                }
-                            }
-                        }
-                        
-                        newTermNum = 2
-                    }
-                    
                     termName = "Auto-C"
                 }
                 else if connString != "Y"

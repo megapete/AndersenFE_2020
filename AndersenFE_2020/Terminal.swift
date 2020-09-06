@@ -65,9 +65,14 @@ class Terminal: Codable
     /// It is the calling routine's (the one that creates the Terminal) responsibility to set this factor for either auto_series or auto_common connected windings. The ratio is (seriesTurns + commonTurns) / seriesTurns
     var autoFactor:Double = 1.0
     
-    /// The nominal leg amps of the Terminal (winding). These are the ACTUAL amps flowing in the winding.
+    /// The nominal leg amps of the Terminal (winding). These are the ACTUAL amps flowing in the winding. If nominalLineVolts is 0, this function returns 0
     var nominalAmps:Double {
         get {
+            
+            if self.nominalLineVolts < 0.1
+            {
+                return 0.0
+            }
             
             let result = self.legVA / (self.nominalLineVolts / self.connectionFactor)
             
@@ -171,7 +176,10 @@ class Terminal: Codable
     {
         if legVolts == 0.0
         {
-            self.currentDirection = 0
+            if let wdg = self.winding
+            {
+                wdg.SetTurnsActivation(activate: false)
+            }
             self.VA = 0.0
             return
         }

@@ -603,7 +603,7 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 let wdgTurns = nextWdg.CurrentCarryingTurns()
                 
-                nextWdg.terminal.SetVoltsAndVA(legVolts: (newVoltage / nextWdg.terminal.connectionFactor) * wdgTurns / totalEffectiveTurns, amps: nil)
+                nextWdg.terminal.SetVoltsAndAmps(legVolts: (newVoltage / nextWdg.terminal.connectionFactor) * wdgTurns / totalEffectiveTurns)
                 
                 // nextWdg.terminal.nominalLineVolts = newVoltage * wdgTurns / totalEffectiveTurns
             }
@@ -782,7 +782,7 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 let voltage = nextWdg.CurrentCarryingTurns() * vpn
                 
-                nextWdg.terminal.SetVoltsAndVA(legVolts: voltage, amps: legAmps)
+                nextWdg.terminal.SetVoltsAndAmps(legVolts: voltage, amps: legAmps)
             }
             
             self.updateCurrentTransformer(newTransformer: txfo)

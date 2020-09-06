@@ -35,7 +35,7 @@ class Terminal: Codable
     /// The original no-load voltage for the terminal (usually whatever was in the XL design file, corrected for double axial stacks)
     let noloadLegVoltage:Double
     
-    /// The total (1-ph or 3-ph) VA for the Terminal. This is the THROUGHPUT VA for auto-connected windings
+    /// The total (1-ph or 3-ph) VA for the Terminal. This is the ACTUAL VA for auto-connected windings
     var VA:Double
     
     /// The leg VA for the Terminal. This is the ACTUAL VA flowing in the winding.
@@ -171,43 +171,22 @@ class Terminal: Codable
         }
     }
     
-    /// This function sets the VA of the terminal based on the voltage and current passed in. Note that if 'amps' is negative, the currentDirection property is INVERTED. If 'amps' is equal to nil, it is assumed that the VA does not change. For auto-connected windings, the amps are the ACTUAL amps flowing in the winding.
-    func SetVoltsAndVA(legVolts:Double, amps:Double? = nil)
+    /// This function sets the VA of the terminal based on the voltage and current passed in. The legVolts parameter must be a non-zero, positive number. The 'amps' parameter can be either positive or negative. If 'amps' is equal to nil, it is assumed that the VA does not change (although the voltage might). If legVolts is nil, the voltage does not change (but the VA might). For auto-connected windings, the amps are the ACTUAL amps flowing in the winding.
+    func SetVoltsAndAmps(legVolts:Double? = nil, amps:Double? = nil)
     {
-        if legVolts == 0.0
+        let newVolts = legVolts == nil ? self.nominalLegVoltsStore : legVolts!
+        
+        if newVolts <= 0.0
         {
-            if let wdg = self.winding
-            {
-                wdg.SetTurnsActivation(activate: false)
-            }
-            self.VA = 0.0
-            return
+            DLog("Attempt to set voltage to \(newVolts) for terminal \(self.name)")
         }
         
-        self.nominalLegVoltsStore = legVolts
+        ZAssert(newVolts > 0.0, message: "Terminal voltage must be a non-zero, positive number")
         
-        guard let newAmps = amps else
-        {
-            return
-        }
+        let newLegVA = amps == nil ? self.legVA : amps! * newVolts
         
-        self.VA = legVolts * fabs(newAmps) * self.phaseFactor
-        
-        if newAmps < 0 && self.currentDirection != 0
-        {
-            self.currentDirection = -self.currentDirection
-        }
-        else if newAmps == 0
-        {
-            self.currentDirection = 0
-            self.VA = 0.0
-        }
-        else if self.currentDirection == 0
-        {
-            self.currentDirection = newAmps < 0.0 ? -1 : 1
-        }
-        
-        
+        self.nominalLegVoltsStore = newVolts
+        self.VA = newLegVA * self.phaseFactor
     }
     
 }

@@ -674,7 +674,7 @@ class Transformer:Codable {
                     {
                         for nextTermToZero in termsToFix
                         {
-                            nextTermToZero.SetVoltsAndVA(legVolts: 0.0)
+                            nextTermToZero.SetVoltsAndAmps(amps: 0.0)
                         }
                         
                         continue
@@ -694,7 +694,15 @@ class Transformer:Codable {
                     for nextTermToFix in termsToFix
                     {
                         let volts = nextTermToFix.winding!.CurrentCarryingTurns() * vpn
-                        nextTermToFix.SetVoltsAndVA(legVolts: volts, amps: amps)
+                        
+                        if volts < 0.1
+                        {
+                            nextTermToFix.SetVoltsAndAmps(amps: 0.0)
+                        }
+                        else
+                        {
+                            nextTermToFix.SetVoltsAndAmps(legVolts: volts, amps: amps)
+                        }
                     }
                 }
             }
@@ -1429,8 +1437,8 @@ class Transformer:Codable {
                 if (isDoubleStack)
                 {
                     let theTerm = terminals[termIndex - 1]!
-                    let legV = theTerm.nominalLineVolts / theTerm.connectionFactor
-                    theTerm.SetVoltsAndVA(legVolts: legV / 2.0, amps: nil)
+                    let legV = theTerm.noloadLegVoltage
+                    theTerm.SetVoltsAndAmps(legVolts: legV / 2.0)
                     // terminals[termIndex - 1]!.nominalLineVolts /= 2.0
                 }
                 

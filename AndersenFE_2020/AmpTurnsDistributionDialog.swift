@@ -107,6 +107,27 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     
     func CheckAmpTurns() -> Double
     {
+        if let autoTerm = self.autoCalcTerm
+        {
+            let autoIndex = autoTerm - 1
+            
+            var result = 0.0
+            
+            for i in 0..<6
+            {
+                if i == autoIndex
+                {
+                    continue
+                }
+                
+                result += self.currentTerminalPercentages[i]
+            }
+            
+            self.currentTerminalPercentages[autoIndex] = -result
+            
+            self.niTextFields[autoIndex].stringValue = "\(-result)"
+        }
+        
         let ampTurns = self.currentTerminalPercentages.reduce(0.0, +)
         
         if ampTurns == 0.0
@@ -234,7 +255,12 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         let button:NSButton = sender as! NSButton
         let index = button.tag - tagBase
         
-        var niToFix = self.currentTerminalPercentages[index]
+        self.doBalanceTerminal(termIndex: index)
+    }
+    
+    func doBalanceTerminal(termIndex:Int) {
+        
+        var niToFix = self.currentTerminalPercentages[termIndex]
         
         let ampTurns = self.CheckAmpTurns()
         
@@ -245,14 +271,13 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         
         niToFix -= ampTurns
         
-        self.currentTerminalPercentages[index] = niToFix
-        self.sliders[index].doubleValue = niToFix
-        self.niTextFields[index].doubleValue = niToFix
+        self.currentTerminalPercentages[termIndex] = niToFix
+        self.sliders[termIndex].doubleValue = niToFix
+        self.niTextFields[termIndex].doubleValue = niToFix
         
         // check
         let _ = self.CheckAmpTurns()
     }
-    
     
     @IBAction func sliderMoved(_ sender: Any) {
         
@@ -274,6 +299,14 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             
             if txFld.tag >= 100 && txFld.tag <= 105
             {
+                if let autoTerm = self.autoCalcTerm
+                {
+                    if txFld.tag - tagBase == autoTerm - 1
+                    {
+                        return
+                    }
+                }
+                
                 self.sliders[txFld.tag - tagBase].doubleValue = newValue
                 self.currentTerminalPercentages[txFld.tag - tagBase] = newValue
             }
@@ -285,27 +318,4 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             let _ = self.CheckAmpTurns()
         }
     }
-    
-    /*
-    func controlTextDidEndEditing(_ obj: Notification) {
-        
-        if let txFld = obj.object as? NSTextField
-        {
-            let newValue = min(maxValue, max(minValue, txFld.doubleValue))
-            
-            if txFld.tag >= 100 && txFld.tag <= 105
-            {
-                self.sliders[txFld.tag - tagBase].doubleValue = newValue
-                self.currentTerminalPercentages[txFld.tag - tagBase] = newValue
-            }
-            else
-            {
-                return
-            }
-            
-            let _ = self.CheckAmpTurns()
-        }
-    }
- */
-    
 }

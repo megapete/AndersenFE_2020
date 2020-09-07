@@ -6,7 +6,7 @@
 //  Copyright © 2020 Peter Huber. All rights reserved.
 //
 
-// This Dialog Box is used to find the ampere-turn distribution in transformers with 3 or more terminals. The user must adjust the sliders (or enter real numbers, or use the provided "Balance" buttons) so that the total NI equals zero. The Ok button is disabled whenever the NI does NOT equal zero. The calling routine should access the 'currentTerminalPercentages' array to get the final distribution upon exit, where the index 'i' into the array is for the (Andersen) terminal 'i+1'.
+// This Dialog Box is used to find the ampere-turn distribution in transformers with 3 or more terminals. The user must enter the percentages, or use the provided "Balance" buttons so that the total NI equals zero. The Ok button is disabled whenever the NI does NOT equal zero. The calling routine should access the 'currentTerminalPercentages' array to get the final distribution upon exit, where the index 'i' into the array is for the (Andersen) terminal 'i+1'.
 
 import Cocoa
 
@@ -30,6 +30,7 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     @IBOutlet weak var term6Label: NSTextField!
     var labels:[NSTextField] = []
     
+    // percent labels
     @IBOutlet weak var term1percentLabel: NSTextField!
     @IBOutlet weak var term2percentLabel: NSTextField!
     @IBOutlet weak var term3percentLabel: NSTextField!
@@ -37,18 +38,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     @IBOutlet weak var term5percentLabel: NSTextField!
     @IBOutlet weak var term6percentLabel: NSTextField!
     var percentLabels:[NSTextField] = []
-    
-    // percent signs
-    
-    
-    // sliders
-    @IBOutlet weak var term1Slider: NSSlider!
-    @IBOutlet weak var term2Slider: NSSlider!
-    @IBOutlet weak var term3Slider: NSSlider!
-    @IBOutlet weak var term4Slider: NSSlider!
-    @IBOutlet weak var term5Slider: NSSlider!
-    @IBOutlet weak var term6Slider: NSSlider!
-    var sliders:[NSSlider] = []
     
     // text fields
     @IBOutlet weak var term1TextField: NSTextField!
@@ -77,7 +66,7 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     let fixedTerm:Int?
     let autoCalcTerm:Int?
     
-    init(termsToShow:Set<Int>, fixedTerm:Int?, autoCalcTerm:Int?, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0, hideCancel:Bool = false)
+    init(termsToShow:Set<Int>, fixedTerm:Int?, autoCalcTerm:Int?, term1:Double, term2:Double, term3:Double, term4:Double = 0.0, term5:Double = 0.0, term6:Double = 0.0, term1name:String? = nil, term2name:String? = nil, term3name:String? = nil, term4name:String? = nil, term5name:String? = nil, term6name:String? = nil, hideCancel:Bool = false)
     {
         self.currentTerminalPercentages[0] = min(maxValue, max(minValue, term1))
         self.currentTerminalPercentages[1] = min(maxValue, max(minValue, term2))
@@ -95,14 +84,24 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         {
             self.autoCalcTerm = autoCalcTerm
         }
+        
+        let test = term1name!
+        
+        self.term1Label.stringValue = "Terminal 1" + (term1name == nil ? "" : " (\(term1name!)")
+        self.term2Label.stringValue = "Terminal 2" + (term2name == nil ? "" : " (\(term2name!)")
+        self.term3Label.stringValue = "Terminal 3" + (term3name == nil ? "" : " (\(term3name!)")
+        self.term4Label.stringValue = "Terminal 4" + (term4name == nil ? "" : " (\(term4name!)")
+        self.term5Label.stringValue = "Terminal 5" + (term5name == nil ? "" : " (\(term5name!)")
+        self.term6Label.stringValue = "Terminal 6" + (term6name == nil ? "" : " (\(term6name!)")
+        
         self.termsToShow = termsToShow
         
         super.init(viewNibFileName: "AmpTurnsDistribution", windowTitle: "AmpTurns Distribution", hideCancel: false)
     }
     
-    convenience init(termsToShow:Set<Int>, fixedTerm:Int? = nil, autoCalcTerm:Int? = nil, termPercentages:[Double], hideCancel:Bool = false)
+    convenience init(termsToShow:Set<Int>, termNames:[String?], fixedTerm:Int? = nil, autoCalcTerm:Int? = nil, termPercentages:[Double], hideCancel:Bool = false)
     {
-        self.init(termsToShow: termsToShow, fixedTerm:fixedTerm, autoCalcTerm:autoCalcTerm, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5], hideCancel:hideCancel)
+        self.init(termsToShow: termsToShow, fixedTerm:fixedTerm, autoCalcTerm:autoCalcTerm, term1:termPercentages[0], term2:termPercentages[1], term3:termPercentages[2], term4:termPercentages[3], term5:termPercentages[4], term6:termPercentages[5], term1name:termNames[0], term2name:termNames[1], term3name:termNames[2], term4name:termNames[3], term5name:termNames[4], term6name:termNames[5], hideCancel:hideCancel)
     }
     
     func CheckAmpTurns() -> Double
@@ -154,48 +153,36 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     
     override func awakeFromNib() {
         
-        self.term1Slider.doubleValue = currentTerminalPercentages[0]
-        self.sliders.append(self.term1Slider)
         self.term1TextField.doubleValue = currentTerminalPercentages[0]
         self.niTextFields.append(self.term1TextField)
         self.balanceButtons.append(self.term1BalanceButton)
         self.labels.append(self.term1Label)
         self.percentLabels.append(self.term1percentLabel)
         
-        self.term2Slider.doubleValue = currentTerminalPercentages[1]
-        self.sliders.append(self.term2Slider)
         self.term2TextField.doubleValue = currentTerminalPercentages[1]
         self.niTextFields.append(self.term2TextField)
         self.balanceButtons.append(self.term2BalanceButton)
         self.labels.append(self.term2Label)
         self.percentLabels.append(self.term2percentLabel)
         
-        self.term3Slider.doubleValue = currentTerminalPercentages[2]
-        self.sliders.append(self.term3Slider)
         self.term3TextField.doubleValue = currentTerminalPercentages[2]
         self.niTextFields.append(self.term3TextField)
         self.balanceButtons.append(self.term3BalanceButton)
         self.labels.append(self.term3Label)
         self.percentLabels.append(self.term3percentLabel)
         
-        self.term4Slider.doubleValue = currentTerminalPercentages[3]
-        self.sliders.append(self.term4Slider)
         self.term4TextField.doubleValue = currentTerminalPercentages[3]
         self.niTextFields.append(self.term4TextField)
         self.balanceButtons.append(self.term4BalanceButton)
         self.labels.append(self.term4Label)
         self.percentLabels.append(self.term4percentLabel)
         
-        self.term5Slider.doubleValue = currentTerminalPercentages[4]
-        self.sliders.append(self.term5Slider)
         self.term5TextField.doubleValue = currentTerminalPercentages[4]
         self.niTextFields.append(self.term5TextField)
         self.balanceButtons.append(self.term5BalanceButton)
         self.labels.append(self.term5Label)
         self.percentLabels.append(self.term5percentLabel)
         
-        self.term6Slider.doubleValue = currentTerminalPercentages[5]
-        self.sliders.append(self.term6Slider)
         self.term6TextField.doubleValue = currentTerminalPercentages[5]
         self.niTextFields.append(self.term6TextField)
         self.balanceButtons.append(self.term6BalanceButton)
@@ -215,7 +202,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             if self.termsToShow.contains(i + 1)
             {
                 self.niTextFields[i].isHidden = false
-                self.sliders[i].isHidden = false
                 self.balanceButtons[i].isHidden = false
                 self.labels[i].isHidden = false
                 self.percentLabels[i].isHidden = false
@@ -232,7 +218,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
                 
                 if i + 1 == disableTerminal
                 {
-                    self.sliders[i].isEnabled = false
                     self.niTextFields[i].isEnabled = false
                 }
                 
@@ -240,7 +225,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             else
             {
                 self.niTextFields[i].isHidden = true
-                self.sliders[i].isHidden = true
                 self.balanceButtons[i].isHidden = true
                 self.labels[i].isHidden = true
                 self.percentLabels[i].isHidden = true
@@ -272,7 +256,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         niToFix -= ampTurns
         
         self.currentTerminalPercentages[termIndex] = niToFix
-        self.sliders[termIndex].doubleValue = niToFix
         self.niTextFields[termIndex].doubleValue = niToFix
         
         // check
@@ -307,7 +290,6 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
                     }
                 }
                 
-                self.sliders[txFld.tag - tagBase].doubleValue = newValue
                 self.currentTerminalPercentages[txFld.tag - tagBase] = newValue
             }
             else

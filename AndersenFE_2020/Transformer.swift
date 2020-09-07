@@ -578,6 +578,21 @@ class Transformer:Codable {
         return va / vpn
     }
     
+    func TermName(termNum:Int) -> String?
+    {
+        for maybeTerminal in self.terminals
+        {
+            if let term = maybeTerminal
+            {
+                if term.andersenNumber == termNum
+                {
+                    return term.name
+                }
+            }
+        }
+        
+        return nil
+    }
     
     /// Total AmpereTurns for the Transformer in its current state (this value must equal 0 to be able to calculate impedance). If the reference terminal has not been defined, this function throws an error. Note that if forceBalance is true, then this function will modify all non-reference Terminals' 'nominalLineVoltage','VA', and 'currentDirection' fields to force amp-turns to be equal to 0.
     func AmpTurns(forceBalance:Bool, showDistributionDialog:Bool) throws -> Double
@@ -585,6 +600,12 @@ class Transformer:Codable {
         guard let refTerm = self.niRefTerm else {
             
             throw TransformerErrors(info: "", type: .NoReferenceTerminalDefined)
+        }
+        
+        var termNames:[String?] = [nil, nil, nil, nil, nil, nil]
+        for nextTermNum in self.AvailableTerminals()
+        {
+            termNames[nextTermNum - 1] = self.TermName(termNum: nextTermNum)
         }
         
         if forceBalance
@@ -651,7 +672,7 @@ class Transformer:Codable {
                 let fixedTerm:Int? = gotAuto ? 1 : nil
                 let calcTerm:Int? = gotAuto ? 2 : nil
                 
-                let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, fixedTerm: fixedTerm, autoCalcTerm: calcTerm, termPercentages: niArray, hideCancel:niSum != 0)
+                let niDlog = AmpTurnsDistributionDialog(termsToShow: availableTerms, termNames: termNames, fixedTerm: fixedTerm, autoCalcTerm: calcTerm, termPercentages: niArray, hideCancel:niSum != 0)
                 
                 // This HAS to be OK on return, but we test anyway
                 if niDlog.runModal() == .OK

@@ -1163,10 +1163,10 @@ class Transformer:Codable {
                 let connectionFactor = connection == .wye || connection == .auto_series || connection == .auto_common ? SQRT3 : 1.0
                 let nlv = voltage / connectionFactor
                 
-                // ignore 0-level current directions, but set the current line voltage to zero
+                // ignore 0-level current directions, but set the current VA to zero
                 if currDir == 0
                 {
-                    voltage = 0.0
+                    VA = 0.0
                     currDir = 1
                 }
                 

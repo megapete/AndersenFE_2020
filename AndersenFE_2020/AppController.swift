@@ -718,7 +718,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             if terms[0].connection == .auto_series
             {
-                for nextTerm in txfo.terminals
+                for nextTerm in txfo.wdgTerminals
                 {
                     if let cTerm = nextTerm
                     {
@@ -743,7 +743,7 @@ class AppController: NSObject, NSMenuItemValidation {
             }
             else if terms[0].connection == .auto_common
             {
-                for nextTerm in txfo.terminals
+                for nextTerm in txfo.wdgTerminals
                 {
                     if let sTerm = nextTerm
                     {
@@ -1458,7 +1458,11 @@ class AppController: NSObject, NSMenuItemValidation {
                 if self.preferences.generalPrefs.defaultRefTerm2
                 {
                     newTxfo.vpnRefTerm = 2
-                    newTxfo.niRefTerm = 2
+                    
+                    if newTxfo.niRefTerm == nil
+                    {
+                        newTxfo.niRefTerm = 2
+                    }
                 }
             
                 self.lastOpenedTxfoFile = nil

@@ -42,7 +42,7 @@ class Transformer:Codable {
     
     var windings:[Winding] = []
     
-    var terminals:[Terminal?] = []
+    var wdgTerminals:[Terminal?] = []
     
     /// V/N reference terminal
     var vpnRefTerm:Int? = nil
@@ -67,7 +67,7 @@ class Transformer:Codable {
         self.niRefTerm = niRefTermNum
         self.niDistribution = niDistribution
         self.scResults = scResults
-        self.terminals = []
+        self.wdgTerminals = []
         
         var index = 0
         for nextWdg in windings
@@ -76,7 +76,7 @@ class Transformer:Codable {
             let newTerm = Terminal(name: oldTerm.name, lineVoltage: oldTerm.nominalLineVolts, noloadLegVoltage: oldTerm.noloadLegVoltage, VA: oldTerm.VA, connection: oldTerm.connection, currDir: oldTerm.currentDirection, termNum: oldTerm.andersenNumber)
             
             self.windings.append(Winding(srcWdg: nextWdg, terminal: newTerm))
-            self.terminals.append(newTerm)
+            self.wdgTerminals.append(newTerm)
             
             index += 1
         }
@@ -130,7 +130,7 @@ class Transformer:Codable {
             {
                 numWoundLimbs = 1
                 
-                for nextTerm in self.terminals
+                for nextTerm in self.wdgTerminals
                 {
                     if let term = nextTerm
                     {
@@ -156,7 +156,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.terminals, vpnRefTermNum: self.vpnRefTerm, niRefTermNum: self.niRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.wdgTerminals, vpnRefTermNum: self.vpnRefTerm, niRefTermNum: self.niRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
     }
     
     /// Some errors that can be thrown by various routines
@@ -249,7 +249,7 @@ class Transformer:Codable {
     {
         var result = 0
         
-        for nextTerm in self.terminals
+        for nextTerm in self.wdgTerminals
         {
             if let term = nextTerm
             {
@@ -268,7 +268,7 @@ class Transformer:Codable {
     {
         var result:[Terminal] = []
         
-        for nextTerm in self.terminals
+        for nextTerm in self.wdgTerminals
         {
             if let term = nextTerm
             {
@@ -312,7 +312,7 @@ class Transformer:Codable {
     {
         var result:Set<Int> = []
         
-        for nextEntry in self.terminals
+        for nextEntry in self.wdgTerminals
         {
             if let nextTerm = nextEntry
             {
@@ -360,7 +360,7 @@ class Transformer:Codable {
         
         if terms[0].connection == .auto_series
         {
-            for nextTerm in self.terminals
+            for nextTerm in self.wdgTerminals
             {
                 if let cTerm = nextTerm
                 {
@@ -385,7 +385,7 @@ class Transformer:Codable {
         }
         else if terms[0].connection == .auto_common
         {
-            for nextTerm in self.terminals
+            for nextTerm in self.wdgTerminals
             {
                 if let sTerm = nextTerm
                 {
@@ -500,7 +500,7 @@ class Transformer:Codable {
         
         if terms[0].connection == .auto_series
         {
-            for nextTerm in self.terminals
+            for nextTerm in self.wdgTerminals
             {
                 if let cTerm = nextTerm
                 {
@@ -580,7 +580,7 @@ class Transformer:Codable {
     
     func TermName(termNum:Int) -> String?
     {
-        for maybeTerminal in self.terminals
+        for maybeTerminal in self.wdgTerminals
         {
             if let term = maybeTerminal
             {
@@ -1061,16 +1061,19 @@ class Transformer:Codable {
         var zigTerm = -1
         var zagTerm = -1
         
+        var maxVA = -1.0
+        var maxVAtermnum = 2
+        
         while currIndex < 9
         {
             lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
             
-            if var voltage = Double(lineElements[0])
+            if let voltage = Double(lineElements[0])
             {
                 if voltage == 0.0
                 {
                     currIndex += 1
-                    terminals.append(nil)
+                    wdgTerminals.append(nil)
                     continue
                 }
                 
@@ -1094,6 +1097,16 @@ class Transformer:Codable {
                 else
                 {
                     throw DesignFileError(info: "\(currIndex)", type: .InvalidValue)
+                }
+                
+                if VA == maxVA && newTermNum == 2
+                {
+                    maxVAtermnum = 2
+                }
+                else if VA > maxVA
+                {
+                    maxVA = VA
+                    maxVAtermnum = newTermNum
                 }
                 
                 var currDir = 0
@@ -1193,7 +1206,7 @@ class Transformer:Codable {
                 
                 let newTerm = Terminal(name: termName, lineVoltage: voltage, noloadLegVoltage: nlv, VA: VA, connection: connection, currDir:currDir, termNum: newTermNum)
                 
-                terminals.append(newTerm)
+                wdgTerminals.append(newTerm)
             }
             else
             {
@@ -1457,13 +1470,13 @@ class Transformer:Codable {
                 // fix the terminal voltage for double-stacked windings
                 if (isDoubleStack)
                 {
-                    let theTerm = terminals[termIndex - 1]!
+                    let theTerm = wdgTerminals[termIndex - 1]!
                     let legV = theTerm.noloadLegVoltage
                     theTerm.SetVoltsAndAmps(legVolts: legV / 2.0)
                     // terminals[termIndex - 1]!.nominalLineVolts /= 2.0
                 }
                 
-                let newWinding = Winding(preferences: prefs.wdgPrefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: terminals[termIndex - 1]!)
+                let newWinding = Winding(preferences: prefs.wdgPrefs, wdgType: wdgType, isSpiral: isSpiral, isDoubleStack: isDoubleStack, numTurns: Winding.NumberOfTurns(minTurns: minTurns, nomTurns: nomTurns, maxTurns: maxTurns), elecHt: elecHt, numAxialSections: numAxialSections, radialSpacer: Winding.RadialSpacer(thickness: radialSpacerThickness, width: radialSpacerWidth), numAxialColumns: numAxialColumns, numRadialSections: numRadialSections, radialInsulation: insulationBetweenLayers, ducts: Winding.RadialDucts(count: numRadialDucts, dim: radialDuctDimn), numRadialSupports: numRadialColumns, turnDef: turnDef, axialGaps: Winding.AxialGaps(center: axialGapCenter, bottom: axialGapLower, top: axialGapUpper), bottomEdgePack: bottomEdgePack, coilID: windingID, radialOverbuild: overbuildAllowance, groundClearance: groundClearance, terminal: wdgTerminals[termIndex - 1]!)
                 
                 self.windings.append(newWinding)
             }
@@ -1473,6 +1486,8 @@ class Transformer:Codable {
         
         self.scFactor = assymetryFactor
         self.systemGVA = systemStrength
+        
+        self.niRefTerm = maxVAtermnum
         
         self.InitializeWindings(prefs: prefs)
         

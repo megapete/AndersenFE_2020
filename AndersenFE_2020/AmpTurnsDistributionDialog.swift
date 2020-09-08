@@ -29,6 +29,7 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     @IBOutlet weak var term5Label: NSTextField!
     @IBOutlet weak var term6Label: NSTextField!
     var labels:[NSTextField] = []
+    var labelStrings:[String] = ["", "", "", "", "", ""]
     
     // percent labels
     @IBOutlet weak var term1percentLabel: NSTextField!
@@ -85,14 +86,47 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
             self.autoCalcTerm = autoCalcTerm
         }
         
-        let test = term1name!
-        
-        self.term1Label.stringValue = "Terminal 1" + (term1name == nil ? "" : " (\(term1name!)")
-        self.term2Label.stringValue = "Terminal 2" + (term2name == nil ? "" : " (\(term2name!)")
-        self.term3Label.stringValue = "Terminal 3" + (term3name == nil ? "" : " (\(term3name!)")
-        self.term4Label.stringValue = "Terminal 4" + (term4name == nil ? "" : " (\(term4name!)")
-        self.term5Label.stringValue = "Terminal 5" + (term5name == nil ? "" : " (\(term5name!)")
-        self.term6Label.stringValue = "Terminal 6" + (term6name == nil ? "" : " (\(term6name!)")
+        for i in 0..<6
+        {
+            var labelString = "Terminal \(i+1) "
+            
+            switch i {
+            case 0:
+                if let name = term1name
+                {
+                    labelString += "(\(name))"
+                }
+            case 1:
+                if let name = term2name
+                {
+                    labelString += "(\(name))"
+                }
+            case 2:
+                if let name = term3name
+                {
+                    labelString += "(\(name))"
+                }
+            case 3:
+                if let name = term4name
+                {
+                    labelString += "(\(name))"
+                }
+            case 4:
+                if let name = term5name
+                {
+                    labelString += "(\(name))"
+                }
+            case 5:
+                if let name = term6name
+                {
+                    labelString += "(\(name))"
+                }
+            default:
+                break
+            }
+            
+            self.labelStrings[i] = labelString
+        }
         
         self.termsToShow = termsToShow
         
@@ -196,6 +230,8 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         
         for i in 0..<6
         {
+            self.labels[i].stringValue = self.labelStrings[i]
+            
             self.niTextFields[i].delegate = self
             self.niTextFields[i].formatter = textFieldFormatter
             

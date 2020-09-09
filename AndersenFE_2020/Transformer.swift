@@ -96,7 +96,8 @@ class Transformer:Codable {
             {
                 let terms = try self.TerminalsFromAndersenNumber(termNum: nextTerm)
                 
-                let termMVA = try self.TotalVA(terminal: nextTerm) * 1.0E-6
+                var termMVA = try self.TotalVA(terminal: nextTerm) * 1.0E-6
+                
                 let termKV = try self.TerminalLineVoltage(terminal: nextTerm) * 1.0E-3
                 
                 let newFld12Term = PCH_FLD12_Terminal(number: Int32(nextTerm), connection: Int32(terms[0].AndersenConnection()), mva: termMVA, kv: termKV)
@@ -358,7 +359,9 @@ class Transformer:Codable {
         
         var autoFactor = 1.0
         
-        if terms[0].connection == .auto_series
+        let connection = terms[0].connection
+        
+        if connection == .auto_series
         {
             for nextTerm in self.wdgTerminals
             {
@@ -383,7 +386,7 @@ class Transformer:Codable {
                 }
             }
         }
-        else if terms[0].connection == .auto_common
+        else if connection == .auto_common
         {
             for nextTerm in self.wdgTerminals
             {
@@ -404,6 +407,34 @@ class Transformer:Codable {
                         }
                         
                         autoFactor = (seriesTurns + commonTurns) / seriesTurns
+                    }
+                }
+            }
+        }
+        else if connection == .zig
+        {
+            // This is a bit weird. Andersen requires that the "per-term" MVA of zig-zag connected windings be equal to the sum total of the zig nd zag windings and that each of the terms be given that MVA. This is ONLY TRUE zigzag windings when they are one of the main windings (eg: a Dzn connection or something). If the transformer is a straightforward zigzag (grounding transformer), then each MVA should be the real MVA (ie not the sum) in each winding. This makes some sense to me since in a grounding transformer, the currents is single phase and the zig and zag windings currents are in opposing directions - just like a regular transformer leg. However, if the ZZ windings are treated as a 3-phase terminal, then phase angles get in the picture and the actual amp-turns in each zig (or zag) is actually 1/0.866 higher than what is needed to counter the other main winding(s) amp-turns. In that case, both zig and zag have currents running in the same direction. We assume that zig and zag are ALWAYS the same volts and amps, so we simply set the autofactor to 2 for the terminal.
+            for nextTerm in self.wdgTerminals
+            {
+                if let zTerm = nextTerm
+                {
+                    if zTerm.connection == .zag && zTerm.currentDirection == terms[0].currentDirection
+                    {
+                        autoFactor = 2.0
+                    }
+                }
+            }
+        }
+        else if connection == .zag
+        {
+            // See the blabber for .zig windings above for the logic used here
+            for nextTerm in self.wdgTerminals
+            {
+                if let zTerm = nextTerm
+                {
+                    if zTerm.connection == .zig && zTerm.currentDirection == terms[0].currentDirection
+                    {
+                        autoFactor = 2.0
                     }
                 }
             }
@@ -681,7 +712,7 @@ class Transformer:Codable {
                 }
             }
             
-            DLog("NI-array: \(niArray)")
+            // DLog("NI-array: \(niArray)")
             
             do
             {
@@ -731,7 +762,6 @@ class Transformer:Codable {
             {
                 throw error
             }
-            
             
             return 0.0
         }

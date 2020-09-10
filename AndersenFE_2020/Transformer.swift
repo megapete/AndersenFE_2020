@@ -680,7 +680,7 @@ class Transformer:Codable {
                         }
                     }
                     
-                    niArray[nextTerm - 1] = niTermLeg / fabs(refTermNI) * 100.0
+                    niArray[nextTerm - 1] = round(niTermLeg / fabs(refTermNI) * 100.0)
                     niSum += niTermLeg
                 }
             }
@@ -698,7 +698,7 @@ class Transformer:Codable {
                 }
             }
             
-            if showDistributionDialog || niSum != 0
+            if showDistributionDialog || fabs(niSum / refTermNI) > 0.001
             {
                 let fixedTerm:Int? = gotAuto ? 1 : nil
                 let calcTerm:Int? = gotAuto ? 2 : nil

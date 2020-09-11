@@ -34,6 +34,7 @@ class Transformer:Codable {
         let diameter:Double
         let windHt:Double
     }
+    
     let core:Core
     
     var scFactor:Double
@@ -96,7 +97,7 @@ class Transformer:Codable {
             {
                 let terms = try self.TerminalsFromAndersenNumber(termNum: nextTerm)
                 
-                var termMVA = try self.TotalVA(terminal: nextTerm) * 1.0E-6
+                let termMVA = try self.TotalVA(terminal: nextTerm) * 1.0E-6
                 
                 let termKV = try self.TerminalLineVoltage(terminal: nextTerm) * 1.0E-3
                 
@@ -110,8 +111,21 @@ class Transformer:Codable {
             
             var fld12Layers:[PCH_FLD12_Layer] = []
             
+            var lowerAddition = 10000.0
+            var upperAddition = 10000.0
+            
             for nextWdg in self.windings
             {
+                if nextWdg.extremeDimensions.bottom < lowerAddition
+                {
+                    lowerAddition = nextWdg.extremeDimensions.bottom
+                }
+                
+                if self.core.windHt - nextWdg.extremeDimensions.top < upperAddition
+                {
+                    upperAddition = self.core.windHt - nextWdg.extremeDimensions.top
+                }
+                
                 for nextLayer in nextWdg.layers
                 {
                     let newFld12Layer = nextLayer.FLD12layer(layernum: nextLayerNum, firstSegNum: nextSegmentNum)
@@ -144,7 +158,7 @@ class Transformer:Codable {
                 }
             }
             
-            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: Int32(numWoundLimbs), lowerZ: 0.0, upperZ: self.core.windHt, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
+            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: Int32(numWoundLimbs), lowerZ: -lowerAddition, upperZ: lowerAddition + self.core.windHt + upperAddition, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
             
             return newFld12Txfo
         }
@@ -161,7 +175,7 @@ class Transformer:Codable {
     }
     
     /// Some errors that can be thrown by various routines
-    struct TransformerErrors:Error
+    struct TransformerErrors:LocalizedError
     {
         enum errorType
         {
@@ -177,7 +191,7 @@ class Transformer:Codable {
         let info:String
         let type:errorType
         
-        var localizedDescription: String
+        var errorDescription: String?
         {
             get
             {
@@ -894,7 +908,7 @@ class Transformer:Codable {
     }
     
     /// Some different errors that can be thrown by the init routine
-    struct DesignFileError:Error
+    struct DesignFileError:LocalizedError
     {
         enum errorType
         {
@@ -911,7 +925,7 @@ class Transformer:Codable {
         let info:String
         let type:errorType
         
-        var localizedDescription: String
+        var errorDescription: String?
         {
             get
             {

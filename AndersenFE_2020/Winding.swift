@@ -244,6 +244,15 @@ class Winding:Codable {
     /// The distance from the bottom yoke to the copper of this Winding
     let bottomEdgePack:Double
     
+    var extremeDimensions:(bottom:Double, top:Double) {
+        get {
+            let bottomDim = self.layers[0].segments[0].minZ
+            let topDim = self.layers[0].segments.last!.maxZ
+            
+            return (bottomDim, topDim)
+        }
+    }
+    
     /// The inner diameter of this winding
     let coilID:Double
     
@@ -290,7 +299,7 @@ class Winding:Codable {
     var layers:[Layer] = []
     
     /// Errors that can be thrown by the Layer creation and modification routines
-    struct LayerError:Error
+    struct LayerError:LocalizedError
     {
         enum errorType
         {
@@ -301,7 +310,7 @@ class Winding:Codable {
         let info:String
         let type:errorType
         
-        var localizedDescription: String
+        var errorDescription: String?
         {
             get
             {

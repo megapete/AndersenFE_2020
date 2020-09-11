@@ -960,6 +960,7 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         
         self.txfoView.segments = []
+        
         self.txfoView.removeAllToolTips()
         
         for nextWdg in txfo.windings
@@ -979,6 +980,14 @@ class AppController: NSObject, NSMenuItemValidation {
                     
                     newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: nil)
                     // DLog("New ToolTag: \(newSegPath.toolTipTag)")
+                    
+                    if let currentSegment = self.txfoView.currentSegment
+                    {
+                        if currentSegment.segment.serialNumber == nextSegment.serialNumber
+                        {
+                            self.txfoView.currentSegment = newSegPath
+                        }
+                    }
                     
                     self.txfoView.segments.append(newSegPath)
                 }
@@ -1067,6 +1076,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             guard let txfo = self.currentTxfo, let currSeg = self.txfoView.currentSegment else
             {
+                DLog("Returning false")
                 return false
             }
             
@@ -1078,6 +1088,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 {
                     if txfo.NumTerminalsFromAndersenNumber(termNum: termNum) < 2
                     {
+                        DLog("Returning false")
                         return false
                     }
                 }

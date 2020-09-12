@@ -279,23 +279,51 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         return result
     }
     
-    // MARK: Contextual Menu
+    // MARK: Contextual Menu Handlers
 
     @IBAction func handleReverseCurrent(_ sender: Any) {
         
-        DLog("Got Reverse Current")
+        guard let appCtrl = self.appController, let currSeg = self.currentSegment else
+        {
+            return
+        }
+        
+        let winding = currSeg.segment.inLayer!.parentTerminal.winding!
+        
+        appCtrl.doReverseCurrentDirection(winding: winding)
     }
     
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
-        guard let appCtrl = self.appController else
+        guard let appCtrl = self.appController, let txfo = appCtrl.currentTxfo else
         {
             return false
         }
         
         if menuItem == self.reverseCurrentDirectionMenuItem
         {
+            guard let currSeg = self.currentSegment else
+            {
+                return false
+            }
             
+            let terminal = currSeg.segment.inLayer!.parentTerminal
+            let termNum = terminal.andersenNumber
+            
+            if let refTerm = txfo.niRefTerm
+            {
+                if refTerm != termNum
+                {
+                    // DLog("Fraction: \(txfo.FractionOfTerminal(terminal: terminal, andersenNum: termNum))")
+                    if txfo.FractionOfTerminal(terminal: terminal, andersenNum: termNum) >= 0.5
+                    {
+                        // DLog("Returning false because this would cause a reversal of a non-ref terminal")
+                        return false
+                    }
+                }
+            }
+            
+            return currSeg.segment.inLayer!.parentTerminal.winding!.CurrentCarryingTurns() != 0.0
         }
         
         return true
@@ -390,6 +418,8 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
     
     override func rightMouseDown(with event: NSEvent) {
         
+        // reset the mode
+        self.mode = .selectSegment
         let eventLocation = event.locationInWindow
         let clickPoint = self.convert(eventLocation, from: nil)
         

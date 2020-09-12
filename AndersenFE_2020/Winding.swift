@@ -20,9 +20,7 @@ class Winding:Codable {
         case section
         case multistart
     }
-    
-    /// Each winding has a number assigned to it so that we can refer to the correct winding when making copies of the transformer
-    
+        
     /// Each winding has its own "preferences", which can be changed by the user
     var preferences:PCH_AFE2020_Prefs.WindingPrefs
     

@@ -481,10 +481,11 @@ class AppController: NSObject, NSMenuItemValidation {
             {
                 if winding.terminal.andersenNumber != refTerm && txfo.AvailableTerminals().count == 2
                 {
-                    let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
-                    let wdgTurns = winding.CurrentCarryingTurns()
+                    // let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+                    // let wdgTurns = winding.CurrentCarryingTurns()
                     
-                    if wdgTurns / totalTerminalTurns >= 0.5
+                    // if wdgTurns / totalTerminalTurns >= 0.5
+                    if txfo.FractionOfTerminal(terminal: winding.terminal, andersenNum: winding.terminal.andersenNumber) >= 0.5
                     {
                         let alert = NSAlert()
                         alert.messageText = "You may not change the direction of the main winding for a terminal unless it is the reference terminal."
@@ -519,36 +520,8 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        // we need to fix the amps if the current reversal causes a change of turns
-        do
-        {
-            let termNum = newWdg.terminal.andersenNumber
-            let terminals = try newTransformer.TerminalsFromAndersenNumber(termNum: termNum)
-            
-            if terminals.count > 1
-            {
-                let oldTurns = newWdg.CurrentCarryingTurns()
-                let oldAmps = newWdg.terminal.nominalAmps
-                let vpn = try newTransformer.VoltsPerTurn()
-                
-                
-                
-            }
-            
-            newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
-            self.updateCurrentTransformer(newTransformer: newTransformer)
-        }
-        catch
-        {
-            let alert = NSAlert(error: error)
-            let _ = alert.runModal()
-            return
-        }
-        
-        
-        
-        
-        
+        newWdg.terminal.currentDirection = -newWdg.terminal.currentDirection
+        self.updateCurrentTransformer(newTransformer: newTransformer)
     }
     
     
@@ -1083,13 +1056,14 @@ class AppController: NSObject, NSMenuItemValidation {
             
             let termNum = currSeg.segment.inLayer!.parentTerminal.andersenNumber
             
-            if let refTerm = txfo.vpnRefTerm
+            if let refTerm = txfo.niRefTerm
             {
                 if refTerm != termNum
                 {
-                    if txfo.NumTerminalsFromAndersenNumber(termNum: termNum) < 2
+                    // DLog("Fraction: \(txfo.FractionOfTerminal(terminal: terminal, andersenNum: termNum))")
+                    if txfo.FractionOfTerminal(terminal: currSeg.segment.inLayer!.parentTerminal, andersenNum: termNum) >= 0.5
                     {
-                        DLog("Returning false")
+                        // DLog("Returning false because this would cause a reversal of a non-ref terminal")
                         return false
                     }
                 }

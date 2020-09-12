@@ -259,6 +259,29 @@ class Transformer:Codable {
         return result
     }
     
+    /// Return the absolute value of the fraction of the total current-carrying turns of 'andersenNum' that are contributed by 'terminal'
+    func FractionOfTerminal(terminal:Terminal, andersenNum:Int) -> Double
+    {
+        let fractionTurns = terminal.winding!.CurrentCarryingTurns() * Double(terminal.currentDirection)
+        var totalTurns = fractionTurns
+        
+        for nextTerminal in self.wdgTerminals
+        {
+            if let term = nextTerminal
+            {
+                if term.winding!.coilID != terminal.winding!.coilID
+                {
+                    if term.andersenNumber == andersenNum
+                    {
+                        totalTurns += term.winding!.CurrentCarryingTurns() * Double(term.currentDirection)
+                    }
+                }
+            }
+        }
+        
+        return fabs(fractionTurns / totalTurns)
+    }
+    
     /// A quick way of finding the number of Terminals associated with a given Andersen terminal number (quick because it doesn't throw)
     func NumTerminalsFromAndersenNumber(termNum:Int) -> Int
     {

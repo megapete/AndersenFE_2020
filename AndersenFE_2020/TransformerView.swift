@@ -116,7 +116,9 @@ struct SegmentPath {
     }
 }
 
-class TransformerView: NSView, NSViewToolTipOwner {
+class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
+    
+    
 
     // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity, so I'll just save a weak reference to the AppController here
     weak var appController:AppController? = nil
@@ -159,6 +161,9 @@ class TransformerView: NSView, NSViewToolTipOwner {
     let zoomRectLineDash:[CGFloat] = [15.0, 8.0]
     
     var currentSegment:SegmentPath? = nil
+    
+    @IBOutlet weak var contextualMenu:NSMenu!
+    @IBOutlet weak var reverseCurrentDirectionMenuItem:NSMenuItem!
     
     // MARK: Draw function override
     override func draw(_ dirtyRect: NSRect) {
@@ -274,6 +279,28 @@ class TransformerView: NSView, NSViewToolTipOwner {
         return result
     }
     
+    // MARK: Contextual Menu
+
+    @IBAction func handleReverseCurrent(_ sender: Any) {
+        
+        DLog("Got Reverse Current")
+    }
+    
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        
+        guard let appCtrl = self.appController else
+        {
+            return false
+        }
+        
+        if menuItem == self.reverseCurrentDirectionMenuItem
+        {
+            
+        }
+        
+        return true
+    }
+    
     // MARK: Mouse Events
     override func mouseDown(with event: NSEvent) {
         
@@ -357,6 +384,25 @@ class TransformerView: NSView, NSViewToolTipOwner {
         
         self.zoomRect = NSRect(origin: localLocation, size: NSSize())
         self.needsDisplay = true
+    }
+    
+    // MARK: Contextual Menu handling
+    
+    override func rightMouseDown(with event: NSEvent) {
+        
+        let eventLocation = event.locationInWindow
+        let clickPoint = self.convert(eventLocation, from: nil)
+        
+        for nextPath in self.segments
+        {
+            if nextPath.contains(point: clickPoint)
+            {
+                self.currentSegment = nextPath
+                self.needsDisplay = true
+                NSMenu.popUpContextMenu(self.contextualMenu, with: event, for: self)
+                return
+            }
+        }
     }
     
     // MARK: Zoom Functions

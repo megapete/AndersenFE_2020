@@ -981,6 +981,7 @@ class AppController: NSObject, NSMenuItemValidation {
                     newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: nil)
                     // DLog("New ToolTag: \(newSegPath.toolTipTag)")
                     
+                    // update the currently-selected segment in the TransformerView
                     if let currentSegment = self.txfoView.currentSegment
                     {
                         if currentSegment.segment.serialNumber == nextSegment.serialNumber

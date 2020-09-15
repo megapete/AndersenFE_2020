@@ -130,13 +130,13 @@ class Winding:Codable {
         let multiStartWindingLoops:Int // this will be 0 for non-multistart windings
         
         /// Function to get the overall (shrunk) dimensions of a single turn. Note that this routine assumes a 0.8 shrinkage factor for paper, and 1.0 for epoxy. It also assumes that all insulation is paper, except for the strand insulation of CTC, which is assumed to be epoxy.
-        /// - Returns: The axial and radial dimensions of the turn after shrinking
+        /// - Returns: The axial and radial dimensions of the turn after shrinking (NOTE: The radial dimension is not affected by shrinkage)
         func Dimensions() -> (axial:Double, radial:Double)
         {
             let shrinkageInsulation = (self.type == .CTC ? 1.0 : 0.8)
             
             var cableA:Double = strandA + strandInsulation * shrinkageInsulation
-            var cableR:Double = strandR + strandInsulation * shrinkageInsulation
+            var cableR:Double = strandR + strandInsulation + (self.type == .CTC ? 0.0005 * 25.4 : 0.0) // this comes from the XL-design sheet
             
             var cableDim = (axial:cableA, radial:cableR)
             
@@ -145,7 +145,7 @@ class Winding:Codable {
                 cableA *= 2.0
                 cableA += cableInsulation * shrinkageInsulation
                 let numStrandsR = (numStrands + 1) / 2
-                cableR = cableR * Double(numStrandsR) + cableInsulation * shrinkageInsulation
+                cableR = cableR * Double(numStrandsR) + cableInsulation + self.CTC_HeightAdder()
                 cableDim = (axial:cableA, radial:cableR)
                 
             }
@@ -153,13 +153,43 @@ class Winding:Codable {
             {
                 cableA += cableInsulation * shrinkageInsulation
                 cableR *= 2.0
-                cableR += cableInsulation * shrinkageInsulation
+                cableR += cableInsulation /* * shrinkageInsulation */
                 cableDim = (axial:cableA, radial:cableR)
             }
             
             let multiStartFactor = self.multiStartWindingLoops == 0 ? 1 : self.multiStartWindingLoops
             
             return (cableDim.axial * Double(numCablesAxial / multiStartFactor) + internalAxialInsulation * Double(numCablesAxial - 1) / Double(multiStartFactor), cableDim.radial * Double(numCablesRadial) + internalRadialInsulation * Double(numCablesRadial - 1))
+        }
+        
+        /// This function encapsulates the table found in the Excel design sheet (and which I can't find on the Superior Essex site anymore)
+        func CTC_HeightAdder() -> Double
+        {
+            // convert the strand dimensions back to inch and round them to the nearest thousandth
+            let strA = round(self.strandA / 25.4 * 1000.0) / 1000.0
+            let strR = round(self.strandR / 25.4 * 1000.0) / 1000.0
+            
+            var result = 0.0
+            if strA <= 0.3 && strR <= 0.08
+            {
+                result = 0.006 + Double(self.numStrands - 5) / 2.0 * 0.001
+            }
+            else if strA <= 0.3
+            {
+                result = 0.009 + Double(self.numStrands - 5) / 2.0 * 0.0015
+            }
+            else if strR <= 0.1
+            {
+                result = 0.012 + Double(self.numStrands - 5) / 2.0 * 0.002
+            }
+            else
+            {
+                result = 0.016 + Double(self.numStrands - 5) / 2.0 * 0.0025
+            }
+            
+            DLog("CTC adder: \(result)")
+            
+            return result * 25.4
         }
         
         func NumStrandsPerTurn() -> Int
@@ -789,7 +819,9 @@ class Winding:Codable {
         }
         
         var nextIR = self.coilID / 2.0
-        let copperRadialBuild = numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim)
+        let copperRadialBuild = (numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim)) * self.radialOverbuild
+        
+        DLog("Turns: \(numTurnsRadiallyPerLayer); Dim: \(self.turnDef.Dimensions().radial / 25.4); Build: \(copperRadialBuild / 25.4)")
         
         var layerSegments:[Segment] = []
         let strandsRadiallyPerLayer:Int = Int(ceil(numTurnsRadiallyPerLayer)) * self.turnDef.NumStrandsRadially()
@@ -830,7 +862,7 @@ class Winding:Codable {
             
             self.layers.append(newLayer)
             
-            nextIR += copperRadialBuild + self.ducts.dim
+            nextIR += copperRadialBuild + self.ducts.dim * self.radialOverbuild
         }
     }
 }

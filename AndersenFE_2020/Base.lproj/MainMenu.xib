@@ -603,8 +603,11 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <connections>
+                                                        <outlet property="activateAllWdgTurnsMenuItem" destination="44K-HR-t3v" id="AZ2-GY-vFs"/>
                                                         <outlet property="contextualMenu" destination="PKF-ho-E86" id="fAa-zS-ECZ"/>
+                                                        <outlet property="deactivateAllWdgTurnsMenuItem" destination="Lvc-yc-qYG" id="pCc-ym-nNf"/>
                                                         <outlet property="reverseCurrentDirectionMenuItem" destination="e6b-PR-1Uc" id="9qW-bs-vdh"/>
+                                                        <outlet property="toggleActivationMenuItem" destination="vP2-z4-P39" id="PU2-qb-vy3"/>
                                                     </connections>
                                                 </customView>
                                             </subviews>
@@ -788,13 +791,22 @@
                 <menuItem isSeparatorItem="YES" id="97k-fr-a3b"/>
                 <menuItem title="Activate All Winding Turns" id="44K-HR-t3v">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleActivateAllWindingTurns:" target="-1" id="3EU-Yc-NMX"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Deactivate All Winding Turns" id="Lvc-yc-qYG">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleDeactivateAllWindingTurns:" target="-1" id="FeC-wX-Sxd"/>
+                    </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="WzO-8P-7jw"/>
                 <menuItem title="Deactivate Segment" id="vP2-z4-P39">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleToggleActivation:" target="-1" id="2hV-pz-fjz"/>
+                    </connections>
                 </menuItem>
             </items>
             <point key="canvasLocation" x="717" y="342"/>

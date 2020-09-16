@@ -164,6 +164,9 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
     
     @IBOutlet weak var contextualMenu:NSMenu!
     @IBOutlet weak var reverseCurrentDirectionMenuItem:NSMenuItem!
+    @IBOutlet weak var toggleActivationMenuItem:NSMenuItem!
+    @IBOutlet weak var activateAllWdgTurnsMenuItem:NSMenuItem!
+    @IBOutlet weak var deactivateAllWdgTurnsMenuItem:NSMenuItem!
     
     // MARK: Draw function override
     override func draw(_ dirtyRect: NSRect) {
@@ -293,6 +296,37 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         appCtrl.doReverseCurrentDirection(winding: winding)
     }
     
+    @IBAction func handleToggleActivation(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, let currSeg = self.currentSegment else
+        {
+            return
+        }
+        
+        appCtrl.doToggleSegmentActivation(segment: currSeg.segment)
+    }
+    
+    @IBAction func handleActivateAllWindingTurns(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, let currSeg = self.currentSegment else
+        {
+            return
+        }
+        
+        appCtrl.doSetActivation(winding: currSeg.segment.inLayer!.parentTerminal.winding!, activate: true)
+    }
+    
+    @IBAction func handleDeactivateAllWindingTurns(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, let currSeg = self.currentSegment else
+        {
+            return
+        }
+        
+        appCtrl.doSetActivation(winding: currSeg.segment.inLayer!.parentTerminal.winding!, activate: false)
+    }
+    
+    
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
         guard let appCtrl = self.appController, let txfo = appCtrl.currentTxfo else
@@ -325,8 +359,67 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
             
             return currSeg.segment.inLayer!.parentTerminal.winding!.CurrentCarryingTurns() != 0.0
         }
+        else if menuItem == self.toggleActivationMenuItem
+        {
+            guard let segPath = self.currentSegment else
+            {
+                return false
+            }
+            
+            if segPath.isActive
+            {
+                let winding = segPath.segment.inLayer!.parentTerminal.winding!
+                let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+                let wdgTurns = winding.CurrentCarryingTurns()
+                let segTurns = segPath.segment.activeTurns
+                
+                if wdgTurns == segTurns && fabs(totalTerminalTurns - wdgTurns) < 0.5
+                {
+                    return false
+                }
+            }
+        }
+        else if menuItem == self.activateAllWdgTurnsMenuItem
+        {
+            return self.currentSegment != nil
+        }
+        else if menuItem == self.deactivateAllWdgTurnsMenuItem
+        {
+            guard let segPath = self.currentSegment else
+            {
+                return false
+            }
+            
+            let winding = segPath.segment.inLayer!.parentTerminal.winding!
+            let totalTerminalTurns = txfo.CurrentCarryingTurns(terminal: winding.terminal.andersenNumber)
+            let wdgTurns = winding.CurrentCarryingTurns()
+            
+            if fabs(totalTerminalTurns - wdgTurns) < 0.5
+            {
+                return false
+            }
+        }
         
         return true
+    }
+    
+    func UpdateToggleActivationMenu(deactivate:Bool)
+    {
+        if deactivate
+        {
+            self.toggleActivationMenuItem.title = "Deactivate segment"
+        }
+        else
+        {
+            self.toggleActivationMenuItem.title = "Activate segment"
+        }
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.UpdateToggleActivationMenu(deactivate: deactivate)
     }
     
     // MARK: Mouse Events
@@ -428,6 +521,7 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
             if nextPath.contains(point: clickPoint)
             {
                 self.currentSegment = nextPath
+                self.UpdateToggleActivationMenu(deactivate: nextPath.segment.IsActive())
                 self.needsDisplay = true
                 NSMenu.popUpContextMenu(self.contextualMenu, with: event, for: self)
                 return

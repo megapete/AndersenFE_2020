@@ -142,7 +142,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
         {
             if nextFld.frame.contains(self.rightClickPoint)
             {
-                appCtrl.doSetReferenceTerminal(refTerm: nextFld.tag)
+                appCtrl.doSetVpnReferenceTerminal(refTerm: nextFld.tag)
             }
         }
     }

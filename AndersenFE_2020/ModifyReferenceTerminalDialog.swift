@@ -19,15 +19,27 @@ class ModifyReferenceTerminalDialog: PCH_DialogBox {
     var termButtons:[NSButton] = []
     var currentRefIndex:Int = -1
     
+    enum refTermType {
+        case vpn
+        case ni
+    }
+    
+    let type:refTermType
+    
     /// oldTerminal must be either 'nil' or an Int from 1...6
-    init(oldTerminal:Int?) {
+    init(oldTerminal:Int?, type:refTermType = .vpn) {
         
         if let oldRefTerm = oldTerminal
         {
             self.currentRefIndex = oldRefTerm - 1
         }
         
-        super.init(viewNibFileName: "ModifyReferenceTerminal", windowTitle: "Modify Reference Terminal", hideCancel: false)
+        self.type = type
+        
+        let windowTitle = (type == .vpn ? "Modify VPN Reference Terminal" : "Modify NI Reference Terminal")
+        
+        
+        super.init(viewNibFileName: "ModifyReferenceTerminal", windowTitle: windowTitle, hideCancel: false)
     }
     
     override func awakeFromNib() {

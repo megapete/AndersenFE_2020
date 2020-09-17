@@ -88,6 +88,7 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var setRefTerminalMenuItem: NSMenuItem!
     @IBOutlet weak var setMVAMenuItem: NSMenuItem!
     @IBOutlet weak var setRefVoltageMenuItem: NSMenuItem!
+    @IBOutlet weak var setNiRefTermMenuItem: NSMenuItem!
     @IBOutlet weak var setNIdistMenuItem: NSMenuItem!
     
     @IBOutlet weak var TxfoContextMenu:NSMenu!
@@ -207,16 +208,21 @@ class AppController: NSObject, NSMenuItemValidation {
                         {
                             let alert = NSAlert()
                             alert.messageText = "Calculation of impedance & forces failed!"
+                            alert.informativeText = "Do you wish to save the Andersen input file before reverting to the last transformer?"
+                            alert.addButton(withTitle: "Save file")
+                            alert.addButton(withTitle: "Continue")
                             alert.alertStyle = .critical
-                            let _ = alert.runModal()
                             
-                            let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
-                            
-                            let savePanel = NSSavePanel()
-                            savePanel.message = "Save the Andersen Input File"
-                            if (savePanel.runModal() == .OK)
+                            if alert.runModal() == .alertFirstButtonReturn
                             {
-                               try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                                let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                                
+                                let savePanel = NSSavePanel()
+                                savePanel.message = "Save the Andersen Input File"
+                                if (savePanel.runModal() == .OK)
+                                {
+                                    try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                                }
                             }
                             
                             return
@@ -769,9 +775,24 @@ class AppController: NSObject, NSMenuItemValidation {
     }
     
     
-    @IBAction func handleSetReferenceTerminal(_ sender: Any) {
+    @IBAction func handleSetAmpTurnReferenceTerminal(_ sender: Any) {
         
-        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.vpnRefTerm)
+        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.niRefTerm, type: .ni)
+        
+        if refnumDlog.runModal() == .OK
+        {
+            self.doSetAmpTurnReferenceTerminal(refTerm: refnumDlog.currentRefIndex + 1)
+        }
+    }
+    
+    func doSetAmpTurnReferenceTerminal(refTerm:Int)
+    {
+        
+    }
+    
+    @IBAction func handleSetVpnReferenceTerminal(_ sender: Any) {
+        
+        let refnumDlog = ModifyReferenceTerminalDialog(oldTerminal: self.currentTxfo!.vpnRefTerm, type: .vpn)
         
         var oldRefNumIndex = -1
         if let refNum = self.currentTxfo!.vpnRefTerm
@@ -794,14 +815,14 @@ class AppController: NSObject, NSMenuItemValidation {
                 {
                     if refnumDlog.currentRefIndex >= 0
                     {
-                        self.doSetReferenceTerminal(refTerm: refnumDlog.currentRefIndex + 1)
+                        self.doSetVpnReferenceTerminal(refTerm: refnumDlog.currentRefIndex + 1)
                     }
                 }
             }
         }
     }
     
-    func doSetReferenceTerminal(refTerm:Int)
+    func doSetVpnReferenceTerminal(refTerm:Int)
     {
         guard let currTxfo = self.currentTxfo else
         {

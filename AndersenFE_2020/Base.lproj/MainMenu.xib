@@ -32,6 +32,7 @@
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
+                <outlet property="setNiRefTermMenuItem" destination="L56-sK-jsw" id="tnY-J0-MSa"/>
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
                 <outlet property="setTxfoDescriptionMenuItem" destination="Gi5-1S-RQB" id="6q6-nM-agC"/>
                 <outlet property="termsView" destination="JKq-ah-7fY" id="rU8-af-xVE"/>
@@ -398,11 +399,14 @@
                             <menuItem title="Set V/N Reference Terminal..." id="CsF-zD-wyS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleSetReferenceTerminal:" target="6yZ-bT-Gps" id="oi4-d7-d6c"/>
+                                    <action selector="handleSetVpnReferenceTerminal:" target="6yZ-bT-Gps" id="oi4-d7-d6c"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Set NI Reference Terminal..." id="L56-sK-jsw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetAmpTurnReferenceTerminal:" target="6yZ-bT-Gps" id="QWq-vu-yk2"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Set Reference MVA..." id="SUT-qo-38h">
                                 <modifierMask key="keyEquivalentModifierMask"/>

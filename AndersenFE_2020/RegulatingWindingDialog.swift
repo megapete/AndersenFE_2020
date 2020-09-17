@@ -17,16 +17,17 @@ class RegulatingWindingDialog: PCH_DialogBox, NSTextFieldDelegate {
     
     var type:wdgType
     
-    var numLoops:Int = 8
+    var numLoops:Int
     
     @IBOutlet weak var doubleAxialStackRadioButton: NSButton!
     @IBOutlet weak var multistartRadioButton: NSButton!
     @IBOutlet weak var numLoopsTextField: NSTextField!
     
     
-    init(type:RegulatingWindingDialog.wdgType)
+    init(type:RegulatingWindingDialog.wdgType, numLoops:Int)
     {
         self.type = type
+        self.numLoops = numLoops
         
         super.init(viewNibFileName: "RegulatingWinding", windowTitle: "Define Regulating Winding", hideCancel: false)
     }

@@ -42,7 +42,6 @@ class Terminal: Codable
     var legVA:Double {
         get {
             
-            
             return self.VA / self.phaseFactor
         }
     }

@@ -21,7 +21,8 @@ class TerminalsView: NSView, NSMenuItemValidation {
     // contextual menu
     // NOTE TO FUTURE ME: You need to create this variable FIRST (as an @IBOutlet) then connect it back to the NSMenu created with IB back in the MainMenu.xib file.
     @IBOutlet weak var contextualMenu:NSMenu!
-    @IBOutlet weak var SetRefTermMenuItem:NSMenuItem!
+    @IBOutlet weak var SetVpnRefTermMenuItem:NSMenuItem!
+    @IBOutlet weak var SetAmpTurnRefTermMenuItem:NSMenuItem!
     @IBOutlet weak var SetRefMVAMenuItem:NSMenuItem!
     @IBOutlet weak var SetNIDistributionMenuItem:NSMenuItem!
     
@@ -130,8 +131,24 @@ class TerminalsView: NSView, NSMenuItemValidation {
         appCtrl.handleSetTxfoDesc(sender)
     }
     
+    @IBAction func handleSetAmpTurnsRefTerm(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        for nextFld in self.termFields
+        {
+            if nextFld.frame.contains(self.rightClickPoint)
+            {
+                appCtrl.doSetAmpTurnReferenceTerminal(refTerm: nextFld.tag)
+            }
+        }
+    }
     
-    @IBAction func handleSetRefTerm(_ sender: Any) {
+    
+    @IBAction func handleVpnSetRefTerm(_ sender: Any) {
         
         guard let appCtrl = self.appController else
         {
@@ -196,7 +213,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
             return false
         }
         
-        if menuItem == self.SetRefTermMenuItem
+        if menuItem == self.SetVpnRefTermMenuItem || menuItem == self.SetAmpTurnRefTermMenuItem
         {
             for nextFld in self.termFields
             {

@@ -624,7 +624,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSetReferenceMVA(_ sender: Any) {
         
-        let refTerm = self.currentTxfo!.vpnRefTerm!
+        let refTerm = self.currentTxfo!.niRefTerm!
         
         do
         {
@@ -635,7 +635,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             if mvaDlog.runModal() == .OK
             {
-                doSetReferenceMVA(newMVA: mvaDlog.MVA)
+                doSetReferenceMVA(oldMVA: currentMVA, newMVA: mvaDlog.MVA)
             }
         }
         catch
@@ -644,25 +644,9 @@ class AppController: NSObject, NSMenuItemValidation {
             let _ = alert.runModal()
             return
         }
-        /*
-        var va = 0.0
-        let txfo = self.currentTxfo!
-        for nextTerm in txfo.terminals
-        {
-            if let term = nextTerm
-            {
-                if term.andersenNumber == refTerm
-                {
-                    va += term.VA
-                }
-            }
-        }
-         */
-        
-        
     }
     
-    func doSetReferenceMVA(newMVA:Double)
+    func doSetReferenceMVA(oldMVA:Double, newMVA:Double)
     {
         guard let currTxfo = self.currentTxfo else
         {
@@ -670,7 +654,12 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        guard currTxfo.CurrentCarryingTurns(terminal: currTxfo.vpnRefTerm!) != 0.0 else
+        guard let refTerm = currTxfo.niRefTerm else
+        {
+            return
+        }
+        
+        guard currTxfo.CurrentCarryingTurns(terminal: refTerm) != 0.0 else
         {
             let alert = NSAlert()
             alert.messageText = "Reference Terminal has no effective turns!"
@@ -679,99 +668,20 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        do
+        let newTxfo = currTxfo.Copy()
+        
+        for nextMaybeTerm in newTxfo.wdgTerminals
         {
-            let txfo = currTxfo.Copy()
-            
-            let vpn = try txfo.VoltsPerTurn()
-            
-            let refWdgs = try txfo.WindingsFromAndersenNumber(termNum: txfo.vpnRefTerm!)
-            
-            let phaseFactor = refWdgs[0].terminal.phaseFactor
-            
-            var legVolts = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!) * vpn
-            
-            var autoFactor = 1.0
-            
-            let terms = try txfo.TerminalsFromAndersenNumber(termNum: txfo.vpnRefTerm!)
-            
-            if terms[0].connection == .auto_series
+            if let nextTerm = nextMaybeTerm, nextTerm.andersenNumber == refTerm
             {
-                for nextTerm in txfo.wdgTerminals
-                {
-                    if let cTerm = nextTerm
-                    {
-                        if cTerm.connection == .auto_common
-                        {
-                            var commonTurns = txfo.CurrentCarryingTurns(terminal: cTerm.andersenNumber)
-                            if commonTurns == 0
-                            {
-                                commonTurns = txfo.NoLoadTurns(terminal: cTerm.andersenNumber)
-                            }
-                            
-                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!)
-                            if seriesTurns == 0
-                            {
-                                seriesTurns = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!)
-                            }
-                            
-                            autoFactor = (seriesTurns + commonTurns) / seriesTurns
-                        }
-                    }
-                }
-            }
-            else if terms[0].connection == .auto_common
-            {
-                for nextTerm in txfo.wdgTerminals
-                {
-                    if let sTerm = nextTerm
-                    {
-                        if sTerm.connection == .auto_series
-                        {
-                            var seriesTurns = txfo.CurrentCarryingTurns(terminal: sTerm.andersenNumber)
-                            if seriesTurns == 0
-                            {
-                                seriesTurns = txfo.NoLoadTurns(terminal: sTerm.andersenNumber)
-                            }
-                            
-                            var commonTurns = txfo.CurrentCarryingTurns(terminal: txfo.vpnRefTerm!)
-                            if commonTurns == 0
-                            {
-                                commonTurns = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!)
-                            }
-                            
-                            autoFactor = (seriesTurns + commonTurns) / seriesTurns
-                        }
-                    }
-                }
-            }
-            
-            
-            var legVA = newMVA * 1.0E6 / phaseFactor / autoFactor
-            
-            if legVolts == 0.0
-            {
-                legVolts = txfo.NoLoadTurns(terminal: txfo.vpnRefTerm!) * vpn
-                legVA = 0.0
-            }
-            
-            let legAmps = legVA / legVolts
-            
-            for nextWdg in refWdgs
-            {
-                let voltage = nextWdg.CurrentCarryingTurns() * vpn
+                let oldAmps = nextTerm.nominalAmps
+                let newAmps = oldAmps * newMVA / oldMVA
                 
-                nextWdg.terminal.SetVoltsAndAmps(legVolts: voltage, amps: legAmps)
+                nextTerm.SetVoltsAndAmps(amps: newAmps)
             }
+        }
             
-            self.updateCurrentTransformer(newTransformer: txfo)
-        }
-        catch
-        {
-            let alert = NSAlert(error: error)
-            let _ = alert.runModal()
-            return
-        }
+        self.updateCurrentTransformer(newTransformer: newTxfo)
     }
     
     

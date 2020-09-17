@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097.3"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -720,9 +721,10 @@
                                     </textField>
                                 </subviews>
                                 <connections>
+                                    <outlet property="SetAmpTurnRefTermMenuItem" destination="P0k-im-y9S" id="A3O-K5-d77"/>
                                     <outlet property="SetNIDistributionMenuItem" destination="5L4-cL-fka" id="QDP-UV-Rmx"/>
                                     <outlet property="SetRefMVAMenuItem" destination="VZH-bl-orK" id="Yqi-sr-Qjq"/>
-                                    <outlet property="SetRefTermMenuItem" destination="DOj-Px-Yk0" id="r62-Ss-5zx"/>
+                                    <outlet property="SetVpnRefTermMenuItem" destination="DOj-Px-Yk0" id="r62-Ss-5zx"/>
                                     <outlet property="contextualMenu" destination="9xV-35-2jM" id="4zf-rA-bcs"/>
                                 </connections>
                             </customView>
@@ -748,11 +750,14 @@
                 <menuItem title="Set V/N Reference Terminal" id="DOj-Px-Yk0">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="handleSetRefTerm:" target="-1" id="uLk-As-7OY"/>
+                        <action selector="handleVpnSetRefTerm:" target="-1" id="uLk-As-7OY"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Set NI Reference Terminal" id="P0k-im-y9S">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSetAmpTurnsRefTerm:" target="-1" id="sun-wn-Bxd"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Set Reference MVA" id="VZH-bl-orK">
                     <modifierMask key="keyEquivalentModifierMask"/>

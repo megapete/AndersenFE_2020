@@ -787,7 +787,25 @@ class AppController: NSObject, NSMenuItemValidation {
     
     func doSetAmpTurnReferenceTerminal(refTerm:Int)
     {
+        guard let currTxfo = self.currentTxfo else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
         
+        if let oldRefTerm = currTxfo.niRefTerm
+        {
+            if oldRefTerm == refTerm
+            {
+                // The same reference terminal is being selected, do nothing
+                DLog("Attempt to set the same reference terminal - ignoring")
+                return
+            }
+        }
+        
+        let newTransformer = currTxfo.Copy()
+        newTransformer.niRefTerm = refTerm
+        self.updateCurrentTransformer(newTransformer: newTransformer, reinitialize: true)
     }
     
     @IBAction func handleSetVpnReferenceTerminal(_ sender: Any) {

@@ -759,7 +759,7 @@ class Transformer:Codable {
                 {
                     let termsToFix = try TerminalsFromAndersenNumber(termNum: nextTerm)
                     
-                    if niArray[nextTerm - 1] < 1.0
+                    if fabs(niArray[nextTerm - 1]) < 1.0
                     {
                         for nextTermToZero in termsToFix
                         {

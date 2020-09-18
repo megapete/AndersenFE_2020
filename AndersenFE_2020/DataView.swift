@@ -10,7 +10,7 @@ import Cocoa
 
 struct DataWarnings {
     
-    var strings:[NSAttributedString] = []
+    var message:[NSAttributedString] = [NSAttributedString(string: "Warnings")]
     
     enum WarningLevel {
         case information    // green
@@ -18,18 +18,53 @@ struct DataWarnings {
         case critical       // red
     }
     
-    /// Function to simplify crating the warning strings. Note that 'wordsToHilight' is 0-based
-    func addWarning(string:String, level:WarningLevel, wordsToHilight:[Int])
+    mutating func reset()
+    {
+        self.message = [NSAttributedString(string: "Warnings")]
+    }
+    
+    /// Function to simplify creating the warning strings. Note that 'wordsToHighlight' is 0-based. Also, words are assumed to be separated by SINGLE SPACES.
+    mutating func addWarning(string:String, level:WarningLevel, wordsToHighlight:[Int])
     {
         let stringComponents = string.components(separatedBy: " ")
         
-        for nextWord in wordsToHilight
+        let newWarning = NSMutableAttributedString(string: string)
+        
+        for nextWordIndex in wordsToHighlight
         {
-            if nextWord < stringComponents.count
+            if nextWordIndex < stringComponents.count
             {
+                let wordToFind = stringComponents[nextWordIndex]
                 
+                // check for multiple copies of the word
+                var rangeIndex = 0
+                for i in 0..<stringComponents.count
+                {
+                    if stringComponents[i] == wordToFind
+                    {
+                        if i == nextWordIndex
+                        {
+                            break
+                        }
+                        else
+                        {
+                            rangeIndex += 1
+                        }
+                    }
+                }
+                
+                // Use the extension from GlobalDefs to get the ranges of the word
+                let swiftWordRange = string.ranges(of: wordToFind)[rangeIndex]
+                // We need to convert the Swift String range to an NSRange manually. I can't actually find the documentation for this functiom It comes from https://stackoverflow.com/questions/27040924/nsrange-from-swift-range (Accepted Answer, Update for Swift 4)
+                let wordRange = NSRange(swiftWordRange, in: string)
+                
+                let wordColor = (level == .information ? NSColor.green : (level == .caution ? NSColor.yellow : NSColor.red))
+                
+                newWarning.addAttribute(.foregroundColor, value: wordColor, range: wordRange)
             }
         }
+        
+        self.message.append(newWarning)
     }
 }
 
@@ -44,10 +79,18 @@ class DataView: NSView {
     
     var dataFields:[NSTextField] = []
     
+    var warnings:DataWarnings = DataWarnings()
+    
     func InitializeFields()
     {
         SetVpN(newVpN: 0.0, refTerm: nil)
+        
+        self.warnings.addWarning(string: "Everything is fine", level: .information, wordsToHighlight: [0, 2])
+        
+        self.UpdateWarningField()
     }
+    
+
     
     func SetImpedance(newImpPU:Double?, baseMVA:Double?)
     {
@@ -102,11 +145,24 @@ class DataView: NSView {
         self.SetFieldString(fieldID: .vpn, txt: vpnField)
     }
     
+    func UpdateWarningField()
+    {
+        let warningField = self.dataFields[fieldIDs.warnings.rawValue - 1]
+        
+        let attString = NSMutableAttributedString()
+        
+        for nextString in self.warnings.message
+        {
+            attString.append(nextString)
+            attString.append(NSAttributedString(string: "\n"))
+        }
+        
+        warningField.attributedStringValue = attString
+    }
+    
     func SetFieldString(fieldID:fieldIDs, txt:String)
     {
         let tagToFind = fieldID.rawValue
-        
-        
         
         for nextField in self.dataFields
         {

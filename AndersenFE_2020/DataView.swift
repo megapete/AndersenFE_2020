@@ -8,6 +8,31 @@
 
 import Cocoa
 
+struct DataWarnings {
+    
+    var strings:[NSAttributedString] = []
+    
+    enum WarningLevel {
+        case information    // green
+        case caution        // yellow
+        case critical       // red
+    }
+    
+    /// Function to simplify crating the warning strings. Note that 'wordsToHilight' is 0-based
+    func addWarning(string:String, level:WarningLevel, wordsToHilight:[Int])
+    {
+        let stringComponents = string.components(separatedBy: " ")
+        
+        for nextWord in wordsToHilight
+        {
+            if nextWord < stringComponents.count
+            {
+                
+            }
+        }
+    }
+}
+
 class DataView: NSView {
     
     enum fieldIDs:Int {

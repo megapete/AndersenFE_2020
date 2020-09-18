@@ -173,9 +173,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // MARK: Model Modification & Update functions
     func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false, runAndersen:Bool = true) {
-        
-        // DLog("Updating transformer model...")
-        
+                
         if runAndersen || reinitialize
         {
             // make sure that the VAs of the various terminals is updated (this is done in the AmpTurns() function of Transformer)
@@ -188,17 +186,6 @@ class AppController: NSObject, NSMenuItemValidation {
                     if self.preferences.generalPrefs.useAndersenFLD12
                     {
                         let fld12txfo = try newTransformer.QuickFLD12transformer()
-                        
-                        // Next few lines used to debug the Andersen file - uncomment them to save the file somewhere
-                        /*
-                         let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
-                         
-                         let savePanel = NSSavePanel()
-                         if (savePanel.runModal() == .OK)
-                         {
-                            try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
-                         }
-                         // */
                         
                         if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                         {
@@ -252,9 +239,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             undoStack.insert(PCH_AFE2020_Save_Struct(transformer: oldTransformer), at: 0)
         }
-        
-        // DLog("Number of transformers currently on the undo stack: \(undoStack.count)")
-        
+                
         self.currentTxfo = newTransformer
         self.currentTxfoIsDirty = true
         
@@ -785,44 +770,6 @@ class AppController: NSObject, NSMenuItemValidation {
         return results.SegmentData(andersenSegNum: andersenSegNum)
     }
     
-    /*
-    // Code for testing View-related drawing stuff (will eventually be commented out)
-    @IBAction func testInitView(_ sender: Any) {
-        // testing for now
-        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0, tankWallR: 250.0)
-        print("Bounds: \(self.txfoView.bounds)")
-        let segPath = NSBezierPath(rect: NSRect(x: 50.0, y: 50.0, width: 200.0, height: 800.0))
-        let testSegment = SegmentPath(path: segPath, segmentColor: .red, isActive: true)
-        self.txfoView.segments.append(testSegment)
-        
-        self.txfoView.needsDisplay = true
-    }
-    @IBAction func testZoomOut(_ sender: Any) {
-        self.txfoView.scaleUnitSquare(to: NSSize(width: 0.5, height: 0.5))
-        print("Bounds: \(self.txfoView.bounds)")
-        self.txfoView.setBoundsOrigin(NSPoint(x: -50.0, y: -50.0))
-        self.txfoView.needsDisplay = true
-    }
-    @IBAction func testZoomAll(_ sender: Any) {
-        self.txfoView.zoomAll(coreRadius: 10.0, windowHt: 1000.0, tankWallR: 250.0)
-    }
-    @IBAction func testZoomIn(_ sender: Any) {
-        self.txfoView.setBoundsOrigin(NSPoint(x: 20.0, y: 70.0))
-        let aspectRatio = self.txfoView.frame.width / self.txfoView.frame.height
-        let height:CGFloat = 200.0
-        let width = height * aspectRatio
-        self.txfoView.setBoundsSize(NSSize(width: width, height: height))
-    }
-    @IBAction func handleTestTermView(_ sender: Any) {
-        termsView.SetTermData(termNum: 5, name: "TEST", displayVolts: 123000.0, VA: 47000000, connection: .auto_common)
-    }
-    
-    @IBAction func handleTestAmpereTurnsView(_ sender: Any) {
-        
-        // let ampTurnDlog = AmpTurnsDistributionDialog(term1: -80.0, term2: -20.0, term3: 100.0)
-        // let _ = ampTurnDlog.runModal()
-    }
- */
     // MARK: Contextual Menus
     
     

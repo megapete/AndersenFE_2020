@@ -14,6 +14,7 @@ class DataView: NSView {
         case vpn = 1
         case NI = 2
         case impedance = 3
+        case warnings = 4
     }
     
     var dataFields:[NSTextField] = []
@@ -79,6 +80,8 @@ class DataView: NSView {
     func SetFieldString(fieldID:fieldIDs, txt:String)
     {
         let tagToFind = fieldID.rawValue
+        
+        
         
         for nextField in self.dataFields
         {

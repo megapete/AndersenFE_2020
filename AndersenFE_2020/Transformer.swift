@@ -90,6 +90,35 @@ class Transformer:Codable {
         
         // check for actual problems here
         
+        if let currResults = self.scResults
+        {
+            // make sure that inner windings have enough radial supports
+            for nextWdg in self.windings
+            {
+                for nextLayer in nextWdg.layers
+                {
+                    for nextSegment in nextLayer.segments
+                    {
+                        if let segSCdata = currResults.SegmentData(andersenSegNum: nextSegment.andersenSegNum)
+                        {
+                            let actualRadialSupports = Double(nextWdg.numRadialSupports)
+                            let requiredRadialSupports = segSCdata.scMinSpacerBars
+                            
+                            if actualRadialSupports < requiredRadialSupports
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' has only \(actualRadialSupports) radial supports (Andersen segment #\(nextSegment.andersenSegNum) requires \(requiredRadialSupports))", level: .critical, wordsToHighlight: [4, 11]))
+                            }
+                            else if actualRadialSupports / requiredRadialSupports <= 1.1
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' has \(actualRadialSupports) radial supports (Andersen segment #\(nextSegment.andersenSegNum) requires \(requiredRadialSupports) )", level: .caution, wordsToHighlight: [3, 10]))
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+        
         if result.isEmpty
         {
             let noProblems = DataView.WarningData(string: "None", level: .information, wordsToHighlight: [0])

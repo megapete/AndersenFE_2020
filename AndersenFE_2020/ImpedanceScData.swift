@@ -79,12 +79,6 @@ struct ImpedanceAndScData:Codable {
             DLog("Could not open segment data array")
             return
         }
-        /*
-        guard let andersenSegDataArray = andersenOutput.segmentData else
-        {
-            return
-        }
- */
         
         for nextData in andersenSegDataArray
         {

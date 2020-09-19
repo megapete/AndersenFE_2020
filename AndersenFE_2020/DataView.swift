@@ -82,7 +82,9 @@ class DataView: NSView {
                 // We need to convert the Swift String range to an NSRange manually. I can't actually find the documentation for this functiom It comes from https://stackoverflow.com/questions/27040924/nsrange-from-swift-range (Accepted Answer, Update for Swift 4)
                 let wordRange = NSRange(swiftWordRange, in: warning.string)
                 
-                let wordColor = (warning.level == .information ? NSColor.green : (warning.level == .caution ? NSColor.yellow : NSColor.red))
+                let okayGreen = NSColor(red: 0.0, green: 0.75, blue: 0.0, alpha: 1.0)
+                let cautionYellow = NSColor(red: 1.0, green: 0.75, blue: 0.0, alpha: 1.0)
+                let wordColor = (warning.level == .information ? okayGreen : (warning.level == .caution ? cautionYellow : NSColor.red))
                 
                 newWarning.addAttribute(.foregroundColor, value: wordColor, range: wordRange)
             }

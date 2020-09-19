@@ -270,7 +270,7 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
                         let actualSpacerBars = nextSegment.segment.inLayer!.parentTerminal.winding!.numRadialSupports
                         andersenData += "Min. Spacer Bars: \(andersenResults.scMinSpacerBars) (Actual: \(actualSpacerBars))\n"
                     }
-                    andersenData += "Compression in Radial Spacers: \(andersenResults.scForceInSpacerBars) MPa\n"
+                    andersenData += "Compression in Radial Spacers: \(andersenResults.scForceInSpacerBlocks) MPa\n"
                     andersenData += "Combined Axial Force: \(andersenResults.scCombinedForce) MPa"
                     
                 }

@@ -86,13 +86,18 @@ class Transformer:Codable {
     /// Function to check for warnings in the current scResults and return an array of objects that are  used by the DataView class
     func CheckForWarnings() -> [DataView.WarningData]
     {
+        // some constants used in this function (should really be part of a preferences file or something that the user can change - maybe one day)
+        let endThrustWarningLimit = 100000.0 * newtonsPerlb
+        let unworkedCopperLimit = 9000.0 * nmm2PerPsi
+        let spacerBlockWarningLimit = 2500.0 * nmm2PerPsi // based on my experience, anything over 2500 is a bitch to compress
+        let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
         
         // check for actual problems here
+        // TODO: Add tilting calculation
         
         if let currResults = self.scResults
         {
-            // make sure that inner windings have enough radial supports
             for nextWdg in self.windings
             {
                 for nextLayer in nextWdg.layers
@@ -101,6 +106,7 @@ class Transformer:Codable {
                     {
                         if let segSCdata = currResults.SegmentData(andersenSegNum: nextSegment.andersenSegNum)
                         {
+                            // make sure that inner windings have enough radial supports
                             let actualRadialSupports = Double(nextWdg.numRadialSupports)
                             let requiredRadialSupports = segSCdata.scMinSpacerBars
                             
@@ -113,9 +119,41 @@ class Transformer:Codable {
                                 result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' has \(actualRadialSupports) radial supports (Andersen segment #\(nextSegment.andersenSegNum) requires \(requiredRadialSupports) )", level: .caution, wordsToHighlight: [3, 10]))
                             }
                             
+                            let scHoopStress = segSCdata.scMaxTensionCompression
+                            let condFactor = nextWdg.turnDef.type == .CTC ? 0.6 : 0.35
+                            let maxHoopStressAllowed = unworkedCopperLimit * condFactor
+                            
+                            if scHoopStress > maxHoopStressAllowed
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) hoop stress is \(scHoopStress) N/sq.mm. Allowed: \(maxHoopStressAllowed)", level: .critical, wordsToHighlight: [7, 10]))
+                            }
+                            
+                            let scCombinedStress = segSCdata.scCombinedForce
+                            let maxCombinedStressAllowed = unworkedCopperLimit * 0.9
+                            
+                            if scCombinedStress > maxCombinedStressAllowed
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) combined stress is \(scCombinedStress) N/sq.mm. Allowed: \(maxCombinedStressAllowed)", level: .critical, wordsToHighlight: [7, 10]))
+                            }
+                            
+                            let scSpacerBlockForce = segSCdata.scForceInSpacerBlocks
+                            
+                            if scSpacerBlockForce > spacerBlockMaxLimit
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                            }
+                            else if scSpacerBlockForce > spacerBlockWarningLimit
+                            {
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (Should be less than: \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                            }
                         }
                     }
                 }
+            }
+            
+            if currResults.totalThrustUpper >= endThrustWarningLimit || currResults.totalThrustLower >= endThrustWarningLimit
+            {
+                result.append(DataView.WarningData(string: "End thrust greater than 50 tons. Confirm leg-plate strength.", level: .caution, wordsToHighlight: [6, 7, 8]))
             }
         }
         

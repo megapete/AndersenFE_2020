@@ -90,10 +90,10 @@ class DataView: NSView {
             }
         }
         
-        DLog("New: \(newWarning)")
+        // DLog("New: \(newWarning)")
         self.warningMessage.append(NSAttributedString(string: "\n\n"))
         self.warningMessage.append(newWarning)
-        DLog("Message: \(self.warningMessage)")
+        // DLog("Message: \(self.warningMessage)")
     }
     
     func SetImpedance(newImpPU:Double?, baseMVA:Double?)
@@ -155,7 +155,7 @@ class DataView: NSView {
         {
             if nextField.tag == fieldIDs.warnings.rawValue
             {
-                DLog("Message: \(self.warningMessage)")
+                // DLog("Message: \(self.warningMessage)")
                 nextField.attributedStringValue = self.warningMessage
                 return
             }

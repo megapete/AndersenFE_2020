@@ -53,12 +53,13 @@ struct ImpedanceAndScData:Codable {
         let scAxially:Double
         let scMaxTensionCompression:Double
         let scMinSpacerBars:Double
-        let scForceInSpacerBars:Double
+        let scForceInSpacerBlocks:Double
         let scCombinedForce:Double
     }
     
     var segDataArray:[SegmentScData] = []
     
+    // Thrust is in Newtons (metric) or Pounds (inch)
     let totalThrustUpper:Double
     let totalThrustLower:Double
     
@@ -83,7 +84,7 @@ struct ImpedanceAndScData:Codable {
         for nextData in andersenSegDataArray
         {
             
-            let newSegScData = SegmentScData(number: Int(nextData.number), ampTurns: nextData.ampTurns, kVA: nextData.kVA, dcLoss: nextData.dcLoss, eddyLossAxialFlux: nextData.eddyLossAxialFlux, eddyLossRadialFlux: nextData.eddyLossRadialFlux, eddyPUaverage: nextData.eddyPUaverage, eddyPUmax: nextData.eddyPUmax, eddyMaxRect: nextData.eddyMaxRect, scForceTotalRadial: nextData.scForceTotalRadial, scForceTotalAxial: nextData.scForceTotalAxial, scMinRadially: nextData.scMinRadially, scMaxRadially: nextData.scMaxRadially, scMaxAccumAxially: nextData.scMaxAccumAxially, scAxially: nextData.scAxially, scMaxTensionCompression: nextData.scMaxTensionCompression, scMinSpacerBars: nextData.scMinSpacerBars, scForceInSpacerBars: nextData.scForceInSpacerBlocks, scCombinedForce: nextData.scCombinedForce)
+            let newSegScData = SegmentScData(number: Int(nextData.number), ampTurns: nextData.ampTurns, kVA: nextData.kVA, dcLoss: nextData.dcLoss, eddyLossAxialFlux: nextData.eddyLossAxialFlux, eddyLossRadialFlux: nextData.eddyLossRadialFlux, eddyPUaverage: nextData.eddyPUaverage, eddyPUmax: nextData.eddyPUmax, eddyMaxRect: nextData.eddyMaxRect, scForceTotalRadial: nextData.scForceTotalRadial, scForceTotalAxial: nextData.scForceTotalAxial, scMinRadially: nextData.scMinRadially, scMaxRadially: nextData.scMaxRadially, scMaxAccumAxially: nextData.scMaxAccumAxially, scAxially: nextData.scAxially, scMaxTensionCompression: nextData.scMaxTensionCompression, scMinSpacerBars: nextData.scMinSpacerBars, scForceInSpacerBlocks: nextData.scForceInSpacerBlocks, scCombinedForce: nextData.scCombinedForce)
             
             self.segDataArray.append(newSegScData)
         }

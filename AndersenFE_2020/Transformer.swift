@@ -120,8 +120,9 @@ class Transformer:Codable {
                             }
                             
                             let scHoopStress = segSCdata.scMaxTensionCompression
-                            let condFactor = nextWdg.turnDef.type == .CTC ? 0.6 : 0.35
-                            let maxHoopStressAllowed = unworkedCopperLimit * condFactor
+                            // These factors come from IEC 60076--5
+                            let hoopFactor = scHoopStress > 0.0 ? 0.9 : nextWdg.turnDef.type == .CTC ? 0.6 : 0.35
+                            let maxHoopStressAllowed = unworkedCopperLimit * hoopFactor
                             
                             if scHoopStress > maxHoopStressAllowed
                             {

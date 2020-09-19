@@ -190,13 +190,6 @@ class AppController: NSObject, NSMenuItemValidation {
                         if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                         {
                             newTransformer.scResults = ImpedanceAndScData(andersenOutput: fld12output)
-                            
-                            let warnings = newTransformer.CheckForWarnings()
-                            
-                            for nextWarning in warnings
-                            {
-                                self.dataView.AddWarning(warning: nextWarning)
-                            }
                         }
                         else
                         {
@@ -927,6 +920,13 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
        
+        let warnings = txfo.CheckForWarnings()
+        
+        for nextWarning in warnings
+        {
+            self.dataView.AddWarning(warning: nextWarning)
+        }
+        
         self.dataView.UpdateWarningField()
     }
     

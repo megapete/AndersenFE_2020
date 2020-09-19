@@ -8,29 +8,53 @@
 
 import Cocoa
 
-struct DataWarnings {
+class DataView: NSView {
     
-    var message:[NSAttributedString] = [NSAttributedString(string: "Warnings")]
+    enum fieldIDs:Int {
+        
+        case vpn = 1
+        case NI = 2
+        case impedance = 3
+        case warnings = 4
+    }
     
     enum WarningLevel {
+        
         case information    // green
         case caution        // yellow
         case critical       // red
     }
     
-    mutating func reset()
-    {
-        self.message = [NSAttributedString(string: "Warnings")]
+    struct WarningData {
+        
+        let string:String
+        let level:WarningLevel
+        let wordsToHighlight:[Int]
     }
     
-    /// Function to simplify creating the warning strings. Note that 'wordsToHighlight' is 0-based. Also, words are assumed to be separated by SINGLE SPACES.
-    mutating func addWarning(string:String, level:WarningLevel, wordsToHighlight:[Int])
+    var dataFields:[NSTextField] = []
+    
+    var warningMessage:NSMutableAttributedString = NSMutableAttributedString()
+    
+    func InitializeFields()
     {
-        let stringComponents = string.components(separatedBy: " ")
+        SetVpN(newVpN: 0.0, refTerm: nil)
         
-        let newWarning = NSMutableAttributedString(string: string)
+        self.ResetWarnings()
+    }
+    
+    func ResetWarnings()
+    {
+        self.warningMessage = NSMutableAttributedString(string: "Warnings:")
+    }
+    
+    func AddWarning(warning:WarningData)
+    {
+        let stringComponents = warning.string.components(separatedBy: " ")
         
-        for nextWordIndex in wordsToHighlight
+        let newWarning = NSMutableAttributedString(string: warning.string)
+        
+        for nextWordIndex in warning.wordsToHighlight
         {
             if nextWordIndex < stringComponents.count
             {
@@ -54,43 +78,19 @@ struct DataWarnings {
                 }
                 
                 // Use the extension from GlobalDefs to get the ranges of the word
-                let swiftWordRange = string.ranges(of: wordToFind)[rangeIndex]
+                let swiftWordRange = warning.string.ranges(of: wordToFind)[rangeIndex]
                 // We need to convert the Swift String range to an NSRange manually. I can't actually find the documentation for this functiom It comes from https://stackoverflow.com/questions/27040924/nsrange-from-swift-range (Accepted Answer, Update for Swift 4)
-                let wordRange = NSRange(swiftWordRange, in: string)
+                let wordRange = NSRange(swiftWordRange, in: warning.string)
                 
-                let wordColor = (level == .information ? NSColor.green : (level == .caution ? NSColor.yellow : NSColor.red))
+                let wordColor = (warning.level == .information ? NSColor.green : (warning.level == .caution ? NSColor.yellow : NSColor.red))
                 
                 newWarning.addAttribute(.foregroundColor, value: wordColor, range: wordRange)
             }
         }
         
-        self.message.append(newWarning)
+        self.warningMessage.append(NSAttributedString(string: "\n\n"))
+        self.warningMessage.append(newWarning)
     }
-}
-
-class DataView: NSView {
-    
-    enum fieldIDs:Int {
-        case vpn = 1
-        case NI = 2
-        case impedance = 3
-        case warnings = 4
-    }
-    
-    var dataFields:[NSTextField] = []
-    
-    var warnings:DataWarnings = DataWarnings()
-    
-    func InitializeFields()
-    {
-        SetVpN(newVpN: 0.0, refTerm: nil)
-        
-        self.warnings.addWarning(string: "Everything is fine", level: .information, wordsToHighlight: [0, 2])
-        
-        self.UpdateWarningField()
-    }
-    
-
     
     func SetImpedance(newImpPU:Double?, baseMVA:Double?)
     {
@@ -147,17 +147,14 @@ class DataView: NSView {
     
     func UpdateWarningField()
     {
-        let warningField = self.dataFields[fieldIDs.warnings.rawValue - 1]
-        
-        let attString = NSMutableAttributedString()
-        
-        for nextString in self.warnings.message
+        for nextField in self.dataFields
         {
-            attString.append(nextString)
-            attString.append(NSAttributedString(string: "\n"))
+            if nextField.tag == fieldIDs.warnings.rawValue
+            {
+                nextField.attributedStringValue = self.warningMessage
+                return
+            }
         }
-        
-        warningField.attributedStringValue = attString
     }
     
     func SetFieldString(fieldID:fieldIDs, txt:String)
@@ -180,6 +177,11 @@ class DataView: NSView {
             if let nextField = nextView as? NSTextField
             {
                 self.dataFields.append(nextField)
+                
+                if nextField.tag == fieldIDs.warnings.rawValue
+                {
+                    nextField.attributedStringValue = self.warningMessage
+                }
             }
         }
         

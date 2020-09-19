@@ -83,6 +83,22 @@ class Transformer:Codable {
         }
     }
     
+    /// Function to check for warnings in the current scResults and return an array of objects that are  used by the DataView class
+    func CheckForWarnings() -> [DataView.WarningData]
+    {
+        var result:[DataView.WarningData] = []
+        
+        // check for actual problems here
+        
+        if result.isEmpty
+        {
+            let noProblems = DataView.WarningData(string: "None", level: .information, wordsToHighlight: [0])
+            result.append(noProblems)
+        }
+        
+        return result
+    }
+    
     /// Function to create a PCH_FLD12_TxfoDetails struct (intended for use for the "continuous" impedance calculation)
     func QuickFLD12transformer() throws -> PCH_FLD12_TxfoDetails
     {

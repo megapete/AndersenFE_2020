@@ -190,6 +190,13 @@ class AppController: NSObject, NSMenuItemValidation {
                         if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                         {
                             newTransformer.scResults = ImpedanceAndScData(andersenOutput: fld12output)
+                            
+                            let warnings = newTransformer.CheckForWarnings()
+                            
+                            for nextWarning in warnings
+                            {
+                                self.dataView.AddWarning(warning: nextWarning)
+                            }
                         }
                         else
                         {
@@ -848,7 +855,6 @@ class AppController: NSObject, NSMenuItemValidation {
                     var newSegPath = SegmentPath(segment: nextSegment, segmentColor: pathColor)
                     
                     newSegPath.toolTipTag = self.txfoView.addToolTip(newSegPath.rect, owner: self.txfoView as Any, userData: nil)
-                    // DLog("New ToolTag: \(newSegPath.toolTipTag)")
                     
                     // update the currently-selected segment in the TransformerView
                     if let currentSegment = self.txfoView.currentSegment
@@ -921,6 +927,7 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
        
+        self.dataView.UpdateWarningField()
     }
     
     // MARK: Menu validation

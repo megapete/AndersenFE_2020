@@ -141,7 +141,7 @@ class Transformer:Codable {
                             
                             if scSpacerBlockForce > spacerBlockMaxLimit
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockWarningLimit) )", level: .critical, wordsToHighlight: [8, 14]))
                             }
                             else if scSpacerBlockForce > spacerBlockWarningLimit
                             {

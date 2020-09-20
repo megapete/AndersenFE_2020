@@ -57,7 +57,7 @@ class SplitSegmentDialog: PCH_DialogBox {
     
     override func handleOk() {
         
-        self.number = Double(self.labelTextField.stringValue)!
+        self.number = Double(self.numsegsTextField.stringValue)!
         
         super.handleOk()
     }

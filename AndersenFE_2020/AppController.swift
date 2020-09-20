@@ -96,11 +96,12 @@ class AppController: NSObject, NSMenuItemValidation {
     // Winding Menu
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
     
-    
     @IBOutlet weak var changeWdgNameMenuItem: NSMenuItem!
     @IBOutlet weak var activateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var deactivateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var toggleSegmentActivationMenuItem: NSMenuItem!
+    @IBOutlet weak var splitSegmentMenuItem: NSMenuItem!
+    
     
     // View Menu
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
@@ -251,6 +252,69 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             self.updateViews()
         }
+    }
+    
+    @IBAction func handleSplitSegment(_ sender: Any) {
+        
+        guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        let splitDlog = SplitSegmentDialog()
+        
+        if splitDlog.runModal() == .OK
+        {
+            if splitDlog.type == .multiple
+            {
+                let numSegs = Int(splitDlog.number)
+                self.doSplitSegment(segment: segPath.segment, splitType: .multiple, numSegs: numSegs)
+            }
+        }
+    }
+    
+    func doSplitSegment(segment:Segment, splitType:SplitSegmentDialog.SplitType, numSegs:Int)
+    {
+        guard let txfo = currentTxfo, let oldLayer = segment.inLayer else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        var newLayer:Layer? = nil
+        for nextWdg in newTransformer.windings
+        {
+            for nextLayer in nextWdg.layers
+            {
+                if nextLayer.innerRadius == oldLayer.innerRadius
+                {
+                    newLayer = nextLayer
+                    break
+                }
+            }
+            
+            if newLayer != nil
+            {
+                break
+            }
+        }
+        
+        guard let layer = newLayer else
+        {
+            return
+        }
+        
+        if splitType == .multiple
+        {
+            layer.SplitSegment(segmentSerialNumber: segment.serialNumber, numSegments: numSegs)
+        }
+        else
+        {
+            return
+        }
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
     
@@ -920,6 +984,8 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
        
+        self.dataView.ResetWarnings()
+        
         let warnings = txfo.CheckForWarnings()
         
         for nextWarning in warnings
@@ -974,7 +1040,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             return currSeg.segment.inLayer!.parentTerminal.winding!.CurrentCarryingTurns() != 0.0
         }
-        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem
+        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem || menuItem == self.splitSegmentMenuItem
         {
             guard  self.currentTxfo != nil, self.txfoView.currentSegment != nil else
             {

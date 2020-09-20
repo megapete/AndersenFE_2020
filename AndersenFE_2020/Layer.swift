@@ -107,4 +107,24 @@ class Layer:Codable {
     {
         return 2.0 * (self.innerRadius + radialBuild)
     }
+    
+    func SplitSegment(segmentSerialNumber:Int, numSegments:Int)
+    {
+        guard let oldSegIndex = self.segArray.firstIndex(where: {$0.serialNumber == segmentSerialNumber}) else
+        {
+            return
+        }
+        
+        let oldSegment = self.segArray.remove(at: oldSegIndex)
+        
+        var mirrors = oldSegment.mirrorSegments
+        mirrors.removeAll(where: {$0 == segmentSerialNumber})
+        
+        if mirrors.count == 0
+        {
+            let activeTurns = oldSegment.activeTurns / Double(numSegments)
+            let totalTurns = oldSegment.totalTurns / Double(numSegments)
+            let zHt = (oldSegment.maxZ - oldSegment.minZ) / Double(numSegments)
+        }
+    }
 }

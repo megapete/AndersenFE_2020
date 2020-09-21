@@ -126,7 +126,7 @@ class Layer:Codable {
             let hiActiveTurns = oldSegment.activeTurns - loActiveTurns
             let loTotalTurns = puForLowerSegment * oldSegment.totalTurns
             let hiTotalTurns = oldSegment.totalTurns - loTotalTurns
-            let splitZ = puForLowerSegment * oldSegment.height
+            let splitZ = puForLowerSegment * oldSegment.height + oldSegment.minZ
             
             let newLoSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: loActiveTurns, totalTurns: loTotalTurns, minZ: oldSegment.minZ, maxZ: splitZ, mirrorSegments: [], inLayer: self)
             

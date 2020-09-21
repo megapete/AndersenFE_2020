@@ -108,6 +108,77 @@ class Layer:Codable {
         return 2.0 * (self.innerRadius + radialBuild)
     }
     
+    func SplitSegment(segmentSerialNumber:Int, puForLowerSegment:Double)
+    {
+        guard let oldSegIndex = self.segArray.firstIndex(where: {$0.serialNumber == segmentSerialNumber}), puForLowerSegment >= 0.01, puForLowerSegment <= 99.0 else
+        {
+            return
+        }
+        
+        let oldSegment = self.segArray.remove(at: oldSegIndex)
+        
+        var mirrors = oldSegment.mirrorSegments
+        mirrors.removeAll(where: {$0 == segmentSerialNumber})
+        
+        if mirrors.count == 0
+        {
+            let loActiveTurns = puForLowerSegment * oldSegment.activeTurns
+            let hiActiveTurns = oldSegment.activeTurns - loActiveTurns
+            let loTotalTurns = puForLowerSegment * oldSegment.totalTurns
+            let hiTotalTurns = oldSegment.totalTurns - loTotalTurns
+            let splitZ = puForLowerSegment * oldSegment.height
+            
+            let newLoSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: loActiveTurns, totalTurns: loTotalTurns, minZ: oldSegment.minZ, maxZ: splitZ, mirrorSegments: [], inLayer: self)
+            
+            let newHiSegment = Segment(serialNumber: Segment.nextSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: hiActiveTurns, totalTurns: hiTotalTurns, minZ: splitZ, maxZ: oldSegment.maxZ, mirrorSegments: [], inLayer: self)
+            
+            self.segArray.append(newLoSegment)
+            self.segArray.append(newHiSegment)
+        }
+        else if self.parentTerminal.winding!.isDoubleStack && mirrors.count == 1
+        {
+            let loActiveTurns = puForLowerSegment * oldSegment.activeTurns
+            let hiActiveTurns = oldSegment.activeTurns - loActiveTurns
+            let loTotalTurns = puForLowerSegment * oldSegment.totalTurns
+            let hiTotalTurns = oldSegment.totalTurns - loTotalTurns
+            var splitZ = puForLowerSegment * oldSegment.height + oldSegment.minZ
+            
+            let loLowerSerialNumber = Segment.nextSerialNumber
+            let hiLowerSerialNumber = Segment.nextSerialNumber
+            let loUpperSerialNumber = Segment.nextSerialNumber
+            let hiUpperSerialNumber = Segment.nextSerialNumber
+            
+            let newLoLowerSegment = Segment(serialNumber: loLowerSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: loActiveTurns, totalTurns: loTotalTurns, minZ: oldSegment.minZ, maxZ: splitZ, mirrorSegments: [hiUpperSerialNumber], inLayer: self)
+            
+            let newHiLowerSegment = Segment(serialNumber: hiLowerSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: hiActiveTurns, totalTurns: hiTotalTurns, minZ: splitZ, maxZ: oldSegment.maxZ, mirrorSegments: [loUpperSerialNumber], inLayer: self)
+            
+            guard let mirrorIndex = self.segArray.firstIndex(where: {$0.serialNumber == mirrors.first!}) else
+            {
+                ALog("Could not find mirror index")
+                self.segArray.append(oldSegment)
+                self.segments.sort(by: {$0.minZ < $1.minZ})
+                return
+            }
+            
+            let mirrorSegment = self.segArray.remove(at: mirrorIndex)
+            
+            splitZ = (1.0 - puForLowerSegment) * mirrorSegment.height + mirrorSegment.minZ
+            
+            let newLoUpperSegment = Segment(serialNumber: loUpperSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: hiActiveTurns, totalTurns: hiTotalTurns, minZ: mirrorSegment.minZ, maxZ: splitZ, mirrorSegments: [hiLowerSerialNumber], inLayer: self)
+            
+            let newHiUpperSegment = Segment(serialNumber: hiUpperSerialNumber, strandA: oldSegment.strandA, strandR: oldSegment.strandR, strandsPerLayer: oldSegment.strandsPerLayer, strandsPerTurn: oldSegment.strandsPerTurn, activeTurns: loActiveTurns, totalTurns: loTotalTurns, minZ: splitZ, maxZ: mirrorSegment.maxZ, mirrorSegments: [loLowerSerialNumber], inLayer: self)
+            
+            self.segArray.append(contentsOf: [newLoLowerSegment, newHiLowerSegment, newLoUpperSegment, newHiUpperSegment])
+        }
+        else
+        {
+            ALog("Cannot split multi-start winding segments")
+            self.segArray.append(oldSegment)
+        }
+        
+        self.segments.sort(by: {$0.minZ < $1.minZ})
+    }
+    
     func SplitSegment(segmentSerialNumber:Int, numSegments:Int)
     {
         guard let oldSegIndex = self.segArray.firstIndex(where: {$0.serialNumber == segmentSerialNumber}), numSegments > 1 else
@@ -144,6 +215,8 @@ class Layer:Codable {
             guard let mirrorIndex = self.segArray.firstIndex(where: {$0.serialNumber == mirrors.first!}) else
             {
                 ALog("Could not find mirror index")
+                self.segArray.append(oldSegment)
+                self.segments.sort(by: {$0.minZ < $1.minZ})
                 return
             }
             
@@ -169,7 +242,11 @@ class Layer:Codable {
                 lowerBottomZ += zHt
                 upperTopZ -= zHt
             }
-            
+        }
+        else
+        {
+            ALog("Cannot split multi-start winding segments")
+            self.segArray.append(oldSegment)
         }
         
         self.segments.sort(by: {$0.minZ < $1.minZ})

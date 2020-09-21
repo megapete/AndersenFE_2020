@@ -256,7 +256,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     @IBAction func handleSplitSegment(_ sender: Any) {
         
-        guard let txfo = currentTxfo, let segPath = self.txfoView.currentSegment else
+        guard currentTxfo != nil, let segPath = self.txfoView.currentSegment else
         {
             return
         }
@@ -270,10 +270,14 @@ class AppController: NSObject, NSMenuItemValidation {
                 let numSegs = Int(splitDlog.number)
                 self.doSplitSegment(segment: segPath.segment, splitType: .multiple, numSegs: numSegs)
             }
+            else
+            {
+                self.doSplitSegment(segment: segPath.segment, splitType: .double, numSegs: 2, percentageLower: splitDlog.number)
+            }
         }
     }
     
-    func doSplitSegment(segment:Segment, splitType:SplitSegmentDialog.SplitType, numSegs:Int)
+    func doSplitSegment(segment:Segment, splitType:SplitSegmentDialog.SplitType, numSegs:Int, percentageLower:Double = 0.0)
     {
         guard let txfo = currentTxfo, let oldLayer = segment.inLayer else
         {
@@ -311,7 +315,12 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         else
         {
-            return
+            if percentageLower < 1.0 || percentageLower > 99.0
+            {
+                return
+            }
+            
+            layer.SplitSegment(segmentSerialNumber: segment.serialNumber, puForLowerSegment: percentageLower / 100.0)
         }
         
         self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)

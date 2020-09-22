@@ -72,6 +72,9 @@ struct ImpedanceAndScData:Codable {
     
     var layerDataArray:[LayerScData] = []
     
+    let fluxLines:String
+    let fld8File:String
+    
     // Thrust is in Newtons (metric) or Pounds (inch)
     let totalThrustUpper:Double
     let totalThrustLower:Double
@@ -87,6 +90,24 @@ struct ImpedanceAndScData:Codable {
         self.BmaxAtLeg = andersenOutput.bmaxAtLeg
         self.totalThrustLower = andersenOutput.totalThrustLower
         self.totalThrustUpper = andersenOutput.totalThrustUpper
+        
+        if let fluxLines = andersenOutput.fluxLineData
+        {
+            self.fluxLines = fluxLines
+        }
+        else
+        {
+            self.fluxLines = ""
+        }
+        
+        if let fld8File = andersenOutput.fld8FileString
+        {
+            self.fld8File = fld8File
+        }
+        else
+        {
+            self.fld8File = ""
+        }
         
         guard let andersenSegDataArray:[SegmentData] = ConvertDataArray(dataArray: andersenOutput.segmentData! as! [Data]) else
         {
@@ -114,6 +135,19 @@ struct ImpedanceAndScData:Codable {
             
             self.layerDataArray.append(newLayerScData)
         }
+    }
+    
+    func LayerData(andersenLayerNum:Int) -> ImpedanceAndScData.LayerScData?
+    {
+        for nextLayerData in self.layerDataArray
+        {
+            if nextLayerData.number == andersenLayerNum
+            {
+                return nextLayerData
+            }
+        }
+        
+        return nil
     }
     
     func SegmentData(andersenSegNum:Int) -> ImpedanceAndScData.SegmentScData?

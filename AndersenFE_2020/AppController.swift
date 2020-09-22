@@ -109,6 +109,10 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
     @IBOutlet weak var zoomAllMenuItem: NSMenuItem!
     
+    // Output Menu
+    @IBOutlet weak var saveAndOutputMenuItem: NSMenuItem!
+    
+    
     // MARK: Preferences
     var preferences = PCH_AFE2020_Prefs(wdgPrefs: PCH_AFE2020_Prefs.WindingPrefs(modelRadialDucts: false, model0Terminals: false, modelInternalLayerTaps: false, upperLowerAxialGapsAreSymmetrical: true, multiStartElecHtIsToCenter: true), generalPrefs: PCH_AFE2020_Prefs.GeneralPrefs(defaultRefTerm2: true, useAndersenFLD12: true, forceAmpTurnBalance: true, keepImpedanceUpdated: true))
     
@@ -1012,7 +1016,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
-        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem || menuItem == self.setTxfoDescriptionMenuItem
+        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem || menuItem == self.setTxfoDescriptionMenuItem || menuItem == self.saveAndOutputMenuItem
         {
             return self.currentTxfo != nil
         }
@@ -1190,6 +1194,52 @@ class AppController: NSObject, NSMenuItemValidation {
     }
     
     // MARK: Saving and Loading functions
+    
+    @IBAction func handleSaveAndersenOutputFile(_ sender: Any) {
+        
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        do
+        {
+            let txfoDetails = try txfo.QuickFLD12transformer()
+            let outputString = PCH_FLD12_Library.runFLD12withTxfo(txfoDetails, outputType: .metric, withFluxLines: false)
+            
+            if outputString.prefix(5) == "ERROR"
+            {
+                let alert = NSAlert()
+                alert.messageText = "Error running Andersen program!"
+                alert.informativeText = outputString
+                alert.alertStyle = .critical
+                let _ = alert.runModal()
+                return
+            }
+            
+            let savePanel = NSSavePanel()
+            savePanel.title = "Andersen FLD12 Output file"
+            savePanel.message = "Save Andersen FLD12 Output file"
+            savePanel.allowedFileTypes = ["out"]
+            savePanel.allowsOtherFileTypes = false
+            
+            if savePanel.runModal() == .OK
+            {
+                if let fileUrl = savePanel.url
+                {
+                    try outputString.write(to: fileUrl, atomically: false, encoding: .utf8)
+                }
+            }
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+    }
+    
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         
         guard let txfo = currentTxfo else

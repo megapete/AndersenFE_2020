@@ -29,6 +29,7 @@
                 <outlet property="deactivateAllWdgTurnsMenuItem" destination="3cl-q1-BRW" id="HY4-kW-3FO"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="reverseCurrentMenuItem" destination="OAx-Vq-OSe" id="H52-D3-KSC"/>
+                <outlet property="saveAndOutputMenuItem" destination="MZo-Xo-m12" id="DXS-ke-0GV"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
@@ -538,12 +539,22 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Test" id="IOt-U7-HRb">
+                <menuItem title="Output" id="IOt-U7-HRb">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Test" id="ZgQ-mA-mBH">
+                    <menu key="submenu" title="Output" id="ZgQ-mA-mBH">
                         <items>
-                            <menuItem title="Test AmpTurns View" id="F1p-V3-IxQ">
+                            <menuItem title="Add Current Transformer to List... " id="F1p-V3-IxQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Edit Output List" id="KSz-xC-UeU">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="ted-Fg-hc2"/>
+                            <menuItem title="Save Andersen Output File..." id="MZo-Xo-m12">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSaveAndersenOutputFile:" target="6yZ-bT-Gps" id="WG2-Av-yAj"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>
@@ -592,7 +603,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="860" height="871"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -609,11 +620,11 @@
                                         <rect key="frame" x="45" y="0.0" width="498" height="872"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="496" height="870"/>
+                                            <rect key="frame" x="1" y="1" width="481" height="855"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="481" height="855"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <connections>
                                                         <outlet property="activateAllWdgTurnsMenuItem" destination="44K-HR-t3v" id="AZ2-GY-vFs"/>
@@ -626,11 +637,11 @@
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="855" width="496" height="16"/>
+                                            <rect key="frame" x="1" y="856" width="481" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="481" y="1" width="16" height="870"/>
+                                            <rect key="frame" x="482" y="1" width="15" height="855"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
@@ -758,11 +769,8 @@
         </window>
         <menu id="9xV-35-2jM">
             <items>
-                <menuItem title="Set Transformer Description..." id="1jL-tj-u7E">
+                <menuItem title="Item" id="gyC-1y-iFV">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="handleSetTxfoDescription:" target="-1" id="f2n-6k-SXj"/>
-                    </connections>
                 </menuItem>
                 <menuItem title="Set V/N Reference Terminal" id="DOj-Px-Yk0">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -795,7 +803,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="462" y="342"/>
+            <point key="canvasLocation" x="598" y="311"/>
         </menu>
         <menu id="PKF-ho-E86">
             <items>
@@ -835,7 +843,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="717" y="342"/>
+            <point key="canvasLocation" x="851" y="331"/>
         </menu>
     </objects>
 </document>

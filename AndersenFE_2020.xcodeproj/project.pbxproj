@@ -13,6 +13,7 @@
 		D314456724C224650084DEC5 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D314456624C224650084DEC5 /* Segment.swift */; };
 		D3275F8224FADB0B005D9F5A /* TransformerDescriptionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3275F8124FADB0A005D9F5A /* TransformerDescriptionDialog.swift */; };
 		D3275F8424FADB22005D9F5A /* TransformerDescription.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3275F8324FADB22005D9F5A /* TransformerDescription.xib */; };
+		D37F9EF4251943800040BCD8 /* OutputData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37F9EF3251943800040BCD8 /* OutputData.swift */; };
 		D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */; };
 		D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D38833E024CCC1C400A0C7A5 /* Preferences.xib */; };
 		D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */; };
@@ -54,6 +55,7 @@
 		D314456624C224650084DEC5 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 		D3275F8124FADB0A005D9F5A /* TransformerDescriptionDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformerDescriptionDialog.swift; sourceTree = "<group>"; };
 		D3275F8324FADB22005D9F5A /* TransformerDescription.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransformerDescription.xib; sourceTree = "<group>"; };
+		D37F9EF3251943800040BCD8 /* OutputData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputData.swift; sourceTree = "<group>"; };
 		D38833DE24CCC19A00A0C7A5 /* PreferencesDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDialog.swift; sourceTree = "<group>"; };
 		D38833E024CCC1C400A0C7A5 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		D3893D7224D8DBB0000E8E07 /* TerminalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalsView.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				D314456624C224650084DEC5 /* Segment.swift */,
 				D3E307E324C2473A00FDAA83 /* Layer.swift */,
 				D3D2D2D024EF00640072EE96 /* ImpedanceScData.swift */,
+				D37F9EF3251943800040BCD8 /* OutputData.swift */,
 				D314455A24C220A00084DEC5 /* Assets.xcassets */,
 				D314455C24C220A00084DEC5 /* MainMenu.xib */,
 				D314455F24C220A00084DEC5 /* Info.plist */,
@@ -261,6 +264,7 @@
 				F522C85D251790F10036607F /* SplitSegmentDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
+				D37F9EF4251943800040BCD8 /* OutputData.swift in Sources */,
 				D3275F8224FADB0B005D9F5A /* TransformerDescriptionDialog.swift in Sources */,
 				D3CF829424E46A0200055311 /* ModifyReferenceTerminalDialog.swift in Sources */,
 				D3E307E124C242C100FDAA83 /* GlobalDefs.swift in Sources */,
@@ -414,8 +418,8 @@
 				DEVELOPMENT_TEAM = 3R3HXUUS44;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
-					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include,
+					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include,
 				);
 				INFOPLIST_FILE = AndersenFE_2020/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -424,7 +428,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
-					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
+					"/Users/peterhub/Library/Developer/Xcode/DerivedData/PCH_FLD12_Library-dzuikqoosmsvsheozqupdjelxbzg/Build/Products/Debug",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";

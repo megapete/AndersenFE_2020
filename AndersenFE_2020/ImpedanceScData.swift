@@ -88,6 +88,17 @@ struct ImpedanceAndScData:Codable {
             
             self.segDataArray.append(newSegScData)
         }
+        
+        guard let andersenLayerDataArray:[LayerData] = ConvertDataArray(dataArray: andersenOutput.layerData! as! [Data]) else
+        {
+            DLog("Could not open layer data array")
+            return
+        }
+        
+        for nextData in andersenLayerDataArray
+        {
+            DLog("Layer number: \(nextData.number), Max Rect: \(nextData.eddyMaxRect)")
+        }
     }
     
     func SegmentData(andersenSegNum:Int) -> ImpedanceAndScData.SegmentScData?

@@ -59,6 +59,19 @@ struct ImpedanceAndScData:Codable {
     
     var segDataArray:[SegmentScData] = []
     
+    struct LayerScData:Codable {
+        
+        let number:Int
+        let dcLoss:Double
+        let eddyLossAxialFlux:Double
+        let eddyLossRadialFlux:Double
+        let eddyPUaverage:Double
+        let eddyPUmax:Double
+        let eddyMaxRect:NSRect
+    }
+    
+    var layerDataArray:[LayerScData] = []
+    
     // Thrust is in Newtons (metric) or Pounds (inch)
     let totalThrustUpper:Double
     let totalThrustLower:Double
@@ -97,7 +110,9 @@ struct ImpedanceAndScData:Codable {
         
         for nextData in andersenLayerDataArray
         {
-            DLog("Layer number: \(nextData.number), Max Rect: \(nextData.eddyMaxRect)")
+            let newLayerScData = LayerScData(number: Int(nextData.number), dcLoss: nextData.dcLoss, eddyLossAxialFlux: nextData.eddyLossAxialFlux, eddyLossRadialFlux: nextData.eddyLossRadialFlux, eddyPUaverage: nextData.eddyPUaverage, eddyPUmax: nextData.eddyPUmax, eddyMaxRect: nextData.eddyMaxRect)
+            
+            self.layerDataArray.append(newLayerScData)
         }
     }
     

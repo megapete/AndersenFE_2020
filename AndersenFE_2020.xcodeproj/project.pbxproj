@@ -428,7 +428,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
-					"/Users/peterhub/Library/Developer/Xcode/DerivedData/PCH_FLD12_Library-dzuikqoosmsvsheozqupdjelxbzg/Build/Products/Debug",
+					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -45,6 +45,7 @@ struct OutputData {
         let dcLoss:Double
         let averageEddyLoss:Double
         let maximumEddyLoss:Double
+        let maxEddyLossRect:NSRect
         
     }
     

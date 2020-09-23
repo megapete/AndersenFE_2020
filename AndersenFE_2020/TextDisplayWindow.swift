@@ -14,12 +14,14 @@ class TextDisplayWindow: NSObject {
     @IBOutlet var textView: NSTextView!
     
     var stringToDisplay = ""
+    var windowTitle = "Window"
     
-    init(stringToDisplay:String) {
+    init(windowTitle:String, stringToDisplay:String) {
         
         super.init()
         
         self.stringToDisplay = stringToDisplay
+        self.windowTitle = windowTitle
         
         guard let newNib = NSNib(nibNamed: "TextDisplay", bundle: Bundle.main) else
         {
@@ -36,10 +38,13 @@ class TextDisplayWindow: NSObject {
     
     override func awakeFromNib() {
         
+        self.textView.isHorizontallyResizable = true
+        self.textView.autoresizingMask = [.width, .height]
         self.textView.textContainer?.size = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        self.textView.textContainer?.widthTracksTextView = false
         self.textView.string = self.stringToDisplay
         
-        self.window.title = "FLD8 Output"
+        self.window.title = windowTitle
         self.window.makeKeyAndOrderFront(self)
     }
 }

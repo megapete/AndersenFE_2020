@@ -105,6 +105,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // View Menu
     @IBOutlet weak var showFld8MenuItem: NSMenuItem!
+    @IBOutlet weak var showFld12MenuItem: NSMenuItem!
     
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
@@ -859,12 +860,36 @@ class AppController: NSObject, NSMenuItemValidation {
         
         guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
         {
-            DLog("Current transformer is not defined")
+            DLog("FLD8 file not available")
             return
         }
         
-        let _ = TextDisplayWindow(stringToDisplay: results.fld8File)
+        let _ = TextDisplayWindow(windowTitle: "FLD8 File", stringToDisplay: results.fld8File)
         
+    }
+    
+    @IBAction func handleShowFLD12File(_ sender: Any) {
+        
+        guard let currTxfo = self.currentTxfo, currTxfo.scResults != nil else
+        {
+            DLog("FLD12 output file not available")
+            return
+        }
+        
+        do
+        {
+            let currDetails = try currTxfo.QuickFLD12transformer()
+            
+            let fld12File = PCH_FLD12_Library.runFLD12withTxfo(currDetails, outputType: .metric, fluxLineString: nil, fld8String: nil)
+            
+            let _ = TextDisplayWindow(windowTitle: "FLD12 Output File", stringToDisplay: fld12File)
+        }
+        catch
+        {
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
     }
     
     // MARK: Zoom functions
@@ -1116,6 +1141,13 @@ class AppController: NSObject, NSMenuItemValidation {
         else if menuItem == self.showFld8MenuItem
         {
             guard let txfo = currentTxfo, let scData = txfo.scResults, !scData.fld8File.isEmpty else
+            {
+                return false
+            }
+        }
+        else if menuItem == self.showFld12MenuItem
+        {
+            guard let txfo = currentTxfo, txfo.scResults != nil else
             {
                 return false
             }

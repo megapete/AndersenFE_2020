@@ -104,10 +104,14 @@ class AppController: NSObject, NSMenuItemValidation {
     
     
     // View Menu
+    @IBOutlet weak var showFld8MenuItem: NSMenuItem!
+    
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
     @IBOutlet weak var zoomAllMenuItem: NSMenuItem!
+    
+    
     
     // Output Menu
     @IBOutlet weak var saveAndOutputMenuItem: NSMenuItem!
@@ -849,6 +853,19 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // MARK: Contextual Menus
     
+    // MARK: Text File Viewer Functions
+    
+    @IBAction func handleShowFLD8File(_ sender: Any) {
+        
+        guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
+        {
+            DLog("Current transformer is not defined")
+            return
+        }
+        
+        let _ = TextDisplayWindow(stringToDisplay: results.fld8File)
+        
+    }
     
     // MARK: Zoom functions
     @IBAction func handleZoomIn(_ sender: Any) {
@@ -1092,6 +1109,13 @@ class AppController: NSObject, NSMenuItemValidation {
             let wdgTurns = winding.CurrentCarryingTurns()
             
             if fabs(totalTerminalTurns - wdgTurns) < 0.5
+            {
+                return false
+            }
+        }
+        else if menuItem == self.showFld8MenuItem
+        {
+            guard let txfo = currentTxfo, let scData = txfo.scResults, !scData.fld8File.isEmpty else
             {
                 return false
             }

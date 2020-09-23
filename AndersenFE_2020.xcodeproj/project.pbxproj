@@ -41,6 +41,8 @@
 		F5ED558D24C32659002E7031 /* Terminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558C24C32659002E7031 /* Terminal.swift */; };
 		F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED558E24C46BE5002E7031 /* Winding.swift */; };
 		F5ED559124C49074002E7031 /* Transformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5ED559024C49074002E7031 /* Transformer.swift */; };
+		F5F8E835251B699300117F49 /* TextDisplay.xib in Resources */ = {isa = PBXBuildFile; fileRef = F5F8E834251B699300117F49 /* TextDisplay.xib */; };
+		F5F8E838251B79EF00117F49 /* TextDisplayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F8E837251B79EF00117F49 /* TextDisplayWindow.swift */; };
 		F5F971C424FBCBF600267AAC /* ModifyWindingNameDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F971C324FBCBF600267AAC /* ModifyWindingNameDialog.swift */; };
 		F5F971C624FBCC0700267AAC /* ModifyWindingName.xib in Resources */ = {isa = PBXBuildFile; fileRef = F5F971C524FBCC0700267AAC /* ModifyWindingName.xib */; };
 /* End PBXBuildFile section */
@@ -84,6 +86,8 @@
 		F5ED558C24C32659002E7031 /* Terminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Terminal.swift; sourceTree = "<group>"; };
 		F5ED558E24C46BE5002E7031 /* Winding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Winding.swift; sourceTree = "<group>"; };
 		F5ED559024C49074002E7031 /* Transformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformer.swift; sourceTree = "<group>"; };
+		F5F8E834251B699300117F49 /* TextDisplay.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextDisplay.xib; sourceTree = "<group>"; };
+		F5F8E837251B79EF00117F49 /* TextDisplayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDisplayWindow.swift; sourceTree = "<group>"; };
 		F5F971C324FBCBF600267AAC /* ModifyWindingNameDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyWindingNameDialog.swift; sourceTree = "<group>"; };
 		F5F971C524FBCC0700267AAC /* ModifyWindingName.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyWindingName.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -143,6 +147,8 @@
 				D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */,
 				F522C85C251790F10036607F /* SplitSegmentDialog.swift */,
 				F522C85F251791040036607F /* SplitSegment.xib */,
+				F5F8E837251B79EF00117F49 /* TextDisplayWindow.swift */,
+				F5F8E834251B699300117F49 /* TextDisplay.xib */,
 				F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
@@ -240,6 +246,7 @@
 				F5F971C624FBCC0700267AAC /* ModifyWindingName.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
+				F5F8E835251B699300117F49 /* TextDisplay.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +259,7 @@
 			files = (
 				F5ED558F24C46BE5002E7031 /* Winding.swift in Sources */,
 				D3893D7324D8DBB0000E8E07 /* TerminalsView.swift in Sources */,
+				F5F8E838251B79EF00117F49 /* TextDisplayWindow.swift in Sources */,
 				D314455924C2209E0084DEC5 /* AppDelegate.swift in Sources */,
 				F5DD5A2B24D1F88C002D5F52 /* TransformerView.swift in Sources */,
 				D3E307E224C242C100FDAA83 /* PCH_Defs.swift in Sources */,

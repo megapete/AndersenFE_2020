@@ -59,7 +59,8 @@ struct OutputData {
         }
         
         self.description = outputDesc
-        self.MVA = 0.0
+        self.MVA = results.baseMVA
+        
         self.terminals = []
         self.layers = []
     }

@@ -73,6 +73,9 @@ class Layer:Codable {
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal
     
+    /// Andersen Layer Number
+    var andersenLayerNum = -1
+    
     init(segments:[Segment] = [], numSpacerBlocks:Int, spacerBlockWidth:Double, material:ConductorMaterial, numberParallelGroups:Int, radialBuild:Double, innerRadius:Double, parentTerminal:Terminal)
     {
         self.numSpacerBlocks = numSpacerBlocks
@@ -88,6 +91,8 @@ class Layer:Codable {
     /// function to create a  PCH_FLD12_Layer from self
     func FLD12layer(layernum:Int, firstSegNum:Int) -> PCH_FLD12_Layer
     {
+        self.andersenLayerNum = layernum
+        
         var nextSegNum = firstSegNum
         var fld12SegArray:[PCH_FLD12_Segment] = []
         

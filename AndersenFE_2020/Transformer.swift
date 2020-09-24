@@ -1640,6 +1640,8 @@ class Transformer:Codable {
         
         self.niRefTerm = maxVAtermnum
         
+        self.windings.sort(by: {$0.coilID < $1.coilID})
+        
         self.InitializeWindings(prefs: prefs)
         
     }

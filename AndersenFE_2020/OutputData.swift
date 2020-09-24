@@ -113,7 +113,13 @@ struct OutputData {
         self.terminals = termData.sorted(by: {$0.termNum < $1.termNum})
         
         var layerData:[LayerData] = []
-        
+        for nextWdg in txfo.windings
+        {
+            for nextLayer in nextWdg.layers
+            {
+                
+            }
+        }
         
         self.layers = []
     }

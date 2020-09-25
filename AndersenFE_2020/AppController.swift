@@ -98,7 +98,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // Winding Menu
     @IBOutlet weak var reverseCurrentMenuItem: NSMenuItem!
-    
+    @IBOutlet weak var moveWdgRadiallyMenuItem: NSMenuItem!
     @IBOutlet weak var changeWdgNameMenuItem: NSMenuItem!
     @IBOutlet weak var activateAllWdgTurnsMenuItem: NSMenuItem!
     @IBOutlet weak var deactivateAllWdgTurnsMenuItem: NSMenuItem!
@@ -265,6 +265,59 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    @IBAction func handleMoveWindingRadially(_ sender: Any) {
+        
+        guard self.currentTxfo != nil, let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        let winding = segPath.segment.inLayer!.parentTerminal.winding!
+        
+        let moveDlog = MoveWindingDialog()
+        
+        if moveDlog.runModal() == .OK
+        {
+            self.doMoveWindingRadially(winding: winding, deltaR: moveDlog.deltaR)
+        }
+    }
+    
+    func doMoveWindingRadially(winding:Winding, deltaR:Double)
+    {
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
+        var newWinding:Winding? = nil
+        for nextWdg in newTransformer.windings
+        {
+            if nextWdg.coilID == winding.coilID
+            {
+                newWinding = nextWdg
+                break
+            }
+        }
+        
+        guard let newWdg = newWinding else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Could not identify the winding to reverse!!"
+            alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+            alert.alertStyle = .critical
+            let _ = alert.runModal()
+            return
+        }
+        
+        txfo.OffsetWindingRadially(winding: newWdg, deltaR: deltaR)
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: false)
+    }
+    
     
     @IBAction func handleSplitSegment(_ sender: Any) {
         
@@ -1098,7 +1151,7 @@ class AppController: NSObject, NSMenuItemValidation {
             
             return currSeg.segment.inLayer!.parentTerminal.winding!.CurrentCarryingTurns() != 0.0
         }
-        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem || menuItem == self.splitSegmentMenuItem
+        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.changeWdgNameMenuItem || menuItem == self.splitSegmentMenuItem || menuItem == self.moveWdgRadiallyMenuItem
         {
             guard  self.currentTxfo != nil, self.txfoView.currentSegment != nil else
             {

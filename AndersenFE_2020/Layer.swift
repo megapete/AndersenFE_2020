@@ -68,7 +68,7 @@ class Layer:Codable {
     let radialBuild:Double
     
     /// The inner radius of the Layer
-    let innerRadius:Double
+    var innerRadius:Double
     
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal

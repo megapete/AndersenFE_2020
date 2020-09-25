@@ -282,7 +282,7 @@ class Winding:Codable {
     }
     
     /// The inner diameter of this winding
-    let coilID:Double
+    var coilID:Double
     
     /// The mean radius of this winding (used for drawing)
     var meanRadius:Double {
@@ -424,6 +424,16 @@ class Winding:Codable {
         }
         
         return result
+    }
+    
+    func OffsetWindingRadially(deltaR:Double)
+    {
+        self.coilID += 2.0 * deltaR
+        
+        for nextLayer in self.layers
+        {
+            nextLayer.innerRadius += deltaR
+        }
     }
     
     /// The current-carrying turns are the effective turns, and an UNSIGNED quantity

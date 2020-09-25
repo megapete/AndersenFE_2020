@@ -409,6 +409,17 @@ class Transformer:Codable {
         return result
     }
     
+    func OffsetWindingRadially(winding:Winding, deltaR:Double)
+    {
+        for nextWdg in self.windings
+        {
+            if nextWdg.coilID >= winding.coilID
+            {
+                nextWdg.OffsetWindingRadially(deltaR: deltaR)
+            }
+        }
+    }
+    
     func WindingsFromAndersenNumber(termNum:Int) throws -> [Winding]
     {
         var result:[Winding] = []

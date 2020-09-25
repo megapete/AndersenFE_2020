@@ -28,6 +28,7 @@
                 <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
                 <outlet property="deactivateAllWdgTurnsMenuItem" destination="3cl-q1-BRW" id="HY4-kW-3FO"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
+                <outlet property="moveWdgRadiallyMenuItem" destination="UMp-RI-jDT" id="rqQ-Es-GRp"/>
                 <outlet property="reverseCurrentMenuItem" destination="OAx-Vq-OSe" id="H52-D3-KSC"/>
                 <outlet property="saveAndOutputMenuItem" destination="MZo-Xo-m12" id="DXS-ke-0GV"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
@@ -449,6 +450,9 @@
                             </menuItem>
                             <menuItem title="Move Winding Radially..." id="UMp-RI-jDT">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleMoveWindingRadially:" target="6yZ-bT-Gps" id="8Cc-nv-QbZ"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Change Winding Name..." id="SkO-4j-PeK">
                                 <modifierMask key="keyEquivalentModifierMask"/>

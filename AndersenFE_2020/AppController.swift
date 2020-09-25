@@ -77,6 +77,9 @@ class AppController: NSObject, NSMenuItemValidation {
     var undoStack:[PCH_AFE2020_Save_Struct] = []
     var redoStack:[PCH_AFE2020_Save_Struct] = []
     
+    // Output array
+    var outputDataArray:[OutputData] = []
+    
     // MARK: Menu outlets
     // File Menu
     @IBOutlet weak var saveMenuItem: NSMenuItem!

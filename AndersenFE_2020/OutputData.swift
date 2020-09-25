@@ -44,9 +44,9 @@ struct OutputData {
         
         let maxCombinedForce:Double
         
-        private let dcLoss75:Double
-        private let averageEddyPU75:Double
-        private let maximumEddyPU75:Double
+        fileprivate let dcLoss75:Double
+        fileprivate let averageEddyPU75:Double
+        fileprivate let maximumEddyPU75:Double
         let maxEddyLossRect:NSRect
         
         // Andersen calculates losses at 75C
@@ -117,10 +117,59 @@ struct OutputData {
         {
             for nextLayer in nextWdg.layers
             {
+                let parent = nextLayer.parentTerminal
+                let windingDesc = parent.name
+                let parentTerm = parent.andersenNumber
+                let currenTdir = parent.currentDirection
+                let ID = nextLayer.innerRadius * 2.0
+                let OD = nextLayer.OD()
                 
+                guard let nextLayerScData = results.LayerData(andersenLayerNum: nextLayer.andersenLayerNum) else
+                {
+                    DLog("Could not find layer short-circuit data for layer #\(nextLayer.andersenLayerNum)")
+                    return nil
+                }
+                
+                var minSpacerBars = 0.0
+                var maxRadialForce = 0.0
+                var maxBlockForce = 0.0
+                var maxCombForce = 0.0
+                
+                for nextSegment in nextLayer.segments
+                {
+                    guard let segmentScData = results.SegmentData(andersenSegNum: nextSegment.andersenSegNum) else
+                    {
+                        DLog("Could not find layer short-circuit data for segment #\(nextLayer.andersenLayerNum)")
+                        return nil
+                    }
+                    
+                    if segmentScData.scMinSpacerBars > minSpacerBars
+                    {
+                        minSpacerBars = segmentScData.scMinSpacerBars
+                    }
+                    
+                    if fabs(segmentScData.scMaxTensionCompression) > fabs(maxRadialForce)
+                    {
+                        maxRadialForce = segmentScData.scMaxTensionCompression
+                    }
+                    
+                    if segmentScData.scForceInSpacerBlocks > maxBlockForce
+                    {
+                        maxBlockForce = segmentScData.scForceInSpacerBlocks
+                    }
+                    
+                    if segmentScData.scCombinedForce > maxCombForce
+                    {
+                        maxCombForce = segmentScData.scCombinedForce
+                    }
+                }
+                
+                let newLayerData = LayerData(windingDesc: windingDesc, parentTerminal: parentTerm, currentDirection: currenTdir, ID: ID, OD: OD, minimumSpacerBars: minSpacerBars, maxRadialForce: maxRadialForce, maxSpacerBlockForce: maxBlockForce, maxCombinedForce: maxCombForce, dcLoss75: nextLayerScData.dcLoss, averageEddyPU75: nextLayerScData.eddyPUaverage, maximumEddyPU75: nextLayerScData.eddyPUmax, maxEddyLossRect: nextLayerScData.eddyMaxRect)
+                
+                layerData.append(newLayerData)
             }
         }
         
-        self.layers = []
+        self.layers = layerData
     }
 }

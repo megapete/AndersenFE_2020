@@ -72,7 +72,69 @@ struct ImpedanceAndScData:Codable {
     
     var layerDataArray:[LayerScData] = []
     
-    let fluxLines:String
+    let fluxLineString:String
+    var fluxLines:[[NSPoint]] {
+        get {
+            
+            // The logic for this comes from my old AndersenFE program. Where I got THAT from is anyone's guess. The Andersen-supplied BASIC program PLOTSCR.BAS seems to be the source for the variable names, but I don't know how I figured out the file format. I have simplified it somewhat based on what I'm seeing in the actual BAS.FIL file.
+            var result:[[NSPoint]] = []
+            
+            let fluxFileComponents = self.fluxLineString.components(separatedBy: .newlines)
+            
+            // skip past the first couple of lines of the file
+            var currentComponentIndex = 3
+            var currentComponent = fluxFileComponents[currentComponentIndex]
+            
+            // get the maximum X & Y values
+            var currentLine = currentComponent.components(separatedBy: .whitespaces)
+            currentLine.removeAll(where: {$0 == ""})
+            let maxDims:NSPoint = NSPoint(x: Double(currentLine[2])!, y: Double(currentLine[3])!)
+            result.append([maxDims])
+            
+            // advance to the next line
+            currentComponentIndex += 1
+            currentComponent = fluxFileComponents[currentComponentIndex]
+            currentLine = currentComponent.components(separatedBy: .whitespaces)
+            currentLine.removeAll(where: {$0 == ""})
+            
+            var IPNTS:Int = Int(currentLine[0])!
+            var ICOL:Int = Int(currentLine[1])!
+            
+            while (ICOL != 0)
+            {
+                currentComponentIndex += 1
+                
+                if ICOL == 4
+                {
+                    currentComponent = fluxFileComponents[currentComponentIndex]
+                    currentLine = currentComponent.components(separatedBy: .whitespaces)
+                    currentLine.removeAll(where: {$0 == ""})
+                    
+                    var dimArray:[NSPoint] = []
+                    for i in 0..<IPNTS
+                    {
+                        let nextPoint = NSPoint(x: Double(currentLine[i])!, y: Double(currentLine[i + IPNTS])!)
+                        dimArray.append(nextPoint)
+                    }
+                    
+                    result.append(dimArray)
+                }
+                
+                // advance to the next line
+                currentComponentIndex += 1
+                currentComponent = fluxFileComponents[currentComponentIndex]
+                currentLine = currentComponent.components(separatedBy: .whitespaces)
+                currentLine.removeAll(where: {$0 == ""})
+                
+                IPNTS = Int(currentLine[0])!
+                ICOL = Int(currentLine[1])!
+            }
+            
+            // DLog("Done")
+            return result
+        }
+    }
+    
     let fld8File:String
     
     // Thrust is in Newtons (metric) or Pounds (inch)
@@ -93,11 +155,11 @@ struct ImpedanceAndScData:Codable {
         
         if let fluxLines = andersenOutput.fluxLineData
         {
-            self.fluxLines = fluxLines
+            self.fluxLineString = fluxLines
         }
         else
         {
-            self.fluxLines = ""
+            self.fluxLineString = ""
         }
         
         if let fld8File = andersenOutput.fld8FileString

@@ -109,7 +109,7 @@ class AppController: NSObject, NSMenuItemValidation {
     // View Menu
     @IBOutlet weak var showFld8MenuItem: NSMenuItem!
     @IBOutlet weak var showFld12MenuItem: NSMenuItem!
-    
+    @IBOutlet weak var showFluxLinesMenuItem: NSMenuItem!
     @IBOutlet weak var zoomInMenuItem: NSMenuItem!
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem!
     @IBOutlet weak var zoomRectMenuItem: NSMenuItem!
@@ -129,6 +129,8 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var txfoView: TransformerView!
     @IBOutlet weak var termsView: TerminalsView!
     @IBOutlet weak var dataView: DataView!
+    
+    var fluxLinesAreHidden = true
     
     
     // MARK: Initialization
@@ -1107,6 +1109,31 @@ class AppController: NSObject, NSMenuItemValidation {
         self.dataView.UpdateWarningField()
     }
     
+    @IBAction func handleShowFluxLines(_ sender: Any) {
+        
+        self.doShowHideFluxLines(hide: !self.fluxLinesAreHidden)
+    }
+    
+    func doShowHideFluxLines(hide:Bool)
+    {
+        if hide
+        {
+            DLog("Hiding flux lines")
+            self.showFluxLinesMenuItem.title = "Show Flux Lines"
+            self.fluxLinesAreHidden = true
+            return
+        }
+        
+        guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
+        {
+            DLog("Flux lines not available")
+            return
+        }
+        
+        let testArray = results.fluxLines
+        
+    }
+    
     // MARK: Menu validation
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         
@@ -1201,7 +1228,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 return false
             }
         }
-        else if menuItem == self.showFld12MenuItem
+        else if menuItem == self.showFld12MenuItem || menuItem == self.showFluxLinesMenuItem
         {
             guard let txfo = currentTxfo, txfo.scResults != nil else
             {

@@ -118,8 +118,6 @@ struct SegmentPath {
 
 class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
     
-    
-
     // I suppose that I could get fancy and create a TransformerViewDelegate protocol but since the calls are so specific, I'm unable to justify the extra complexity, so I'll just save a weak reference to the AppController here
     weak var appController:AppController? = nil
     

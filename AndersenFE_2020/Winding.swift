@@ -187,7 +187,7 @@ class Winding:Codable {
                 result = 0.016 + Double(self.numStrands - 5) / 2.0 * 0.0025
             }
             
-            DLog("CTC adder: \(result)")
+            // DLog("CTC adder: \(result)")
             
             return result * 25.4
         }
@@ -831,7 +831,7 @@ class Winding:Codable {
         var nextIR = self.coilID / 2.0
         let copperRadialBuild = (numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim)) * self.radialOverbuild
         
-        DLog("Turns: \(numTurnsRadiallyPerLayer); Dim: \(self.turnDef.Dimensions().radial / 25.4); Build: \(copperRadialBuild / 25.4)")
+        // DLog("Turns: \(numTurnsRadiallyPerLayer); Dim: \(self.turnDef.Dimensions().radial / 25.4); Build: \(copperRadialBuild / 25.4)")
         
         var layerSegments:[Segment] = []
         let strandsRadiallyPerLayer:Int = Int(ceil(numTurnsRadiallyPerLayer)) * self.turnDef.NumStrandsRadially()

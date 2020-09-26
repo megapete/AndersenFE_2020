@@ -313,9 +313,9 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        txfo.OffsetWindingRadially(winding: newWdg, deltaR: deltaR)
+        newTransformer.OffsetWindingRadially(winding: newWdg, deltaR: deltaR)
         
-        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: false)
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
     

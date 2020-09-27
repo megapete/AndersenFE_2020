@@ -1040,7 +1040,14 @@ class AppController: NSObject, NSMenuItemValidation {
             }
         }
         
-        self.txfoView.needsDisplay = true
+        if !self.fluxLinesAreHidden
+        {
+            self.doShowHideFluxLines(hide: false)
+        }
+        else
+        {
+            self.txfoView.needsDisplay = true
+        }
         
         let termSet = txfo.AvailableTerminals()
         
@@ -1121,17 +1128,55 @@ class AppController: NSObject, NSMenuItemValidation {
             DLog("Hiding flux lines")
             self.showFluxLinesMenuItem.title = "Show Flux Lines"
             self.fluxLinesAreHidden = true
-            return
+            self.txfoView.fluxlines = []
         }
-        
-        guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
+        else
         {
-            DLog("Flux lines not available")
-            return
+            guard let currTxfo = self.currentTxfo, let results = currTxfo.scResults else
+            {
+                DLog("Andersen results not available")
+                return
+            }
+            
+            var fluxLineArray = results.fluxLines
+            
+            guard !fluxLineArray.isEmpty else
+            {
+                DLog("Flux lines not available")
+                return
+            }
+            
+            // for now, we don't use the max dims for anything
+            let _ = fluxLineArray.removeFirst()
+            
+            var pathArray:[NSBezierPath] = []
+            for nextPath in fluxLineArray
+            {
+                var gotFirst = false
+                let newFluxLine = NSBezierPath()
+                for nextPoint in nextPath
+                {
+                    if !gotFirst
+                    {
+                        newFluxLine.move(to: nextPoint)
+                        gotFirst = true
+                    }
+                    else
+                    {
+                        newFluxLine.line(to: nextPoint)
+                    }
+                }
+                
+                pathArray.append(newFluxLine)
+            }
+            
+            self.showFluxLinesMenuItem.title = "Hide Flux Lines"
+            self.fluxLinesAreHidden = false
+            
+            self.txfoView.fluxlines = pathArray
         }
         
-        let testArray = results.fluxLines
-        
+        self.txfoView.needsDisplay = true
     }
     
     // MARK: Menu validation

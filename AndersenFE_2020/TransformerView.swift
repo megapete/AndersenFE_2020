@@ -160,6 +160,8 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
     
     var currentSegment:SegmentPath? = nil
     
+    var fluxlines:[NSBezierPath] = []
+    
     @IBOutlet weak var contextualMenu:NSMenu!
     @IBOutlet weak var reverseCurrentDirectionMenuItem:NSMenuItem!
     @IBOutlet weak var toggleActivationMenuItem:NSMenuItem!
@@ -188,6 +190,16 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         if let currSeg = self.currentSegment
         {
             self.ShowHandles(segment: currSeg)
+        }
+        
+        if !fluxlines.isEmpty
+        {
+            NSColor.black.set()
+            
+            for nextPath in fluxlines
+            {
+                nextPath.stroke()
+            }
         }
         
         if self.mode == .zoomRect

@@ -33,6 +33,10 @@ struct ImpedanceAndScData:Codable {
     /// Induction level at legs (T)
     let BmaxAtLeg:Double
     
+    /// Data needed to draw fluxlines correctly
+    let zMin:Double
+    let coreRadius:Double
+    
     /// Struct to save the various SC data for a segment (this is based on Andersen)
     struct SegmentScData:Codable {
         
@@ -73,6 +77,7 @@ struct ImpedanceAndScData:Codable {
     var layerDataArray:[LayerScData] = []
     
     let fluxLineString:String
+    /// This routine returns an array of an array of NSPoints. The first array has a single NSPoint in it, representing the maximum dimensions required for the flux lines. Afger that, each array represents the points on the flux line. NOTE: The fluxline x-dimensions are from the core leg (not the center of the core).
     var fluxLines:[[NSPoint]] {
         get {
             
@@ -113,7 +118,7 @@ struct ImpedanceAndScData:Codable {
                     var dimArray:[NSPoint] = []
                     for i in 0..<IPNTS
                     {
-                        let nextPoint = NSPoint(x: Double(currentLine[i])!, y: Double(currentLine[i + IPNTS])!)
+                        let nextPoint = NSPoint(x: Double(currentLine[i])! + self.coreRadius, y: Double(currentLine[i + IPNTS])! + self.zMin)
                         dimArray.append(nextPoint)
                     }
                     
@@ -152,6 +157,17 @@ struct ImpedanceAndScData:Codable {
         self.BmaxAtLeg = andersenOutput.bmaxAtLeg
         self.totalThrustLower = andersenOutput.totalThrustLower
         self.totalThrustUpper = andersenOutput.totalThrustUpper
+        
+        if let inputData = andersenOutput.inputData
+        {
+            self.zMin = inputData.lowerZ
+            self.coreRadius = inputData.coreDiameter / 2.0
+        }
+        else
+        {
+            self.zMin = 0.0
+            self.coreRadius = 0.0
+        }
         
         if let fluxLines = andersenOutput.fluxLineData
         {

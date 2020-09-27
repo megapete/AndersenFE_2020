@@ -45,6 +45,9 @@ class Transformer:Codable {
     
     var wdgTerminals:[Terminal?] = []
     
+    /// Special tuple that only has proper entries if there is a zigzag connection on the transformer
+    var zigzagTerms:[Int] = [0, 0]
+    
     /// V/N reference terminal
     var vpnRefTerm:Int? = nil
     
@@ -56,7 +59,7 @@ class Transformer:Codable {
     var scResults:ImpedanceAndScData? = nil
     
     /// Straightforward init function (designed for the copy() function below)
-    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], vpnRefTermNum:Int? = nil, niRefTermNum:Int? = nil, niDistribution:[Double]? = nil, scResults:ImpedanceAndScData? = nil)
+    init(numPhases:Int, frequency:Double, tempRise:Double, core:Core, scFactor:Double, systemGVA:Double, windings:[Winding], terminals:[Terminal?], vpnRefTermNum:Int? = nil, niRefTermNum:Int? = nil, niDistribution:[Double]? = nil, scResults:ImpedanceAndScData? = nil, zigzagTerms:[Int])
     {
         self.numPhases = numPhases
         self.frequency = frequency
@@ -69,6 +72,7 @@ class Transformer:Codable {
         self.niDistribution = niDistribution
         self.scResults = scResults
         self.wdgTerminals = []
+        self.zigzagTerms = zigzagTerms
         
         var index = 0
         for nextWdg in windings
@@ -92,6 +96,34 @@ class Transformer:Codable {
         let spacerBlockWarningLimit = 2500.0 * nmm2PerPsi // based on my experience, anything over 2500 is a bitch to compress
         let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
+        
+        if self.zigzagTerms[0] > 0
+        {
+            let zigzagConn = self.Copy()
+            
+            // assign the zig terminal to be the NI-reference terminal
+            var refTermIndex = 0
+            var refTerm = try! TerminalsFromAndersenNumber(termNum: self.zigzagTerms[refTermIndex])
+            if refTerm.count > 1
+            {
+                refTermIndex = 1
+                refTerm = try! TerminalsFromAndersenNumber(termNum: self.zigzagTerms[refTermIndex])
+            }
+            
+            if refTerm.count == 1
+            {
+                let otherIndex = refTermIndex == 0 ? 1 : 0
+                
+                zigzagConn.niRefTerm = refTermIndex
+                
+                if refTerm[0].nominalAmps < 0.01
+                {
+                    refTerm[0].SetVoltsAndAmps(amps: 1.0)
+                }
+                
+                
+            }
+        }
         
         // check for actual problems here
         // TODO: Add tilting calculation
@@ -255,7 +287,7 @@ class Transformer:Codable {
     /// Return a copy of this transformer (designed to be used with Undo functionality)
     func Copy() -> Transformer
     {
-        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.wdgTerminals, vpnRefTermNum: self.vpnRefTerm, niRefTermNum: self.niRefTerm, niDistribution: self.niDistribution, scResults: self.scResults)
+        return Transformer(numPhases: self.numPhases, frequency: self.frequency, tempRise: self.tempRise, core: self.core, scFactor: self.scFactor, systemGVA: self.systemGVA, windings: self.windings, terminals: self.wdgTerminals, vpnRefTermNum: self.vpnRefTerm, niRefTermNum: self.niRefTerm, niDistribution: self.niDistribution, scResults: self.scResults, zigzagTerms: self.zigzagTerms)
     }
     
     /// Some errors that can be thrown by various routines
@@ -1313,6 +1345,7 @@ class Transformer:Codable {
                     }
                     
                     zigTerm = newTermNum
+                    self.zigzagTerms[0] = zigTerm
                     connection = .zig
                     gotZig = true
                     termName = "ZIG"
@@ -1325,6 +1358,7 @@ class Transformer:Codable {
                     }
                     
                     zagTerm = newTermNum
+                    self.zigzagTerms[1] = zagTerm
                     connection = .zag
                     gotZag = true
                     termName = "ZAG"

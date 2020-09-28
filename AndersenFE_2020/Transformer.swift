@@ -51,7 +51,7 @@ class Transformer:Codable {
     /// V/N reference terminal
     var vpnRefTerm:Int? = nil
     
-    /// NI reference termonal
+    /// NI reference terminal
     var niRefTerm:Int? = nil
     
     var niDistribution:[Double]? = nil
@@ -103,67 +103,49 @@ class Transformer:Codable {
             let zigzagConn = self.Copy()
             zigzagConn.scResults = nil
             
-            // assign the zig terminal to be the NI-reference terminal
-            var refTermIndex = 0
-            var refTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[refTermIndex])
-            if refTerm.count > 1
+            let zigTermNum = self.zigzagTerms[0]
+            let zagTermNum = self.zigzagTerms[1]
+            
+            let oldWindings = zigzagConn.windings
+            let oldTerms = zigzagConn.wdgTerminals
+            zigzagConn.windings = []
+            zigzagConn.wdgTerminals = []
+            
+            var currDir = -1
+            var nextTermNum = 1
+            for nextWdg in oldWindings
             {
-                refTermIndex = 1
-                refTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[refTermIndex])
-            }
-            
-            let otherIndex = refTermIndex == 0 ? 1 : 0
-            let otherTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[otherIndex])
-            
-            zigzagConn.niRefTerm = zigzagConn.zigzagTerms[refTermIndex]
-            
-            if refTerm[0].nominalAmps < 0.01
-            {
-                for nextTerm in refTerm
-                {
-                    nextTerm.SetVoltsAndAmps(amps: 1.0)
-                    nextTerm.currentDirection = 1
-                }
-            }
+                let oldTerm = nextWdg.terminal
                 
-            let availableTermNums = zigzagConn.AvailableTerminals()
-            for nextTermNum in availableTermNums
-            {
-                if nextTermNum == zigzagConn.niRefTerm!
+                if oldTerm.andersenNumber == zigTermNum || oldTerm.andersenNumber == zagTermNum
                 {
-                    continue
-                }
-                
-                if nextTermNum == zigzagConn.zigzagTerms[otherIndex]
-                {
-                    for nextTerm in otherTerm
-                    {
-                        nextTerm.SetVoltsAndAmps(amps: refTerm[0].nominalAmps)
-                        nextTerm.currentDirection = -refTerm[0].currentDirection
-                    }
-                }
-                else
-                {
-                    let unusedTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: nextTermNum)
-                    for nextTerm in unusedTerm
-                    {
-                        nextTerm.SetVoltsAndAmps(amps: 0.0)
-                    }
+                    let newTerm = Terminal(name: oldTerm.name, lineVoltage: oldTerm.nominalLineVolts, noloadLegVoltage: oldTerm.noloadLegVoltage, VA: oldTerm.VA, connection: .delta, currDir: currDir, termNum: nextTermNum)
+                    
+                    zigzagConn.windings.append(Winding(srcWdg: nextWdg, terminal: newTerm))
+                    zigzagConn.wdgTerminals.append(newTerm)
+                    
+                    currDir *= -1
+                    nextTermNum += 1
                 }
             }
+            
+            zigzagConn.vpnRefTerm = 1
+            zigzagConn.niRefTerm = 1
+            
+            let refTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: 1)
             
             do
             {
                 let _ = try zigzagConn.AmpTurns(forceBalance: true, showDistributionDialog: false)
                 
                 let fld12txfo = try zigzagConn.QuickFLD12transformer()
-                let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
-                let savePanel = NSSavePanel()
-                savePanel.message = "Save the Andersen Input File"
-                if (savePanel.runModal() == .OK)
-                {
-                    try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
-                }
+                // let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                // let savePanel = NSSavePanel()
+                // savePanel.message = "Save the Andersen Input File"
+                // if (savePanel.runModal() == .OK)
+                // {
+                //    try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                // }
                 
                 if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                 {
@@ -198,13 +180,15 @@ class Transformer:Codable {
                 let _ = alert.runModal()
             }
             
-            if let result = zigzagConn.scResults
+            if let scResult = zigzagConn.scResults
             {
-                let refTermLegVolts = try! zigzagConn.TerminalLineVoltage(terminal: zigzagConn.niRefTerm!) / SQRT3
+                let refTermLegVolts = try! zigzagConn.TerminalLineVoltage(terminal: zigzagConn.niRefTerm!)
                 
-                let zeroSequenceOhms = refTermLegVolts * result.puImpedance / refTerm[0].nominalAmps
+                let zeroSequenceOhms = refTermLegVolts * scResult.puImpedance / refTerm[0].nominalAmps
+                let z0 = String(format: "%0.2f", zeroSequenceOhms)
+                // DLog("Zero-Sequence Ohms: \(zeroSequenceOhms)")
                 
-                DLog("Zero-Sequence Ohms: \(zeroSequenceOhms)")
+                result.append(DataView.WarningData(string: "ZigZag Z0: \(z0) \u{3A9}/ph", level: .information, wordsToHighlight: []))
             }
         }
         

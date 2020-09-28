@@ -122,7 +122,7 @@ class Terminal: Codable
     }
     
     /// The connection to use for this Terminal
-    let connection:TerminalConnection
+    var connection:TerminalConnection
     
     /// The current direction for this Terminal. Note that a value of 0 for this property is ILLEGAL.
     var currentDirection:Int

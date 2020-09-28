@@ -97,31 +97,114 @@ class Transformer:Codable {
         let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
         
+        // check if there are zigzag terminals and if so, calculate their zero-sequence impedance
         if self.zigzagTerms[0] > 0
         {
             let zigzagConn = self.Copy()
+            zigzagConn.scResults = nil
             
             // assign the zig terminal to be the NI-reference terminal
             var refTermIndex = 0
-            var refTerm = try! TerminalsFromAndersenNumber(termNum: self.zigzagTerms[refTermIndex])
+            var refTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[refTermIndex])
             if refTerm.count > 1
             {
                 refTermIndex = 1
-                refTerm = try! TerminalsFromAndersenNumber(termNum: self.zigzagTerms[refTermIndex])
+                refTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[refTermIndex])
             }
             
-            if refTerm.count == 1
+            let otherIndex = refTermIndex == 0 ? 1 : 0
+            let otherTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: zigzagConn.zigzagTerms[otherIndex])
+            
+            zigzagConn.niRefTerm = zigzagConn.zigzagTerms[refTermIndex]
+            
+            if refTerm[0].nominalAmps < 0.01
             {
-                let otherIndex = refTermIndex == 0 ? 1 : 0
-                
-                zigzagConn.niRefTerm = refTermIndex
-                
-                if refTerm[0].nominalAmps < 0.01
+                for nextTerm in refTerm
                 {
-                    refTerm[0].SetVoltsAndAmps(amps: 1.0)
+                    nextTerm.SetVoltsAndAmps(amps: 1.0)
+                    nextTerm.currentDirection = 1
+                }
+            }
+                
+            let availableTermNums = zigzagConn.AvailableTerminals()
+            for nextTermNum in availableTermNums
+            {
+                if nextTermNum == zigzagConn.niRefTerm!
+                {
+                    continue
                 }
                 
+                if nextTermNum == zigzagConn.zigzagTerms[otherIndex]
+                {
+                    for nextTerm in otherTerm
+                    {
+                        nextTerm.SetVoltsAndAmps(amps: refTerm[0].nominalAmps)
+                        nextTerm.currentDirection = -refTerm[0].currentDirection
+                    }
+                }
+                else
+                {
+                    let unusedTerm = try! zigzagConn.TerminalsFromAndersenNumber(termNum: nextTermNum)
+                    for nextTerm in unusedTerm
+                    {
+                        nextTerm.SetVoltsAndAmps(amps: 0.0)
+                    }
+                }
+            }
+            
+            do
+            {
+                let _ = try zigzagConn.AmpTurns(forceBalance: true, showDistributionDialog: false)
                 
+                let fld12txfo = try zigzagConn.QuickFLD12transformer()
+                let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                let savePanel = NSSavePanel()
+                savePanel.message = "Save the Andersen Input File"
+                if (savePanel.runModal() == .OK)
+                {
+                    try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                }
+                
+                if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
+                {
+                    zigzagConn.scResults = ImpedanceAndScData(andersenOutput: fld12output)
+                }
+                else
+                {
+                    let alert = NSAlert()
+                    alert.messageText = "Calculation of impedance & forces for zigzag connection failed!"
+                    alert.informativeText = "Do you wish to save the Andersen input file before reverting to the last transformer?"
+                    alert.addButton(withTitle: "Save file")
+                    alert.addButton(withTitle: "Continue")
+                    alert.alertStyle = .critical
+                    
+                    if alert.runModal() == .alertFirstButtonReturn
+                    {
+                        let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
+                        
+                        let savePanel = NSSavePanel()
+                        savePanel.message = "Save the Andersen Input File"
+                        if (savePanel.runModal() == .OK)
+                        {
+                            try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                let alert = NSAlert(error: error)
+                alert.alertStyle = .critical
+                let _ = alert.runModal()
+            }
+            
+            if let result = zigzagConn.scResults
+            {
+                let refTermLegVolts = try! zigzagConn.TerminalLineVoltage(terminal: zigzagConn.niRefTerm!) / SQRT3
+                
+                let zeroSequenceOhms = refTermLegVolts * result.puImpedance / refTerm[0].nominalAmps
+                
+                DLog("Zero-Sequence Ohms: \(zeroSequenceOhms)")
             }
         }
         

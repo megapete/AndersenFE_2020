@@ -97,7 +97,7 @@ class Transformer:Codable {
         let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
         
-        // check if there are zigzag terminals and if so, calculate their zero-sequence impedance
+        // check if there are zigzag terminals and if so, calculate their zero-sequence impedance. The strategy here is to create a copy of the current transformer, then (in the copy) get rid of all non-zigzag terminals and windings. The zig and zag are then converted to delta-delta and we do a simple run of Andersen on it (like the old days in the Excel design file). The copied transformer is then simply discarded. This all works very well, by the way.
         if self.zigzagTerms[0] > 0
         {
             let zigzagConn = self.Copy()
@@ -107,7 +107,6 @@ class Transformer:Codable {
             let zagTermNum = self.zigzagTerms[1]
             
             let oldWindings = zigzagConn.windings
-            let oldTerms = zigzagConn.wdgTerminals
             zigzagConn.windings = []
             zigzagConn.wdgTerminals = []
             
@@ -139,13 +138,6 @@ class Transformer:Codable {
                 let _ = try zigzagConn.AmpTurns(forceBalance: true, showDistributionDialog: false)
                 
                 let fld12txfo = try zigzagConn.QuickFLD12transformer()
-                // let fileString = PCH_FLD12_Library.createFLD12InputFile(withTxfo: fld12txfo)
-                // let savePanel = NSSavePanel()
-                // savePanel.message = "Save the Andersen Input File"
-                // if (savePanel.runModal() == .OK)
-                // {
-                //    try fileString.write(to: savePanel.url!, atomically: false, encoding: .utf8)
-                // }
                 
                 if let fld12output = PCH_FLD12_Library.runFLD12withTxfo(fld12txfo, outputType: .metric)
                 {
@@ -1137,6 +1129,7 @@ class Transformer:Codable {
             case TooManySpecialTypes
             case IllegalTerminalNumber
             case IllegalAutoTerminalNumber
+            case IllegalZigzagTerminalNumber
         }
         
         let info:String
@@ -1177,6 +1170,10 @@ class Transformer:Codable {
                 else if self.type == .IllegalTerminalNumber
                 {
                     return "Could not assign an Andersen terminal number to winding: \(self.info)"
+                }
+                else if self.type == .IllegalZigzagTerminalNumber
+                {
+                    return "Zig terminal number MUST be Zag terminal number plus 1 (ie: consectuve numbers with Zag < Zig)"
                 }
                 
                 return "An unknown error occurred."
@@ -1411,6 +1408,11 @@ class Transformer:Codable {
                         throw DesignFileError(info: "Zig", type: .TooManySpecialTypes)
                     }
                     
+                    if zagTerm > 0 && newTermNum != zagTerm + 1
+                    {
+                        throw DesignFileError(info: "", type: .IllegalZigzagTerminalNumber)
+                    }
+                    
                     zigTerm = newTermNum
                     self.zigzagTerms[0] = zigTerm
                     connection = .zig
@@ -1422,6 +1424,11 @@ class Transformer:Codable {
                     if gotZag && newTermNum != zagTerm
                     {
                         throw DesignFileError(info: "Zag", type: .TooManySpecialTypes)
+                    }
+                    
+                    if zigTerm > 0 && newTermNum != zigTerm - 1
+                    {
+                        throw DesignFileError(info: "", type: .IllegalZigzagTerminalNumber)
                     }
                     
                     zagTerm = newTermNum

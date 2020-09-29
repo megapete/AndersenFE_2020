@@ -119,6 +119,8 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // Output Menu
     @IBOutlet weak var saveAndOutputMenuItem: NSMenuItem!
+    @IBOutlet weak var addTxfoOutputMenuItem: NSMenuItem!
+    @IBOutlet weak var saveOutputDataMenuItem: NSMenuItem!
     
     
     // MARK: Preferences
@@ -267,6 +269,29 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    @IBAction func handleAddTxfoOutput(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo, txfo.scResults != nil else
+        {
+            return
+        }
+        
+        if txfo.txfoDesc.isEmpty
+        {
+            self.handleSetTxfoDesc(self)
+        }
+        
+        if let outputData = OutputData(txfo: txfo, outputDesc: txfo.txfoDesc)
+        {
+            self.outputDataArray.append(outputData)
+        }
+        else
+        {
+            DLog("Could not produce output data!")
+        }
+    }
+    
     
     @IBAction func handleMoveWindingRadially(_ sender: Any) {
         
@@ -1273,12 +1298,16 @@ class AppController: NSObject, NSMenuItemValidation {
                 return false
             }
         }
-        else if menuItem == self.showFld12MenuItem || menuItem == self.showFluxLinesMenuItem
+        else if menuItem == self.showFld12MenuItem || menuItem == self.showFluxLinesMenuItem || menuItem == self.addTxfoOutputMenuItem
         {
             guard let txfo = currentTxfo, txfo.scResults != nil else
             {
                 return false
             }
+        }
+        else if menuItem == self.saveOutputDataMenuItem
+        {
+            return !self.outputDataArray.isEmpty
         }
         
         return true
@@ -1378,6 +1407,24 @@ class AppController: NSObject, NSMenuItemValidation {
     }
     
     // MARK: Saving and Loading functions
+    
+    @IBAction func handleSaveOutputData(_ sender: Any) {
+        
+        if self.outputDataArray.isEmpty
+        {
+            return
+        }
+        
+        var outputString = ""
+        
+        outputString.append("Description,")
+        for nextOutData in self.outputDataArray
+        {
+            outputString.append(",\(nextOutData.description)")
+        }
+        outputString.append("\n")
+        
+    }
     
     @IBAction func handleSaveAndersenOutputFile(_ sender: Any) {
         

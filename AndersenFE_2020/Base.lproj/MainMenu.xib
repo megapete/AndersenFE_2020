@@ -23,6 +23,7 @@
         <customObject id="6yZ-bT-Gps" customClass="AppController" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
                 <outlet property="activateAllWdgTurnsMenuItem" destination="XfI-aw-bW1" id="zWf-IQ-LzA"/>
+                <outlet property="addTxfoOutputMenuItem" destination="F1p-V3-IxQ" id="2gj-Rv-wUQ"/>
                 <outlet property="changeWdgNameMenuItem" destination="SkO-4j-PeK" id="LSA-Cs-P8f"/>
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
                 <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
@@ -33,6 +34,7 @@
                 <outlet property="saveAndOutputMenuItem" destination="MZo-Xo-m12" id="DXS-ke-0GV"/>
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
+                <outlet property="saveOutputDataMenuItem" destination="zXS-Q3-tnS" id="Ngx-IH-uBJ"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
                 <outlet property="setNiRefTermMenuItem" destination="L56-sK-jsw" id="tnY-J0-MSa"/>
@@ -572,9 +574,18 @@
                         <items>
                             <menuItem title="Add Transformer to List... " id="F1p-V3-IxQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleAddTxfoOutput:" target="6yZ-bT-Gps" id="r64-hl-zV7"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Edit Output List" id="KSz-xC-UeU">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Save Output Data..." id="zXS-Q3-tnS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSaveOutputData:" target="6yZ-bT-Gps" id="Pdr-Aa-ZZ4"/>
+                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="ted-Fg-hc2"/>
                             <menuItem title="Save Andersen Output File..." id="MZo-Xo-m12">
@@ -630,7 +641,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="860" height="871"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -647,11 +658,11 @@
                                         <rect key="frame" x="45" y="0.0" width="498" height="872"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
-                                            <rect key="frame" x="1" y="1" width="481" height="855"/>
+                                            <rect key="frame" x="1" y="1" width="496" height="870"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="481" height="855"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="496" height="870"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <connections>
                                                         <outlet property="activateAllWdgTurnsMenuItem" destination="44K-HR-t3v" id="AZ2-GY-vFs"/>
@@ -664,11 +675,11 @@
                                             </subviews>
                                         </clipView>
                                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="0P7-ff-3j5">
-                                            <rect key="frame" x="1" y="856" width="481" height="15"/>
+                                            <rect key="frame" x="1" y="855" width="496" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gzJ-e9-Qi9">
-                                            <rect key="frame" x="482" y="1" width="15" height="855"/>
+                                            <rect key="frame" x="481" y="1" width="16" height="870"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>

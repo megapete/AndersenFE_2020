@@ -1491,6 +1491,52 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         outputString.append("\n")
         
+        // Show the per-layer data
+        outputString.append("LAYER DATA\n")
+        
+        for layerIndex in 0..<outputData[0].layers.count
+        {
+            outputString.append("Layer \(layerIndex + 1),")
+            
+            for nextOutData in outputData
+            {
+                outputString.append(",Winding: \(nextOutData.layers[layerIndex].windingDesc)")
+            }
+            outputString.append("\n ,")
+            
+            for nextOutData in outputData
+            {
+                outputString.append(",Terminal: \(nextOutData.layers[layerIndex].parentTerminal)")
+            }
+            outputString.append("\n ,")
+            
+            for nextOutData in outputData
+            {
+                outputString.append(",Current direction: \(nextOutData.layers[layerIndex].currentDirection)")
+            }
+            outputString.append("\n ,")
+            
+            for nextOutData in outputData
+            {
+                let mmDims = String(format: "%0.1fmm/%0.1fmm", nextOutData.layers[layerIndex].ID, nextOutData.layers[layerIndex].OD)
+                let inchDims = String(format: "%0.3f\"/%0.3f\"", nextOutData.layers[layerIndex].ID / 25.4, nextOutData.layers[layerIndex].OD / 25.4)
+                
+                outputString.append(",ID/OD: \(mmDims) (\(inchDims))")
+            }
+            outputString.append("\n ,")
+            
+            for nextOutData in outputData
+            {
+                let minRadSupts = nextOutData.layers[layerIndex].minimumSpacerBars
+                let minRadString = minRadSupts < 0.1 ? "N/A" : String(format: "%0.1f", minRadSupts)
+                
+                outputString.append(",Min radial supports: \(minRadString)")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("\n\n")
+            
+        }
         
         do
         {

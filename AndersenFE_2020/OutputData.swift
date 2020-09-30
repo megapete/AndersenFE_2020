@@ -173,7 +173,7 @@ struct OutputData {
             }
         }
         
-        self.layers = layerData
+        self.layers = layerData.sorted(by: {$0.ID < $1.ID})
     }
     
     func AvailableTerms() -> [Int]

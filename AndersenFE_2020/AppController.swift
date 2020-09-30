@@ -1627,9 +1627,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 outputString.append(",\(rectString)")
             }
             
-            
             outputString.append("\n\n")
-            
         }
         
         do

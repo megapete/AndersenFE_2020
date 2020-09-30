@@ -30,6 +30,8 @@
 		D3E307E424C2473A00FDAA83 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E307E324C2473A00FDAA83 /* Layer.swift */; };
 		D3F736E3251EB41B00F399A6 /* MoveWindingDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F736E2251EB41B00F399A6 /* MoveWindingDialog.swift */; };
 		D3F736E6251EB4A800F399A6 /* MoveWinding.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3F736E5251EB4A800F399A6 /* MoveWinding.xib */; };
+		D3F9D3DA2525484C00374594 /* EditOutputData.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3F9D3D92525484C00374594 /* EditOutputData.xib */; };
+		D3F9D3DD25254C7900374594 /* EditOutputDataDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F9D3DC25254C7900374594 /* EditOutputDataDialog.swift */; };
 		D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */; };
 		D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */; };
 		F522C85D251790F10036607F /* SplitSegmentDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F522C85C251790F10036607F /* SplitSegmentDialog.swift */; };
@@ -76,6 +78,8 @@
 		D3E307E324C2473A00FDAA83 /* Layer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
 		D3F736E2251EB41B00F399A6 /* MoveWindingDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveWindingDialog.swift; sourceTree = "<group>"; };
 		D3F736E5251EB4A800F399A6 /* MoveWinding.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MoveWinding.xib; sourceTree = "<group>"; };
+		D3F9D3D92525484C00374594 /* EditOutputData.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditOutputData.xib; sourceTree = "<group>"; };
+		D3F9D3DC25254C7900374594 /* EditOutputDataDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditOutputDataDialog.swift; sourceTree = "<group>"; };
 		D3FA0CC124EDE49000C68479 /* ModifyReferenceVoltageDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyReferenceVoltageDialog.swift; sourceTree = "<group>"; };
 		D3FA0CC324EDE4A300C68479 /* ModifyReferenceVoltage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModifyReferenceVoltage.xib; sourceTree = "<group>"; };
 		F522C85C251790F10036607F /* SplitSegmentDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitSegmentDialog.swift; sourceTree = "<group>"; };
@@ -155,6 +159,8 @@
 				F522C85F251791040036607F /* SplitSegment.xib */,
 				F5F8E837251B79EF00117F49 /* TextDisplayWindow.swift */,
 				F5F8E834251B699300117F49 /* TextDisplay.xib */,
+				D3F9D3DC25254C7900374594 /* EditOutputDataDialog.swift */,
+				D3F9D3D92525484C00374594 /* EditOutputData.xib */,
 				F5DD5A2A24D1F88C002D5F52 /* TransformerView.swift */,
 				F5ED559024C49074002E7031 /* Transformer.swift */,
 				F5ED558E24C46BE5002E7031 /* Winding.swift */,
@@ -249,6 +255,7 @@
 				D3F736E6251EB4A800F399A6 /* MoveWinding.xib in Resources */,
 				D3FA0CC424EDE4A300C68479 /* ModifyReferenceVoltage.xib in Resources */,
 				D38833E124CCC1C400A0C7A5 /* Preferences.xib in Resources */,
+				D3F9D3DA2525484C00374594 /* EditOutputData.xib in Resources */,
 				D3275F8424FADB22005D9F5A /* TransformerDescription.xib in Resources */,
 				F5F971C624FBCC0700267AAC /* ModifyWindingName.xib in Resources */,
 				D314455E24C220A00084DEC5 /* MainMenu.xib in Resources */,
@@ -286,6 +293,7 @@
 				F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */,
 				D38833DF24CCC19A00A0C7A5 /* PreferencesDialog.swift in Sources */,
 				D314456724C224650084DEC5 /* Segment.swift in Sources */,
+				D3F9D3DD25254C7900374594 /* EditOutputDataDialog.swift in Sources */,
 				F5ED559124C49074002E7031 /* Transformer.swift in Sources */,
 				D3B8A33624EB4814005AAC87 /* RegulatingWindingDialog.swift in Sources */,
 				F5D9DC4224DF429200D11103 /* AmpTurnsDistributionDialog.swift in Sources */,

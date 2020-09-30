@@ -16,6 +16,8 @@ struct OutputData {
     
     let impedance:Double
     
+    var z0:Double? = nil
+    
     struct TermData
     {
         let termNum:Int
@@ -95,13 +97,14 @@ struct OutputData {
         self.description = outputDesc
         self.MVA = results.baseMVA
         self.impedance = results.puImpedance
+        self.z0 = txfo.zeroSequenceImpedance
         
         var termData:[TermData] = []
         let availableTermNums = txfo.AvailableTerminals()
         for nextTermNum in availableTermNums
         {
-            let tryMVA = try? txfo.TotalVA(terminal: nextTermNum)
-            let tryV = try? txfo.TerminalLineVoltage(terminal: nextTermNum)
+            let tryMVA = try? txfo.TotalVA(terminal: nextTermNum) / 1.0E6
+            let tryV = try? txfo.TerminalLineVoltage(terminal: nextTermNum) / 1.0E3
             if tryMVA == nil || tryV == nil
             {
                 return nil
@@ -171,5 +174,32 @@ struct OutputData {
         }
         
         self.layers = layerData
+    }
+    
+    func AvailableTerms() -> [Int]
+    {
+        var result:[Int] = []
+        
+        for nextTerm in self.terminals
+        {
+            result.append(nextTerm.termNum)
+        }
+        
+        result.sort()
+        
+        return result
+    }
+    
+    func DataForTerm(number:Int) -> (mva:Double, kv:Double)?
+    {
+        for nextTerm in self.terminals
+        {
+            if nextTerm.termNum == number
+            {
+                return (nextTerm.termMVA, nextTerm.termKV)
+            }
+        }
+        
+        return nil
     }
 }

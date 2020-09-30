@@ -48,6 +48,9 @@ class Transformer:Codable {
     /// Special tuple that only has proper entries if there is a zigzag connection on the transformer
     var zigzagTerms:[Int] = [0, 0]
     
+    /// Special value that is only non-nil if there is a zigzag connection and the routine CheckForWarnings() has been called
+    var zeroSequenceImpedance:Double? = nil
+    
     /// V/N reference terminal
     var vpnRefTerm:Int? = nil
     
@@ -73,6 +76,7 @@ class Transformer:Codable {
         self.scResults = scResults
         self.wdgTerminals = []
         self.zigzagTerms = zigzagTerms
+        self.zeroSequenceImpedance = nil // this will get calculated later
         
         var index = 0
         for nextWdg in windings
@@ -177,6 +181,7 @@ class Transformer:Codable {
                 let refTermLegVolts = try! zigzagConn.TerminalLineVoltage(terminal: zigzagConn.niRefTerm!)
                 
                 let zeroSequenceOhms = refTermLegVolts * scResult.puImpedance / refTerm[0].nominalAmps
+                self.zeroSequenceImpedance = zeroSequenceOhms
                 let z0 = String(format: "%0.2f", zeroSequenceOhms)
                 // DLog("Zero-Sequence Ohms: \(zeroSequenceOhms)")
                 

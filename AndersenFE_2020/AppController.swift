@@ -188,6 +188,14 @@ class AppController: NSObject, NSMenuItemValidation {
         
     }
     
+    func InitializeAppController()
+    {
+        self.fluxLinesAreHidden = true
+        self.outputDataArray = []
+        self.undoStack = []
+        self.redoStack = []
+    }
+    
     // MARK: Model Modification & Update functions
     func updateCurrentTransformer(newTransformer:Transformer, reinitialize:Bool = false, runAndersen:Bool = true) {
                 
@@ -262,6 +270,7 @@ class AppController: NSObject, NSMenuItemValidation {
         
         if reinitialize
         {
+            self.InitializeAppController()
             self.initializeViews()
         }
         else
@@ -277,12 +286,18 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
-        if txfo.txfoDesc.isEmpty
+        var description = txfo.txfoDesc
+        if description.isEmpty
         {
-            self.handleSetTxfoDesc(self)
+            let descDlog = TransformerDescriptionDialog(description: "")
+            
+            if descDlog.runModal() == .OK
+            {
+                description = descDlog.desc
+            }
         }
         
-        if let outputData = OutputData(txfo: txfo, outputDesc: txfo.txfoDesc)
+        if let outputData = OutputData(txfo: txfo, outputDesc: description)
         {
             self.outputDataArray.append(outputData)
         }
@@ -1010,10 +1025,13 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // MARK: View functions
     // This function does the following things:
-    // 1) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
-    // 2) Calls updateViews() to draw the coil segments
+    // 1) Shows the main window (if its hidden)
+    // 2) Sets the bounds of the transformer view to the window of the transformer (does a "zoom all" using the current transformer core)
+    // 3) Calls updateViews() to draw the coil segments
     func initializeViews()
     {
+        self.mainWindow.makeKeyAndOrderFront(self)
+        
         self.handleZoomAll(self)
         
         self.termsView.InitializeFields(appController: self)
@@ -1140,6 +1158,12 @@ class AppController: NSObject, NSMenuItemValidation {
         
         self.dataView.UpdateWarningField()
     }
+    
+    @IBAction func handleBringToFront(_ sender: Any) {
+        
+        self.mainWindow.makeKeyAndOrderFront(self)
+    }
+    
     
     @IBAction func handleShowFluxLines(_ sender: Any) {
         
@@ -1415,14 +1439,82 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
+        let outputData = self.outputDataArray
+        
         var outputString = ""
         
         outputString.append("Description,")
-        for nextOutData in self.outputDataArray
+        for nextOutData in outputData
         {
             outputString.append(",\(nextOutData.description)")
         }
+        outputString.append("\n\n")
+        
+        // It is assumed that all of the saved results have the same terminal numbers
+        let availableTerms = outputData[0].AvailableTerms()
+        
+        for nextTermNum in availableTerms
+        {
+            outputString.append("Terminal #\(nextTermNum),")
+            
+            for nextOutData in outputData
+            {
+                if let nextData = nextOutData.DataForTerm(number: nextTermNum)
+                {
+                    let formattedMVA = String(format: "%0.3f", nextData.mva)
+                    let formattedKV = String(format: "%0.3f", nextData.kv)
+                    outputString.append(",MVA: \(formattedMVA) kV: \(formattedKV)")
+                }
+            }
+            
+            outputString.append("\n\n")
+        }
+        
+        // Show the positive sequence impedances (as percentages) for each option
+        outputString.append("Impedance,")
+        for nextOutData in outputData
+        {
+            let nextImp = String(format: "%0.2f%% @ %0.3f MVA", nextOutData.impedance * 100.0, nextOutData.MVA)
+            outputString.append(",\(nextImp)")
+        }
         outputString.append("\n")
+        
+        if outputData[0].z0 != nil
+        {
+            outputString.append("Zero-sequence impedance,")
+            for nextOutData in outputData
+            {
+                let nextImp = String(format: "%0.2f", nextOutData.z0!)
+                outputString.append(",\(nextImp) \u{3A9}/ph")
+            }
+            outputString.append("\n")
+        }
+        outputString.append("\n")
+        
+        
+        do
+        {
+            let savePanel = NSSavePanel()
+            savePanel.title = "AndersenFE_2020 Output file"
+            savePanel.message = "Save Output File"
+            savePanel.allowedFileTypes = ["txt"]
+            savePanel.allowsOtherFileTypes = false
+            
+            if savePanel.runModal() == .OK
+            {
+                if let fileUrl = savePanel.url
+                {
+                    try outputString.write(to: fileUrl, atomically: false, encoding: .utf8)
+                }
+            }
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
         
     }
     

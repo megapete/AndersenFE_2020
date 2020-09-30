@@ -1491,6 +1491,26 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         outputString.append("\n")
         
+        outputString.append("Upper Thrust,")
+        for nextOutData in outputData
+        {
+            let newtons = String(format: "%0.1f N", nextOutData.upperThrust)
+            let pounds = String(format: "%0.1f lbs", nextOutData.upperThrust * lbsPerNewton)
+            
+            outputString.append(",\(newtons) (\(pounds))")
+        }
+        outputString.append("\n")
+        
+        outputString.append("Lower Thrust,")
+        for nextOutData in outputData
+        {
+            let newtons = String(format: "%0.1f N", nextOutData.lowerThrust)
+            let pounds = String(format: "%0.1f lbs", nextOutData.lowerThrust * lbsPerNewton)
+            
+            outputString.append(",\(newtons) (\(pounds))")
+        }
+        outputString.append("\n\n")
+        
         // Show the per-layer data
         outputString.append("LAYER DATA\n")
         
@@ -1498,41 +1518,115 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             outputString.append("Layer \(layerIndex + 1),")
             
+            outputString.append("Winding:")
             for nextOutData in outputData
             {
-                outputString.append(",Winding: \(nextOutData.layers[layerIndex].windingDesc)")
+                outputString.append(",\(nextOutData.layers[layerIndex].windingDesc)")
             }
             outputString.append("\n ,")
             
+            outputString.append("Terminal #")
             for nextOutData in outputData
             {
-                outputString.append(",Terminal: \(nextOutData.layers[layerIndex].parentTerminal)")
+                outputString.append(",\(nextOutData.layers[layerIndex].parentTerminal)")
             }
             outputString.append("\n ,")
             
+            outputString.append("Current direction:")
             for nextOutData in outputData
             {
-                outputString.append(",Current direction: \(nextOutData.layers[layerIndex].currentDirection)")
+                outputString.append(",\(nextOutData.layers[layerIndex].currentDirection)")
             }
             outputString.append("\n ,")
             
+            outputString.append("ID/OD:")
             for nextOutData in outputData
             {
                 let mmDims = String(format: "%0.1fmm/%0.1fmm", nextOutData.layers[layerIndex].ID, nextOutData.layers[layerIndex].OD)
                 let inchDims = String(format: "%0.3f\"/%0.3f\"", nextOutData.layers[layerIndex].ID / 25.4, nextOutData.layers[layerIndex].OD / 25.4)
                 
-                outputString.append(",ID/OD: \(mmDims) (\(inchDims))")
+                outputString.append(",\(mmDims) (\(inchDims))")
             }
             outputString.append("\n ,")
             
+            outputString.append("Min radial supports:")
             for nextOutData in outputData
             {
                 let minRadSupts = nextOutData.layers[layerIndex].minimumSpacerBars
                 let minRadString = minRadSupts < 0.1 ? "N/A" : String(format: "%0.1f", minRadSupts)
                 
-                outputString.append(",Min radial supports: \(minRadString)")
+                outputString.append(",\(minRadString)")
             }
             outputString.append("\n ,")
+            
+            outputString.append("Max. Radial Force:")
+            for nextOutData in outputData
+            {
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxRadialForce)
+                let psi = String(format: "%0.1f psi", nextOutData.layers[layerIndex].maxRadialForce * psiPerNmm2)
+                
+                outputString.append(",\(nPerMm2) (\(psi))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("Max. Spacerblock Force: ")
+            for nextOutData in outputData
+            {
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxSpacerBlockForce)
+                let psi = String(format: "%0.1f psi", nextOutData.layers[layerIndex].maxSpacerBlockForce * psiPerNmm2)
+                
+                outputString.append(",\(nPerMm2) (\(psi))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("Max. Combined Force:")
+            for nextOutData in outputData
+            {
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxCombinedForce)
+                let psi = String(format: "%0.1f psi", nextOutData.layers[layerIndex].maxCombinedForce * psiPerNmm2)
+                
+                outputString.append(",\(nPerMm2) (\(psi))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("DC Loss:")
+            for nextOutData in outputData
+            {
+                let dc75 = String(format: "%0.1fW @75C", nextOutData.layers[layerIndex].dcLoss(temp: 75.0))
+                let dc85 = String(format: "%0.1fW @85C", nextOutData.layers[layerIndex].dcLoss(temp: 85.0))
+                
+                outputString.append(",\(dc75) (\(dc85))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("Average Eddy Loss:")
+            for nextOutData in outputData
+            {
+                let aveEddy75 = String(format: "%0.1f%% @75C", nextOutData.layers[layerIndex].aveEddyPU(temp: 75.0) * 100.0)
+                let aveEddy85 = String(format: "%0.1f%% @85C", nextOutData.layers[layerIndex].aveEddyPU(temp: 85.0) * 100.0)
+                
+                outputString.append(",\(aveEddy75) (\(aveEddy85))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("Maximum Eddy Loss:")
+            for nextOutData in outputData
+            {
+                let maxEddy75 = String(format: "%0.1f%% @75C", nextOutData.layers[layerIndex].maxEddyPU(temp: 75.0) * 100.0)
+                let maxEddy85 = String(format: "%0.1f%% @85C", nextOutData.layers[layerIndex].maxEddyPU(temp: 85.0) * 100.0)
+                
+                outputString.append(",\(maxEddy75) (\(maxEddy85))")
+            }
+            outputString.append("\n ,")
+            
+            outputString.append("Maximum Eddy Rectangle:")
+            for nextOutData in outputData
+            {
+                let rect = nextOutData.layers[layerIndex].maxEddyLossRect
+                let rectString = String(format: "X:%0.1f Y:%0.1f W:%0.1f H:%0.1f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
+                outputString.append(",\(rectString)")
+            }
+            
             
             outputString.append("\n\n")
             

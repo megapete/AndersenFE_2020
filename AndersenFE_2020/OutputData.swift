@@ -18,6 +18,9 @@ struct OutputData {
     
     var z0:Double? = nil
     
+    let lowerThrust:Double
+    let upperThrust:Double
+    
     struct TermData
     {
         let termNum:Int
@@ -56,21 +59,21 @@ struct OutputData {
         
         func dcLoss(temp:Double) -> Double
         {
-            return self.dcLoss75 * (234.5 + temp) / (234.5 + LayerData.refTemp)
+            return self.dcLoss75 * (234.5 + temp) / (234.5 + LayerData.refTemp) * 1000.0
         }
         
         func aveEddyLoss(temp:Double) -> Double
         {
             let refEddyLoss = self.dcLoss75 * self.averageEddyPU75
             
-            return refEddyLoss * (234.5 + LayerData.refTemp) / (234.5 + temp)
+            return 1000.0 * refEddyLoss * (234.5 + LayerData.refTemp) / (234.5 + temp)
         }
         
         func maxEddyLoss(temp:Double) -> Double
         {
             let refEddyLoss = self.dcLoss75 * self.maximumEddyPU75
             
-            return refEddyLoss * (234.5 + LayerData.refTemp) / (234.5 + temp)
+            return 1000.0 * refEddyLoss * (234.5 + LayerData.refTemp) / (234.5 + temp)
         }
         
         func aveEddyPU(temp:Double) -> Double
@@ -174,6 +177,9 @@ struct OutputData {
         }
         
         self.layers = layerData.sorted(by: {$0.ID < $1.ID})
+        
+        self.lowerThrust = results.totalThrustLower
+        self.upperThrust = results.totalThrustUpper
     }
     
     func AvailableTerms() -> [Int]

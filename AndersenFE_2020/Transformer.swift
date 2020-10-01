@@ -45,7 +45,7 @@ class Transformer:Codable {
     
     var wdgTerminals:[Terminal?] = []
     
-    /// Special tuple that only has proper entries if there is a zigzag connection on the transformer
+    /// Special array that only has proper entries if there is a zigzag connection on the transformer. Zig is at index 0, zag is at index 1.
     var zigzagTerms:[Int] = [0, 0]
     
     /// Special value that is only non-nil if there is a zigzag connection and the routine CheckForWarnings() has been called
@@ -271,6 +271,23 @@ class Transformer:Codable {
             var terminals = Array(AvailableTerminals())
             terminals.sort()
             
+            // Due to some REALLY WEIRD programming by Andersen, we have to make sure that IF there's a zigzag connection, that the zig (connection code 6) MUST come before tha zag (connection code 5) in the ".inp" file. This should probably be taken care of in PCH_FLD12_Library, but that's written in Objective-C which I am less comfortable with these days.
+            if self.zigzagTerms[0] != 0
+            {
+                let zigIndex = self.zigzagTerms[0]
+                let zagIndex = self.zigzagTerms[1]
+                
+                let zigTermIndex = terminals.firstIndex(of: zigIndex)!
+                let zagTermIndex = terminals.firstIndex(of: zagIndex)!
+                
+                if zagTermIndex < zigTermIndex
+                {
+                    terminals[zagTermIndex] = zigIndex
+                    terminals[zigTermIndex] = zagIndex
+                    DLog("Did a terminal switch for zigzag")
+                }
+            }
+            
             var fld12terminals:[PCH_FLD12_Terminal] = []
             
             for nextTerm in terminals
@@ -285,6 +302,9 @@ class Transformer:Codable {
                 
                 fld12terminals.append(newFld12Term)
             }
+            
+            
+            
             
             var nextLayerNum = 1
             var nextSegmentNum = 1
@@ -1413,7 +1433,7 @@ class Transformer:Codable {
                         throw DesignFileError(info: "Zig", type: .TooManySpecialTypes)
                     }
                     
-                    if zagTerm > 0 && newTermNum != zagTerm + 1
+                    if zagTerm > 0 && abs(zagTerm - newTermNum) != 1
                     {
                         throw DesignFileError(info: "", type: .IllegalZigzagTerminalNumber)
                     }
@@ -1431,7 +1451,7 @@ class Transformer:Codable {
                         throw DesignFileError(info: "Zag", type: .TooManySpecialTypes)
                     }
                     
-                    if zigTerm > 0 && newTermNum != zigTerm - 1
+                    if zigTerm > 0 && abs(zigTerm - newTermNum) != 1
                     {
                         throw DesignFileError(info: "", type: .IllegalZigzagTerminalNumber)
                     }

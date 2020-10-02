@@ -120,6 +120,7 @@ class AppController: NSObject, NSMenuItemValidation {
     // Output Menu
     @IBOutlet weak var saveAndOutputMenuItem: NSMenuItem!
     @IBOutlet weak var addTxfoOutputMenuItem: NSMenuItem!
+    @IBOutlet weak var editOutputListMenuItem: NSMenuItem!
     @IBOutlet weak var saveOutputDataMenuItem: NSMenuItem!
     
     
@@ -304,6 +305,35 @@ class AppController: NSObject, NSMenuItemValidation {
         else
         {
             DLog("Could not produce output data!")
+        }
+    }
+    
+    @IBAction func handleEditOutputList(_ sender: Any) {
+        
+        guard self.outputDataArray.count > 0 else
+        {
+            return
+        }
+        
+        var outputStrings:[String] = []
+        for nextData in self.outputDataArray
+        {
+            outputStrings.append(nextData.description)
+        }
+        
+        let editDlog = EditOutputDataDialog(outputStrings: outputStrings)
+        
+        if editDlog.runModal() == .OK
+        {
+            if editDlog.removedRows.count > 0
+            {
+                // make sure the array is in reverse order
+                let deadRows = editDlog.removedRows.sorted(by: {$0 > $1})
+                for nextIndex in deadRows
+                {
+                    self.outputDataArray.remove(at: nextIndex)
+                }
+            }
         }
     }
     
@@ -1329,7 +1359,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 return false
             }
         }
-        else if menuItem == self.saveOutputDataMenuItem
+        else if menuItem == self.saveOutputDataMenuItem || menuItem == self.editOutputListMenuItem
         {
             return !self.outputDataArray.isEmpty
         }

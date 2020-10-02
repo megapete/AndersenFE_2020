@@ -28,6 +28,7 @@
                 <outlet property="closeTransformerMenuItem" destination="DVo-aG-piG" id="tgO-pz-rcQ"/>
                 <outlet property="dataView" destination="VHp-aJ-QOo" id="JFo-TV-kMK"/>
                 <outlet property="deactivateAllWdgTurnsMenuItem" destination="3cl-q1-BRW" id="HY4-kW-3FO"/>
+                <outlet property="editOutputListMenuItem" destination="KSz-xC-UeU" id="i5Z-P9-bu8"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="kbE-Ny-rEt"/>
                 <outlet property="moveWdgRadiallyMenuItem" destination="UMp-RI-jDT" id="rqQ-Es-GRp"/>
                 <outlet property="reverseCurrentMenuItem" destination="OAx-Vq-OSe" id="H52-D3-KSC"/>
@@ -580,6 +581,9 @@
                             </menuItem>
                             <menuItem title="Edit Output List" id="KSz-xC-UeU">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleEditOutputList:" target="6yZ-bT-Gps" id="TO8-0d-Fuj"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Save Output Data..." id="zXS-Q3-tnS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -659,7 +663,7 @@
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="07C-KY-SGX">
                                             <rect key="frame" x="1" y="1" width="481" height="855"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyn-iH-4KA" customClass="TransformerView" customModule="AndersenFE_2020" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="481" height="855"/>

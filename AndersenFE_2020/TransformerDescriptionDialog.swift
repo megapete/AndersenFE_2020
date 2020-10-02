@@ -8,15 +8,17 @@
 
 import Cocoa
 
-class TransformerDescriptionDialog: PCH_DialogBox {
+class TransformerDescriptionDialog: PCH_DialogBox, NSControlTextEditingDelegate {
     
     @IBOutlet weak var descriptionTextField: NSTextField!
+    
     var desc:String
     
     init(description:String) {
         
         self.desc = description
-        super.init(viewNibFileName: "TransformerDescription", windowTitle: "Transformer Description", hideCancel: false)
+        DLog("\(self.desc.count)")
+        super.init(viewNibFileName: "TransformerDescription", windowTitle: "Transformer Description", hideCancel: false, okIsEnabled: self.desc.count > 0)
     }
     
     override func awakeFromNib() {
@@ -31,5 +33,23 @@ class TransformerDescriptionDialog: PCH_DialogBox {
         
         // make sure to call the super version of this function to actually handle the OK click
         super.handleOk()
+    }
+    
+    
+    func controlTextDidChange(_ obj: Notification) {
+                
+        if let txFld = obj.object as? NSTextField
+        {
+            if txFld == self.descriptionTextField
+            {
+                if let ok = self.okButton
+                {
+                    ok.isEnabled = txFld.stringValue.count > 0
+                    self.okButtonIsEnabled = ok.isEnabled
+                    self.enableOK = ok.isEnabled
+                }
+            }
+        }
+        
     }
 }

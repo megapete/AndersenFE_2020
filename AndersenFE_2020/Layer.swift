@@ -70,6 +70,44 @@ class Layer:Codable {
     /// The inner radius of the Layer
     var innerRadius:Double
     
+    /// The lowest z-dim of the lowest segment in this layer
+    var minZ:Double {
+        
+        get {
+            
+            var minZ = Double.greatestFiniteMagnitude
+            
+            for nextSegment in self.segments
+            {
+                if nextSegment.minZ < minZ
+                {
+                    minZ = nextSegment.minZ
+                }
+            }
+            
+            return minZ
+        }
+    }
+    
+    /// The highest z-dim of the highest segment in this layer
+    var maxZ:Double {
+        
+        get {
+            
+            var maxZ = -Double.greatestFiniteMagnitude
+            
+            for nextSegment in self.segments
+            {
+                if nextSegment.maxZ > maxZ
+                {
+                    maxZ = nextSegment.maxZ
+                }
+            }
+            
+            return maxZ
+        }
+    }
+    
     /// The Terminal to which this Layer belongs
     let parentTerminal:Terminal
     

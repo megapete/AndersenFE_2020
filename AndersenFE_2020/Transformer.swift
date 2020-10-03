@@ -189,6 +189,16 @@ class Transformer:Codable {
             }
         }
         
+        // check whether any of the windings' centers is off from the transformer center by more than 0.1mm
+        let idealCenter = self.GetWindingsCenter()
+        for nextWdg in self.windings
+        {
+            if fabs(nextWdg.axialCenter - idealCenter) > 0.1
+            {
+                result.append(DataView.WarningData(string: "The axial center of winding '\(nextWdg.terminal.name)' is offset from the ideal center by \(fabs(nextWdg.axialCenter - idealCenter)) mm", level: .caution, wordsToHighlight: [13]))
+            }
+        }
+        
         // check for actual problems here
         // TODO: Add tilting calculation
         

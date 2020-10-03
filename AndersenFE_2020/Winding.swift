@@ -323,6 +323,15 @@ class Winding:Codable {
         }
     }
     
+    /// The CURRENT axial center of this winding (may be different than other windings)
+    var axialCenter:Double {
+        
+        get {
+            
+            return (self.layers[0].minZ + self.layers[0].maxZ) / 2.0
+        }
+    }
+    
     /// The Layers that make up this winding
     var layers:[Layer] = []
     

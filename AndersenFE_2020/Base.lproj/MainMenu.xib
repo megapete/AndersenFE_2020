@@ -436,6 +436,13 @@
                                     <action selector="handleSetAmpTurnDistribution:" target="6yZ-bT-Gps" id="kEn-Xz-nDu"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="fEN-Ft-upy"/>
+                            <menuItem title="Set Peak Factor..." id="Qg2-bi-Jqy">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Set Impedance for Forces..." id="LAC-vu-kjE">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -457,6 +464,9 @@
                                 <connections>
                                     <action selector="handleMoveWindingRadially:" target="6yZ-bT-Gps" id="8Cc-nv-QbZ"/>
                                 </connections>
+                            </menuItem>
+                            <menuItem title="Move Winding Axially..." id="wbN-UL-7ka">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem title="Change Winding Name..." id="SkO-4j-PeK">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -585,13 +595,17 @@
                                     <action selector="handleEditOutputList:" target="6yZ-bT-Gps" id="TO8-0d-Fuj"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Save Output Data..." id="zXS-Q3-tnS">
+                            <menuItem title="Save Output List Data..." id="zXS-Q3-tnS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleSaveOutputData:" target="6yZ-bT-Gps" id="Pdr-Aa-ZZ4"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="ted-Fg-hc2"/>
+                            <menuItem isSeparatorItem="YES" id="v1m-ap-ceZ"/>
+                            <menuItem title="Save Full Force Data..." id="QKQ-ZK-V49">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="czD-VP-vmX"/>
                             <menuItem title="Save Andersen Output File..." id="MZo-Xo-m12">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -887,5 +901,11 @@
             </items>
             <point key="canvasLocation" x="851" y="331"/>
         </menu>
+        <menuItem title="Set Amp-Turn Distribution..." id="DHg-xC-1IE">
+            <modifierMask key="keyEquivalentModifierMask"/>
+            <connections>
+                <action selector="handleSetAmpTurnDistribution:" target="6yZ-bT-Gps" id="ASe-tp-jyU"/>
+            </connections>
+        </menuItem>
     </objects>
 </document>

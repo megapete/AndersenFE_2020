@@ -48,9 +48,9 @@ class Segment:Codable, Equatable {
     let totalTurns:Double
     
     /// The lower dimension of the Segment
-    let minZ:Double
+    var minZ:Double
     /// The upper dimesion of the Segment
-    let maxZ:Double
+    var maxZ:Double
     
     /// The associated segment(s) of either a double-axial stack winding or a multi-start winding. Self is always a member of this array.
     var mirrorSegments:[Int] = []

@@ -337,6 +337,27 @@ class AppController: NSObject, NSMenuItemValidation {
         }
     }
     
+    @IBAction func handleMoveWindingAxially(_ sender: Any) {
+        
+        guard self.currentTxfo != nil, let segPath = self.txfoView.currentSegment else
+        {
+            return
+        }
+        
+        let winding = segPath.segment.inLayer!.parentTerminal.winding!
+        
+        let moveDlog = MoveWindingDialog(direction: .axially)
+        
+        if moveDlog.runModal() == .OK
+        {
+            self.doMoveWindingAxially(winding: winding, deltaZ: moveDlog.delta)
+        }
+    }
+    
+    func doMoveWindingAxially(winding:Winding, deltaZ:Double)
+    {
+        
+    }
     
     @IBAction func handleMoveWindingRadially(_ sender: Any) {
         
@@ -347,11 +368,11 @@ class AppController: NSObject, NSMenuItemValidation {
         
         let winding = segPath.segment.inLayer!.parentTerminal.winding!
         
-        let moveDlog = MoveWindingDialog()
+        let moveDlog = MoveWindingDialog(direction: .radially)
         
         if moveDlog.runModal() == .OK
         {
-            self.doMoveWindingRadially(winding: winding, deltaR: moveDlog.deltaR)
+            self.doMoveWindingRadially(winding: winding, deltaR: moveDlog.delta)
         }
     }
     

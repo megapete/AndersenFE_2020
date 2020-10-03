@@ -467,6 +467,9 @@
                             </menuItem>
                             <menuItem title="Move Winding Axially..." id="wbN-UL-7ka">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleMoveWindingAxially:" target="6yZ-bT-Gps" id="eUv-gW-QN7"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Change Winding Name..." id="SkO-4j-PeK">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -602,11 +605,11 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="v1m-ap-ceZ"/>
-                            <menuItem title="Save Full Force Data..." id="QKQ-ZK-V49">
+                            <menuItem title="Save Segment Force Data for Current Txfo..." id="QKQ-ZK-V49">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="czD-VP-vmX"/>
-                            <menuItem title="Save Andersen Output File..." id="MZo-Xo-m12">
+                            <menuItem title="Save Andersen Output File for Current Txfo..." id="MZo-Xo-m12">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleSaveAndersenOutputFile:" target="6yZ-bT-Gps" id="WG2-Av-yAj"/>

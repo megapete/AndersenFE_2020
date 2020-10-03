@@ -435,6 +435,18 @@ class Winding:Codable {
         return result
     }
     
+    func OffsetWindingAxially(deltaZ:Double)
+    {
+        for nextLayer in self.layers
+        {
+            for nextSegment in nextLayer.segments
+            {
+                nextSegment.minZ += deltaZ
+                nextSegment.maxZ += deltaZ
+            }
+        }
+    }
+    
     func OffsetWindingRadially(deltaR:Double)
     {
         self.coilID += 2.0 * deltaR

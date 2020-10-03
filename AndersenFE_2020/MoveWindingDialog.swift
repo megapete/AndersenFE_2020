@@ -10,26 +10,32 @@ import Cocoa
 
 class MoveWindingDialog: PCH_DialogBox {
     
-    @IBOutlet weak var deltaRtextField: NSTextField!
-    var deltaR:Double = 0.0
+    @IBOutlet weak var deltaTextField: NSTextField!
+    var delta:Double = 0.0
     
-    init()
+    enum direction {
+        case axially
+        case radially
+    }
+    
+    init(direction:direction)
     {
-        super.init(viewNibFileName: "MoveWinding", windowTitle: "Offset Winding Radially", hideCancel: false)
+        let title = direction == .radially ? "Offset Winding Radially" : "Offset Winding Axially"
+        super.init(viewNibFileName: "MoveWinding", windowTitle: title, hideCancel: false)
     }
     
     override func awakeFromNib() {
         
         let formatter = NumberFormatter()
-        formatter.minimum = -100.0
-        formatter.maximum = 100.0
+        formatter.minimum = -1000.0
+        formatter.maximum = 1000.0
         
-        self.deltaRtextField.formatter = formatter
+        self.deltaTextField.formatter = formatter
     }
     
     override func handleOk() {
         
-        self.deltaR = Double(self.deltaRtextField.stringValue)!
+        self.delta = Double(self.deltaTextField.stringValue)!
         
         super.handleOk()
     }

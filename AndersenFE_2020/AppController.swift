@@ -356,7 +356,37 @@ class AppController: NSObject, NSMenuItemValidation {
     
     func doMoveWindingAxially(winding:Winding, deltaZ:Double)
     {
+        guard let txfo = currentTxfo else
+        {
+            return
+        }
         
+        let newTransformer = txfo.Copy()
+        
+        // This is kind of ugly, but we identify the winding in the copy by comparing the ID's of each winding
+        var newWinding:Winding? = nil
+        for nextWdg in newTransformer.windings
+        {
+            if nextWdg.coilID == winding.coilID
+            {
+                newWinding = nextWdg
+                break
+            }
+        }
+        
+        guard let newWdg = newWinding else
+        {
+            let alert = NSAlert()
+            alert.messageText = "Could not identify the winding to reverse!!"
+            alert.informativeText = "This is a very serious problem in that it should be impossible for it to occur."
+            alert.alertStyle = .critical
+            let _ = alert.runModal()
+            return
+        }
+        
+        newWdg.OffsetWindingAxially(deltaZ: deltaZ)
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
     @IBAction func handleMoveWindingRadially(_ sender: Any) {

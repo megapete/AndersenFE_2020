@@ -14,6 +14,15 @@ class TerminalsView: NSView, NSMenuItemValidation {
     
     var termFields:[NSTextField] = []
     
+    let peakFactorTag = -1
+    var peakFactorField:NSTextField? = nil
+    
+    let impForceCalcsTag = -2
+    var impForceCalcsField:NSTextField? = nil
+    
+    let systemGVAtag = -3
+    var systemGVAfield:NSTextField? = nil
+    
     var referenceTerminal = 2
     
     weak var appController:AppController? = nil
@@ -39,6 +48,8 @@ class TerminalsView: NSView, NSMenuItemValidation {
         }
         
         self.appController = appController
+        
+        self.UpdateScData()
     }
     
     func SetTermData(termNum:Int, name:String, displayVolts:Double, VA:Double, connection:Terminal.TerminalConnection, isReference:Bool = false)
@@ -66,13 +77,104 @@ class TerminalsView: NSView, NSMenuItemValidation {
         }
     }
     
+    func UpdateScData()
+    {
+        self.SetPeakFactor()
+        self.SetImpedanceForForceCalcs()
+        self.SetSystemGVA()
+    }
+    
+    func SetPeakFactor()
+    {
+        guard let field = self.peakFactorField, let appCtrl = self.appController, let txfo = appCtrl.currentTxfo else
+        {
+            return
+        }
+        
+        let factor = String(format: "Peak Factor\n%0.3f x √2", txfo.scFactor)
+        field.stringValue = factor
+    }
+    
+    func SetImpedanceForForceCalcs()
+    {
+        guard let field = self.impForceCalcsField, let appCtrl = self.appController, let txfo = appCtrl.currentTxfo else
+        {
+            return
+        }
+        
+        var factor = "Impedance Used for\nForce Calculations\n"
+        
+        if let results = txfo.scResults
+        {
+            factor += String(format: "%0.2f %%", results.puForceImpedance * 100.0)
+        }
+        else
+        {
+            factor += "N/A"
+        }
+        
+        field.stringValue = factor
+    }
+    
+    func SetSystemGVA()
+    {
+        guard let field = self.systemGVAfield, let appCtrl = self.appController, let txfo = appCtrl.currentTxfo else
+        {
+            return
+        }
+        
+        var factor = "System Strength\n"
+        
+        if txfo.systemGVA != 0.0
+        {
+            factor += String(format: "%0.1f GVA", txfo.systemGVA)
+        }
+        else
+        {
+            factor += "Infinite"
+        }
+        
+        field.stringValue = factor
+    }
+    
     override func awakeFromNib() {
         
         for nextView in self.subviews
         {
             if let nextField = nextView as? NSTextField
             {
-                self.termFields.append(nextField)
+                if nextField.tag > 0
+                {
+                    self.termFields.append(nextField)
+                }
+                else
+                {
+                    // Peak factor
+                    if nextField.tag == self.peakFactorTag
+                    {
+                        self.peakFactorField = nextField
+                        let formatter = NumberFormatter()
+                        formatter.minimum = 1.8
+                        formatter.maximum = 2.0
+                        self.peakFactorField!.formatter = formatter
+                    }
+                    else if nextField.tag == self.impForceCalcsTag
+                    {
+                        self.impForceCalcsField = nextField
+                        let formatter = NumberFormatter()
+                        formatter.minimum = 0.1
+                        formatter.maximum = 100.0
+                        self.impForceCalcsField!.formatter = formatter
+                    }
+                    else if nextField.tag == self.systemGVAtag
+                    {
+                        self.systemGVAfield = nextField
+                        let formatter = NumberFormatter()
+                        formatter.minimum = 0.0
+                        formatter.maximum = 100.0
+                        self.systemGVAfield!.formatter = formatter
+                    }
+                }
             }
         }
         

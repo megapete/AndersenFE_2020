@@ -6,47 +6,48 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="MoveWindingDialog" customModule="AndersenFE_2020" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="GetNumberDialog" customModule="AndersenFE_2020" customModuleProvider="target">
             <connections>
-                <outlet property="deltaLabel" destination="w2p-h2-H9U" id="Q5F-Mm-03h"/>
-                <outlet property="deltaTextField" destination="NL8-CV-e7P" id="KHF-G5-tSh"/>
+                <outlet property="descLabel" destination="uK7-WL-Kfn" id="Lj9-7h-YTA"/>
+                <outlet property="numberField" destination="jML-gg-GAn" id="uAQ-0X-kWJ"/>
+                <outlet property="unitsLable" destination="Kh6-N6-XK4" id="vLP-LC-duV"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="c22-O7-iKe">
-            <rect key="frame" x="0.0" y="0.0" width="209" height="117"/>
+            <rect key="frame" x="0.0" y="0.0" width="259" height="132"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w2p-h2-H9U">
-                    <rect key="frame" x="18" y="81" width="54" height="16"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK7-WL-Kfn">
+                    <rect key="frame" x="18" y="96" width="107" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Delta-R:" id="mOg-mR-bIA">
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Description Label:" id="sdg-OE-9Xt">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NL8-CV-e7P">
-                    <rect key="frame" x="78" y="78" width="54" height="21"/>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jML-gg-GAn">
+                    <rect key="frame" x="131" y="93" width="67" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="0" drawsBackground="YES" id="4vj-Ep-YRe">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="cmU-k9-yus">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W9B-cf-Yyw">
-                    <rect key="frame" x="140" y="81" width="27" height="16"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kh6-N6-XK4">
+                    <rect key="frame" x="205" y="96" width="36" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="mm" id="Pju-Hc-oyN">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Units" id="g9a-c0-whZ">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
             </subviews>
-            <point key="canvasLocation" x="-162.5" y="51.5"/>
+            <point key="canvasLocation" x="29.5" y="84"/>
         </customView>
     </objects>
 </document>

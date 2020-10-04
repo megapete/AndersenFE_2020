@@ -1203,6 +1203,8 @@ class AppController: NSObject, NSMenuItemValidation {
             }
         }
         
+        self.termsView.UpdateScData()
+        
         do
         {
             let vpn = try txfo.VoltsPerTurn()

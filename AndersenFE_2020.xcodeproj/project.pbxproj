@@ -38,6 +38,8 @@
 		F50BA4552529F2CF0054CF25 /* GetNumberDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50BA4542529F2CF0054CF25 /* GetNumberDialog.swift */; };
 		F522C85D251790F10036607F /* SplitSegmentDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F522C85C251790F10036607F /* SplitSegmentDialog.swift */; };
 		F522C860251791040036607F /* SplitSegment.xib in Resources */ = {isa = PBXBuildFile; fileRef = F522C85F251791040036607F /* SplitSegment.xib */; };
+		F529EDAF252A5F1D00B32CC3 /* PeakFactorDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F529EDAE252A5F1D00B32CC3 /* PeakFactorDialog.swift */; };
+		F529EDB2252A5F2800B32CC3 /* PeakFactor.xib in Resources */ = {isa = PBXBuildFile; fileRef = F529EDB1252A5F2800B32CC3 /* PeakFactor.xib */; };
 		F5486E5624F04CC300D6CD46 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC370F24DB0A2A000CEED3 /* DataView.swift */; };
@@ -88,6 +90,8 @@
 		F50BA4542529F2CF0054CF25 /* GetNumberDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNumberDialog.swift; sourceTree = "<group>"; };
 		F522C85C251790F10036607F /* SplitSegmentDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitSegmentDialog.swift; sourceTree = "<group>"; };
 		F522C85F251791040036607F /* SplitSegment.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SplitSegment.xib; sourceTree = "<group>"; };
+		F529EDAE252A5F1D00B32CC3 /* PeakFactorDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakFactorDialog.swift; sourceTree = "<group>"; };
+		F529EDB1252A5F2800B32CC3 /* PeakFactor.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PeakFactor.xib; sourceTree = "<group>"; };
 		F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -147,6 +151,8 @@
 				D3275F8324FADB22005D9F5A /* TransformerDescription.xib */,
 				F50BA4542529F2CF0054CF25 /* GetNumberDialog.swift */,
 				F50BA4512529F25B0054CF25 /* GetNumber.xib */,
+				F529EDAE252A5F1D00B32CC3 /* PeakFactorDialog.swift */,
+				F529EDB1252A5F2800B32CC3 /* PeakFactor.xib */,
 				D3F736E2251EB41B00F399A6 /* MoveWindingDialog.swift */,
 				D3F736E5251EB4A800F399A6 /* MoveWinding.xib */,
 				D3B8A33524EB4814005AAC87 /* RegulatingWindingDialog.swift */,
@@ -268,6 +274,7 @@
 				F50BA4522529F25B0054CF25 /* GetNumber.xib in Resources */,
 				F5D9DC4424DF42D900D11103 /* AmpTurnsDistribution.xib in Resources */,
 				F5F8E835251B699300117F49 /* TextDisplay.xib in Resources */,
+				F529EDB2252A5F2800B32CC3 /* PeakFactor.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +299,7 @@
 				F5F971C424FBCBF600267AAC /* ModifyWindingNameDialog.swift in Sources */,
 				D3FA0CC224EDE49000C68479 /* ModifyReferenceVoltageDialog.swift in Sources */,
 				F522C85D251790F10036607F /* SplitSegmentDialog.swift in Sources */,
+				F529EDAF252A5F1D00B32CC3 /* PeakFactorDialog.swift in Sources */,
 				F5ED558D24C32659002E7031 /* Terminal.swift in Sources */,
 				F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */,
 				D37F9EF4251943800040BCD8 /* OutputData.swift in Sources */,

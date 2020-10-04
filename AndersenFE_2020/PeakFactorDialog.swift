@@ -37,7 +37,7 @@ class PeakFactorDialog: PCH_DialogBox {
         super.init(viewNibFileName: "PeakFactor", windowTitle: "Set Peak Factor", hideCancel: false)
     }
     
-    /// This function returns K (per C57.12.00) but WITHOUT the √2 multiplier
+    /// Given X/R, this function returns K (per C57.12.00) but WITHOUT the √2 multiplier
     static func K(xOverR:Double) -> Double
     {
         let rOverX = 1.0 / xOverR

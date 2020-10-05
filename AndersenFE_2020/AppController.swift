@@ -94,6 +94,11 @@ class AppController: NSObject, NSMenuItemValidation {
     @IBOutlet weak var setNiRefTermMenuItem: NSMenuItem!
     @IBOutlet weak var setNIdistMenuItem: NSMenuItem!
     
+    @IBOutlet weak var setPeakFactorMenuItem: NSMenuItem!
+    @IBOutlet weak var setImpForForcesMenuItem: NSMenuItem!
+    @IBOutlet weak var setSystemGVAMenuItem: NSMenuItem!
+    
+    
     @IBOutlet weak var TxfoContextMenu:NSMenu!
     
     // Winding Menu
@@ -279,6 +284,49 @@ class AppController: NSObject, NSMenuItemValidation {
             self.updateViews()
         }
     }
+    
+    @IBAction func handleSetImpedanceForSC(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        
+    }
+    
+    
+    @IBAction func handleSetPeakFactor(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        let pkFact = txfo.scFactor
+        
+        let pkDlog = PeakFactorDialog(pkFactor: pkFact)
+        
+        if pkDlog.runModal() == .OK
+        {
+            self.doSetPeakFactor(newPkFactor: pkDlog.pkFactor)
+        }
+    }
+    
+    func doSetPeakFactor(newPkFactor:Double)
+    {
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        newTransformer.scFactor = newPkFactor
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
+    }
+    
     
     @IBAction func handleAddTxfoOutput(_ sender: Any) {
         
@@ -1318,7 +1366,7 @@ class AppController: NSObject, NSMenuItemValidation {
         {
             return self.lastOpenedTxfoFile != nil && self.currentTxfoIsDirty
         }
-        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem || menuItem == self.setTxfoDescriptionMenuItem || menuItem == self.saveAndOutputMenuItem
+        else if menuItem == self.closeTransformerMenuItem || menuItem == self.zoomInMenuItem || menuItem == self.zoomOutMenuItem || menuItem == self.zoomAllMenuItem || menuItem == self.zoomRectMenuItem || menuItem == self.setRefTerminalMenuItem || menuItem == self.setTxfoDescriptionMenuItem || menuItem == self.saveAndOutputMenuItem || menuItem == self.setPeakFactorMenuItem || menuItem == self.setSystemGVAMenuItem || menuItem == self.setImpForForcesMenuItem
         {
             return self.currentTxfo != nil
         }
@@ -1533,6 +1581,8 @@ class AppController: NSObject, NSMenuItemValidation {
         }
         outputString.append("\n\n")
         
+        
+        
         // It is assumed that all of the saved results have the same terminal numbers
         let availableTerms = outputData[0].AvailableTerms()
         
@@ -1553,12 +1603,28 @@ class AppController: NSObject, NSMenuItemValidation {
             outputString.append("\n\n")
         }
         
-        // Show the positive sequence impedances (as percentages) for each option
-        outputString.append("Impedance,")
+        // Show the positive (transformer) sequence impedances (as percentages) for each option
+        outputString.append("Transformer Impedance,")
         for nextOutData in outputData
         {
             let nextImp = String(format: "%0.2f%% @ %0.3f MVA", nextOutData.impedance * 100.0, nextOutData.MVA)
             outputString.append(",\(nextImp)")
+        }
+        outputString.append("\n")
+        
+        outputString.append("Force Impedance,")
+        for nextOutData in outputData
+        {
+            let nextImp = String(format: "%0.2f%% @ %0.3f MVA", nextOutData.impedanceForForces * 100.0, nextOutData.MVA)
+            outputString.append(",\(nextImp)")
+        }
+        outputString.append("\n")
+        
+        outputString.append("Peak Factor,")
+        for nextOutData in outputData
+        {
+            let nextPkFactor = String(format: "%0.3f", nextOutData.pkFactor * sqrt(2.0))
+            outputString.append(",\(nextPkFactor)")
         }
         outputString.append("\n")
         

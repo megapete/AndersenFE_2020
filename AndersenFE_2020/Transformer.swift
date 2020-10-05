@@ -41,6 +41,8 @@ class Transformer:Codable {
     
     var systemGVA:Double
     
+    var puForceImpedance:Double = 0.0
+    
     var windings:[Winding] = []
     
     var wdgTerminals:[Terminal?] = []
@@ -313,9 +315,6 @@ class Transformer:Codable {
                 fld12terminals.append(newFld12Term)
             }
             
-            
-            
-            
             var nextLayerNum = 1
             var nextSegmentNum = 1
             
@@ -368,7 +367,7 @@ class Transformer:Codable {
                 }
             }
             
-            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: Int32(numWoundLimbs), lowerZ: -lowerAddition, upperZ: lowerAddition + self.core.windHt + upperAddition, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: 0.0, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
+            let newFld12Txfo = PCH_FLD12_TxfoDetails(id: "", inputUnits: 1, numPhases: Int32(self.numPhases), frequency: self.frequency, numberOfWoundLimbs: Int32(numWoundLimbs), lowerZ: -lowerAddition, upperZ: lowerAddition + self.core.windHt + upperAddition, coreDiameter: self.core.diameter, distanceToTank: tankDist, alcuShield: 0, sysSCgva: self.systemGVA, puImpedance: self.puForceImpedance, peakFactor: self.scFactor, numTerminals: Int32(fld12terminals.count), numLayers: Int32(fld12Layers.count), dispElon: 0, deAmount: 0, tankFactor: 0, legFactor: 0, yokeFactor: 0, scale: 1.0, numFluxLines: 25, terminals: fld12terminals, layers: fld12Layers)
             
             return newFld12Txfo
         }

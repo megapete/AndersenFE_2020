@@ -40,6 +40,12 @@ struct ImpedanceAndScData:Codable {
     /// The impedance (in pu) used to calculate sc forces
     let puForceImpedance:Double
     
+    /// The system impedance used in the force calculations
+    let puSystemImpedance:Double
+    
+    /// The peak factor used in the force calculations (without the √2)
+    let pkFactor:Double
+    
     /// Struct to save the various SC data for a segment (this is based on Andersen)
     struct SegmentScData:Codable {
         
@@ -161,16 +167,19 @@ struct ImpedanceAndScData:Codable {
         self.totalThrustLower = andersenOutput.totalThrustLower
         self.totalThrustUpper = andersenOutput.totalThrustUpper
         self.puForceImpedance = andersenOutput.scForcePuImpedance
+        self.puSystemImpedance = andersenOutput.systemPuImpedance
         
         if let inputData = andersenOutput.inputData
         {
             self.zMin = inputData.lowerZ
             self.coreRadius = inputData.coreDiameter / 2.0
+            self.pkFactor = inputData.peakFactor
         }
         else
         {
             self.zMin = 0.0
             self.coreRadius = 0.0
+            self.pkFactor = 1.8
         }
         
         if let fluxLines = andersenOutput.fluxLineData

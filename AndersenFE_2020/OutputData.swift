@@ -18,6 +18,9 @@ struct OutputData {
     
     var z0:Double? = nil
     
+    let impedanceForForces:Double
+    let pkFactor:Double
+    
     let lowerThrust:Double
     let upperThrust:Double
     
@@ -101,6 +104,8 @@ struct OutputData {
         self.MVA = results.baseMVA
         self.impedance = results.puImpedance
         self.z0 = txfo.zeroSequenceImpedance
+        self.impedanceForForces = results.puForceImpedance
+        self.pkFactor = results.pkFactor
         
         var termData:[TermData] = []
         let availableTermNums = txfo.AvailableTerminals()
@@ -180,6 +185,8 @@ struct OutputData {
         
         self.lowerThrust = results.totalThrustLower
         self.upperThrust = results.totalThrustUpper
+        
+        
     }
     
     func AvailableTerms() -> [Int]

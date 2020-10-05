@@ -36,10 +36,13 @@
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="saveOutputDataMenuItem" destination="zXS-Q3-tnS" id="Ngx-IH-uBJ"/>
+                <outlet property="setImpForForcesMenuItem" destination="LAC-vu-kjE" id="gwV-FG-JIs"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
                 <outlet property="setNiRefTermMenuItem" destination="L56-sK-jsw" id="tnY-J0-MSa"/>
+                <outlet property="setPeakFactorMenuItem" destination="Qg2-bi-Jqy" id="VqS-RI-c5Z"/>
                 <outlet property="setRefVoltageMenuItem" destination="AKE-S2-Sz1" id="zR8-YL-U0I"/>
+                <outlet property="setSystemGVAMenuItem" destination="6ZE-cc-dKj" id="smj-dX-uGY"/>
                 <outlet property="setTxfoDescriptionMenuItem" destination="Gi5-1S-RQB" id="6q6-nM-agC"/>
                 <outlet property="showFld12MenuItem" destination="jbe-qY-hBZ" id="uhm-qe-bJN"/>
                 <outlet property="showFld8MenuItem" destination="RGJ-DQ-35A" id="QqV-ji-vLD"/>
@@ -439,9 +442,15 @@
                             <menuItem isSeparatorItem="YES" id="fEN-Ft-upy"/>
                             <menuItem title="Set Peak Factor..." id="Qg2-bi-Jqy">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetPeakFactor:" target="6yZ-bT-Gps" id="bq7-fQ-7vR"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Set Impedance for Forces..." id="LAC-vu-kjE">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSetImpedanceForSC:" target="6yZ-bT-Gps" id="gTJ-L2-Joi"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Set System GVA..." id="6ZE-cc-dKj">
                                 <modifierMask key="keyEquivalentModifierMask"/>

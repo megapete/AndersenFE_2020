@@ -292,7 +292,48 @@ class AppController: NSObject, NSMenuItemValidation {
             return
         }
         
+        let initValue = txfo.puForceImpedance
         
+        let formatter = NumberFormatter()
+        formatter.minimum = 0.0
+        formatter.maximum = 100.0
+        formatter.minimumFractionDigits = 2
+        
+        let setImpDlog = GetNumberDialog(descriptiveText: "Impedance to use:", unitsText: "%", noteText: "(Enter 0 to use txfo impedance)", windowTitle: "Impedance For Force Calcs", initialValue: initValue, fieldFormatter: formatter)
+        
+        if setImpDlog.runModal() == .OK
+        {
+            self.doSetImpedanceForSc(impedance: setImpDlog.numberValue / 100.0)
+        }
+        
+    }
+    
+    func doSetImpedanceForSc(impedance:Double)
+    {
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        newTransformer.puForceImpedance = impedance
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
+    }
+    
+    func doSetSystemGVA(gva:Double)
+    {
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        let newTransformer = txfo.Copy()
+        
+        newTransformer.systemGVA = gva
+        
+        self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
     

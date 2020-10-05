@@ -322,6 +322,29 @@ class AppController: NSObject, NSMenuItemValidation {
         self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
+    @IBAction func handleSetSystemGVA(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo else
+        {
+            return
+        }
+        
+        let initValue = txfo.systemGVA
+        
+        let formatter = NumberFormatter()
+        formatter.minimum = 0.0
+        formatter.maximum = 1000.0
+        formatter.minimumFractionDigits = 2
+        
+        let setSysGVADlog = GetNumberDialog(descriptiveText: "System Strength:", unitsText: "GVA", noteText: "(Enter 0 to use infinity)", windowTitle: "System Short Circuit Strength", initialValue: initValue, fieldFormatter: formatter)
+        
+        if setSysGVADlog.runModal() == .OK
+        {
+            self.doSetSystemGVA(gva: setSysGVADlog.numberValue)
+        }
+    }
+    
+    
     func doSetSystemGVA(gva:Double)
     {
         guard let txfo = self.currentTxfo else

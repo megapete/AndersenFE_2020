@@ -1843,6 +1843,33 @@ class AppController: NSObject, NSMenuItemValidation {
             outputString.append("\n\n")
         }
         
+        // Show warnings
+        outputString.append("Warnings")
+        
+        let maxWarningCharsPerLine = 40
+        var warningStrings:[[String]] = []
+        var maxNumWarnings = 0
+        for nextOutData in outputData
+        {
+            warningStrings.append(nextOutData.warnings)
+            
+            maxNumWarnings = max(maxNumWarnings, nextOutData.warnings.count)
+        }
+        
+        for warningIndex in 0..<maxNumWarnings
+        {
+            for nextWarning in warningStrings
+            {
+                outputString.append(",")
+                if warningIndex < nextWarning.count
+                {
+                    let warningWords = nextWarning[warningIndex].components(separatedBy: .whitespaces)
+                }
+            }
+            
+            outputString.append("\n\n")
+        }
+        
         do
         {
             let savePanel = NSSavePanel()

@@ -93,6 +93,8 @@ struct OutputData {
     
     let layers:[LayerData]
     
+    let warnings:[String]
+    
     init?(txfo:Transformer, outputDesc:String)
     {
         guard let results = txfo.scResults else
@@ -186,7 +188,14 @@ struct OutputData {
         self.lowerThrust = results.totalThrustLower
         self.upperThrust = results.totalThrustUpper
         
+        let scWarnings = txfo.CheckForWarnings()
+        var warningStrings:[String] = []
+        for nextWarning in scWarnings
+        {
+            warningStrings.append(nextWarning.string)
+        }
         
+        self.warnings = warningStrings
     }
     
     func AvailableTerms() -> [Int]

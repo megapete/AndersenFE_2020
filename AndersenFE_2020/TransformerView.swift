@@ -600,14 +600,14 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         let newViewRect = ForceAspectRatioAndNormalize(srcRect: zRect, widthOverHeightRatio: contentAspectRatio)
         let deltaX = newViewRect.origin.x - self.bounds.origin.x
         let deltaY = newViewRect.origin.y - self.bounds.origin.y
-        let newToOld = newViewRect.width / self.bounds.width
-        let frameToBoundsRatio = self.frame.width / self.bounds.width
         
-        print("Old frame: \(self.frame); Old Bounds: \(self.bounds)")
-        let newFrameOrigin = NSPoint(x: self.frame.origin.x - deltaX * frameToBoundsRatio, y: self.frame.origin.y - deltaY * frameToBoundsRatio)
-        let newFrameSize = NSSize(width: self.frame.width + 2 * deltaX * frameToBoundsRatio, height: self.frame.height + 2 * deltaY * frameToBoundsRatio)
-        let newFrameRect = ForceAspectRatioAndNormalize(srcRect: NSRect(origin: newFrameOrigin, size: newFrameSize), widthOverHeightRatio: contentAspectRatio)
-        self.frame = newFrameRect
+        let xContentToBoundsRatio = contentRectangle.width / newViewRect.width
+        
+        let newFrameOrigin = NSPoint(x: newViewRect.origin.x * xContentToBoundsRatio, y: newViewRect.origin.y * xContentToBoundsRatio)
+        let newFrameSize = NSSize(width: newViewRect.origin.x * xContentToBoundsRatio + contentRectangle.width, height: newViewRect.origin.y * xContentToBoundsRatio + contentRectangle.height)
+        
+        self.frame = NSRect(origin: newFrameOrigin, size: newFrameSize)
+        
         self.bounds = newViewRect
         print("New frame: \(self.frame); New Bounds: \(self.bounds)")
         

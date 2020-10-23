@@ -592,36 +592,28 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         {
             return
         }
-        
+                
         let contentRectangle = parentView.bounds
         let contentAspectRatio = contentRectangle.width / contentRectangle.height
         
+        print("Old frame: \(self.frame); Old Bounds: \(self.bounds)")
+        
         // Call PCH standard function (in GlobalDefs.swift) to force the current aspect ratio on the zoom rectangle
         let newViewRect = ForceAspectRatioAndNormalize(srcRect: zRect, widthOverHeightRatio: contentAspectRatio)
+        let newScale = self.bounds.width / newViewRect.width
+        let frameToBoundsRatio = self.frame.width / self.bounds.width
         let deltaX = newViewRect.origin.x - self.bounds.origin.x
         let deltaY = newViewRect.origin.y - self.bounds.origin.y
-        
-        let xContentToBoundsRatio = contentRectangle.width / newViewRect.width
-        
-        let newFrameOrigin = NSPoint(x: newViewRect.origin.x * xContentToBoundsRatio, y: newViewRect.origin.y * xContentToBoundsRatio)
-        let newFrameSize = NSSize(width: newViewRect.origin.x * xContentToBoundsRatio + contentRectangle.width, height: newViewRect.origin.y * xContentToBoundsRatio + contentRectangle.height)
-        
+        let newFrameOrigin = NSPoint(x: -deltaX * newScale * frameToBoundsRatio, y: -deltaY * newScale * frameToBoundsRatio)
+        let newFrameSize = NSSize(width: self.boundary.width * newScale * frameToBoundsRatio, height: self.boundary.height * newScale * frameToBoundsRatio)
+        self.bounds = newViewRect
         self.frame = NSRect(origin: newFrameOrigin, size: newFrameSize)
         
-        self.bounds = newViewRect
+        
         print("New frame: \(self.frame); New Bounds: \(self.bounds)")
         
         self.needsDisplay = true
         
-        /* OLD WAY
-        
-        
-        let aspectRatio = self.frame.width / self.frame.height
-        
-        // Call PCH standard function (in GlobalDefs.swift) to force the current aspect ratio on the zoom rectangle
-        self.bounds = ForceAspectRatioAndNormalize(srcRect: zRect, widthOverHeightRatio: aspectRatio)
-        
- */
     }
     
 

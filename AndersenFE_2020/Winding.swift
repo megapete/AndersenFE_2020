@@ -570,7 +570,14 @@ class Winding:Codable {
                 zList.append((minLayerZ, bottomZmax))
                 zList.append((topZmin, maxLayerZ))
                 
-                segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+                if self.wdgType == .sheet
+                {
+                    segmentTurns = [turnsPerLayer, turnsPerLayer]
+                }
+                else
+                {
+                    segmentTurns = [turnsPerLayer / 2.0, turnsPerLayer / 2.0]
+                }
                 
                 if self.isDoubleStack
                 {
@@ -850,7 +857,7 @@ class Winding:Codable {
         }
         
         var nextIR = self.coilID / 2.0
-        let copperRadialBuild = (numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim)) * self.radialOverbuild
+        let copperRadialBuild = (numTurnsRadiallyPerLayer * self.turnDef.Dimensions().radial + (preferences.modelRadialDucts ? 0.0 : Double(self.ducts.count) * self.ducts.dim) + (wdgType == .sheet ? (numTurnsRadiallyPerLayer - 1.0) * self.radialInsulation : 0.0)) * self.radialOverbuild
         
         // DLog("Turns: \(numTurnsRadiallyPerLayer); Dim: \(self.turnDef.Dimensions().radial / 25.4); Build: \(copperRadialBuild / 25.4)")
         

@@ -1661,7 +1661,7 @@ class Transformer:Codable {
                 
                 // strand axial dimension
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let strandAxialDimn = Double(lineElements[i])! * mmPerInch
+                var strandAxialDimn = Double(lineElements[i])! * mmPerInch
                 currIndex += 1
                 
                 // strand radial dimension
@@ -1747,6 +1747,10 @@ class Transformer:Codable {
                 if !isSpiral && numAxialSections <= 4 && numRadialSections == 1
                 {
                     wdgType = .sheet
+                    
+                    let axialSections = 1.0 + (axialGapCenter > 0 ? 1.0 : 0.0) + (axialGapLower > 0 ? 1.0 : 0.0) + (axialGapUpper > 0 ? 1.0 : 0.0)
+                    
+                    strandAxialDimn = strandAxialDimn / axialSections
                 }
                 else if isMultistart
                 {

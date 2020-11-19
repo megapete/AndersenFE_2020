@@ -470,6 +470,7 @@
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";
@@ -503,6 +504,7 @@
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";

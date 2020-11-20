@@ -32,7 +32,7 @@ class Terminal: Codable
         }
     }
     
-    /// The original no-load voltage for the terminal (usually whatever was in the XL design file, corrected for double axial stacks)
+    /// The original no-load voltage for the terminal (usually whatever was in the XL design file, NOT corrected for double axial stacks)
     let noloadLegVoltage:Double
     
     /// The total (1-ph or 3-ph) VA for the Terminal. This is the ACTUAL VA for auto-connected windings

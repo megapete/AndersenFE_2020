@@ -65,7 +65,7 @@ struct PCH_AFE2020_Save_Struct:Codable {
     let transformer:Transformer
 }
 
-class AppController: NSObject, NSMenuItemValidation {
+class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
     
     // MARK: Transformer Properties
     var currentTxfo:Transformer? = nil
@@ -79,6 +79,7 @@ class AppController: NSObject, NSMenuItemValidation {
     
     // Output array
     var outputDataArray:[OutputData] = []
+    var outputDataIsDirty:Bool = false
     
     // MARK: Menu outlets
     // File Menu
@@ -391,6 +392,27 @@ class AppController: NSObject, NSMenuItemValidation {
         self.updateCurrentTransformer(newTransformer: newTransformer, runAndersen: true)
     }
     
+    func askToSaveOutputData() {
+        
+        if self.outputDataArray.isEmpty
+        {
+            return
+        }
+        
+        let alert = NSAlert()
+        alert.messageText = "Do you wish to save the output data for this session?"
+        
+        alert.addButton(withTitle: "Save")
+        alert.addButton(withTitle: "Don't Save")
+        
+        if alert.runModal() == .alertFirstButtonReturn
+        {
+            self.handleSaveOutputData(self)
+        }
+        
+        self.outputDataIsDirty = false
+    }
+    
     
     @IBAction func handleAddTxfoOutput(_ sender: Any) {
         
@@ -413,6 +435,7 @@ class AppController: NSObject, NSMenuItemValidation {
         if let outputData = OutputData(txfo: txfo, outputDesc: description)
         {
             self.outputDataArray.append(outputData)
+            self.outputDataIsDirty = true
         }
         else
         {
@@ -446,6 +469,8 @@ class AppController: NSObject, NSMenuItemValidation {
                     self.outputDataArray.remove(at: nextIndex)
                 }
             }
+            
+            self.outputDataIsDirty = true
         }
     }
     
@@ -1883,6 +1908,7 @@ class AppController: NSObject, NSMenuItemValidation {
                 if let fileUrl = savePanel.url
                 {
                     try outputString.write(to: fileUrl, atomically: false, encoding: .utf8)
+                    self.outputDataIsDirty = false
                 }
             }
         }
@@ -2128,6 +2154,11 @@ class AppController: NSObject, NSMenuItemValidation {
             return false
         }
         
+        if self.outputDataIsDirty
+        {
+            self.askToSaveOutputData()
+        }
+        
         if fileURL.pathExtension == AFE2020_EXTENSION
         {
             do {
@@ -2195,6 +2226,21 @@ class AppController: NSObject, NSMenuItemValidation {
                 let alert = NSAlert(error: error)
                 let _ = alert.runModal()
                 return false
+            }
+        }
+    }
+    
+    // MARK: Window Delegate Functions
+    
+    func windowWillClose(_ notification: Notification) {
+        
+        let wWindow = notification.object as! NSWindow
+        
+        if wWindow == self.mainWindow
+        {
+            if self.outputDataIsDirty
+            {
+                self.askToSaveOutputData()
             }
         }
     }

@@ -22,6 +22,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
     
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        
+        if appController.outputDataIsDirty
+        {
+            appController.askToSaveOutputData()
+            appController.outputDataIsDirty = false
+        }
+        
+        return .terminateNow
+    }
+    
     func application(_ sender:NSApplication, openFile filename:String) -> Bool
     {
         let fixedFileName = (filename as NSString).expandingTildeInPath

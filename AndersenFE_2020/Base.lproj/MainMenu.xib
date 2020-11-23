@@ -866,6 +866,9 @@
                     </splitView>
                 </subviews>
             </view>
+            <connections>
+                <outlet property="delegate" destination="6yZ-bT-Gps" id="t3f-Lj-ab1"/>
+            </connections>
             <point key="canvasLocation" x="163" y="-231.5"/>
         </window>
         <menu id="9xV-35-2jM">

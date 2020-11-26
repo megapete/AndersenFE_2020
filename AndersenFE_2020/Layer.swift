@@ -49,7 +49,7 @@ class Layer:Codable {
     let material:ConductorMaterial
     
     /// The current direction, which comes from the parent Terminal unless that value is 0, in which case we simply change it to 1
-    var currentDirection:Int {
+    var currentDirection:Int32 {
         get {
             
             if self.parentTerminal.currentDirection == 0
@@ -57,7 +57,9 @@ class Layer:Codable {
                 return 1
             }
             
-            return self.parentTerminal.currentDirection
+            let andCurrDir = self.parentTerminal.nominalAmps * Double(self.parentTerminal.currentDirection)
+            
+            return andCurrDir < 0 ? -1 : 1
         }
     }
     
@@ -140,7 +142,9 @@ class Layer:Codable {
             nextSegNum += 1
         }
         
-        let newLayer = PCH_FLD12_Layer(number: Int32(layernum), lastSegment: Int32(nextSegNum - 1), innerRadius: self.innerRadius, radialBuild: self.radialBuild, terminal: Int32(self.parentTerminal.andersenNumber), numParGroups: Int32(self.numberParallelGroups), currentDirection: Int32(self.currentDirection), cuOrAl: 1, numSpacerBlocks: Int32(self.numSpacerBlocks), spBlkWidth: self.spacerBlockWidth, segments: fld12SegArray)
+        
+        
+        let newLayer = PCH_FLD12_Layer(number: Int32(layernum), lastSegment: Int32(nextSegNum - 1), innerRadius: self.innerRadius, radialBuild: self.radialBuild, terminal: Int32(self.parentTerminal.andersenNumber), numParGroups: Int32(self.numberParallelGroups), currentDirection: self.currentDirection, cuOrAl: 1, numSpacerBlocks: Int32(self.numSpacerBlocks), spBlkWidth: self.spacerBlockWidth, segments: fld12SegArray)
         
         return newLayer
     }

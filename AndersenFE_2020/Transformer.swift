@@ -989,7 +989,7 @@ class Transformer:Codable {
                         continue
                     }
                     
-                    let niAbsolute = niArray[nextTerm - 1] / 100.0 * -refTermNI
+                    let niAbsolute = niArray[nextTerm - 1] / 100.0 * fabs(refTermNI)
                     
                     let effectiveTurns = CurrentCarryingTurns(terminal: nextTerm)
                     

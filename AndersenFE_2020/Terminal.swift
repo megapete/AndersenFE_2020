@@ -182,10 +182,24 @@ class Terminal: Codable
         
         ZAssert(newVolts > 0.0, message: "Terminal voltage must be a non-zero, positive number")
         
-        let newLegVA = amps == nil ? self.legVA : amps! * newVolts
+        
+        
+        if let newAmps = amps
+        {
+            if (newAmps < 0) == (self.currentDirection < 0)
+            {
+                self.currentDirection = 1
+            }
+            
+            self.VA = newAmps * newVolts * self.phaseFactor
+        }
+        else
+        {
+            self.VA = self.legVA * self.phaseFactor
+        }
         
         self.nominalLegVoltsStore = newVolts
-        self.VA = newLegVA * self.phaseFactor
+        
     }
     
 }

@@ -124,6 +124,17 @@ struct ImpedanceAndScData:Codable {
                     currentLine = currentComponent.components(separatedBy: .whitespaces)
                     currentLine.removeAll(where: {$0 == ""})
                     
+                    // At some point (I think when IPNTS reached 250), the dimensions are split onto multiple lines.
+                    while currentLine.count < IPNTS * 2
+                    {
+                        currentComponentIndex += 1
+                        currentComponent = fluxFileComponents[currentComponentIndex]
+                        var currentLine2 = currentComponent.components(separatedBy: .whitespaces)
+                        currentLine2.removeAll(where: {$0 == ""})
+                        
+                        currentLine += currentLine2
+                    }
+                    
                     var dimArray:[NSPoint] = []
                     for i in 0..<IPNTS
                     {

@@ -648,7 +648,7 @@ class Winding:Codable {
             if self.isDoubleStack
             {
                 let tapSectionTurns = self.numTurns.nomTurns / 2.0 * self.numTurns.puPerTap()
-                let nonTapSectionTurns = self.numTurns.maxTurns / 2.0 - 4.0 * tapSectionTurns
+                let nonTapSectionTurns = (self.numTurns.maxTurns / 2.0 - 4.0 * tapSectionTurns) / 2.0
                 
                 let tapSectionZ = (self.elecHt - self.axialGaps.overallGapZ(assumeSymmetry: preferences.upperLowerAxialGapsAreSymmetrical)) / 2.0 * self.numTurns.puPerTap()
                 
@@ -682,7 +682,7 @@ class Winding:Codable {
                 segmentTurns.append(tapSectionTurns)
                 
                 currentBottomZ = currentTopZ + useBottomGap
-                currentTopZ += currentBottomZ + tapSectionZ
+                currentTopZ = currentBottomZ + tapSectionZ
                 // tap A to tap C
                 zList.append((currentBottomZ, currentTopZ))
                 segmentTurns.append(tapSectionTurns)

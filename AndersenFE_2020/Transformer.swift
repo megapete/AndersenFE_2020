@@ -249,11 +249,11 @@ class Transformer:Codable {
                             
                             if scSpacerBlockForce > spacerBlockMaxLimit
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockMaxLimit) )", level: .critical, wordsToHighlight: [8, 14]))
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scSpacerBlockForce) N/sq.mm. (MUST be less than: \(spacerBlockMaxLimit) )", level: .critical, wordsToHighlight: [8, 14]))
                             }
                             else if scSpacerBlockForce > spacerBlockWarningLimit
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (Difficult to compress over \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scSpacerBlockForce) N/sq.mm. (Difficult to compress over \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
                             }
                         }
                     }

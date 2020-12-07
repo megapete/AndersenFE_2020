@@ -99,7 +99,7 @@ class Transformer:Codable {
         // some constants used in this function (should really be part of a preferences file or something that the user can change - maybe one day)
         let endThrustWarningLimit = 100000.0 * newtonsPerlb
         let unworkedCopperLimit = 9000.0 * nmm2PerPsi
-        let spacerBlockWarningLimit = 2500.0 * nmm2PerPsi // based on my experience, anything over 2500 is a bitch to compress
+        let spacerBlockWarningLimit = 3500.0 * nmm2PerPsi // based on my experience, anything over 3500 is a bitch to compress
         let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
         
@@ -249,11 +249,11 @@ class Transformer:Codable {
                             
                             if scSpacerBlockForce > spacerBlockMaxLimit
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockWarningLimit) )", level: .critical, wordsToHighlight: [8, 14]))
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (MUST be less than: \(spacerBlockMaxLimit) )", level: .critical, wordsToHighlight: [8, 14]))
                             }
                             else if scSpacerBlockForce > spacerBlockWarningLimit
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (Should be less than: \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scCombinedStress) N/sq.mm. (Difficult to compress over \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
                             }
                         }
                     }

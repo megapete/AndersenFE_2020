@@ -195,6 +195,11 @@ class Transformer:Codable {
         let idealCenter = self.GetWindingsCenter()
         for nextWdg in self.windings
         {
+            if nextWdg.terminal.andersenNumber == 0
+            {
+                continue
+            }
+            
             if fabs(nextWdg.axialCenter - idealCenter) > 0.1
             {
                 result.append(DataView.WarningData(string: "The axial center of winding '\(nextWdg.terminal.name)' is offset from the ideal center by \(fabs(nextWdg.axialCenter - idealCenter)) mm", level: .caution, wordsToHighlight: [13]))
@@ -208,6 +213,11 @@ class Transformer:Codable {
         {
             for nextWdg in self.windings
             {
+                if nextWdg.terminal.andersenNumber == 0
+                {
+                    continue
+                }
+                
                 for nextLayer in nextWdg.layers
                 {
                     for nextSegment in nextLayer.segments
@@ -462,7 +472,10 @@ class Transformer:Codable {
         
         for nextWdg in self.windings
         {
-            result = max(nextWdg.layers.last!.OD() / 2.0 + nextWdg.groundClearance, result)
+            if nextWdg.terminal.andersenNumber != 0
+            {
+                result = max(nextWdg.layers.last!.OD() / 2.0 + nextWdg.groundClearance, result)
+            }
         }
         
         return result
@@ -572,7 +585,7 @@ class Transformer:Codable {
         
         for nextEntry in self.wdgTerminals
         {
-            if let nextTerm = nextEntry
+            if let nextTerm = nextEntry, nextTerm.andersenNumber != 0
             {
                 result.insert(nextTerm.andersenNumber)
             }
@@ -1707,7 +1720,7 @@ class Transformer:Codable {
                 
                 // max ground clearance
                 lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
-                let groundClearance = Double(lineElements[i])! * mmPerInch
+                let groundClearance = Double(lineElements[i]) != nil ? Double(lineElements[i])! * mmPerInch : 25.0
                 currIndex += 1
                 
                 if i == 0

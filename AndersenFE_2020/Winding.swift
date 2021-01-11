@@ -274,8 +274,8 @@ class Winding:Codable {
     
     var extremeDimensions:(bottom:Double, top:Double) {
         get {
-            let bottomDim = self.layers[0].segments[0].minZ
-            let topDim = self.layers[0].segments.last!.maxZ
+            let bottomDim = self.terminal.andersenNumber != 0 ? self.layers[0].segments[0].minZ : Double.greatestFiniteMagnitude
+            let topDim = self.terminal.andersenNumber != 0 ? self.layers[0].segments.last!.maxZ : 0.0
             
             return (bottomDim, topDim)
         }
@@ -327,6 +327,11 @@ class Winding:Codable {
     var axialCenter:Double {
         
         get {
+            
+            if self.terminal.andersenNumber == 0
+            {
+                return 0.0
+            }
             
             return (self.layers[0].minZ + self.layers[0].maxZ) / 2.0
         }

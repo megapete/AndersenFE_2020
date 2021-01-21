@@ -167,6 +167,9 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
     @IBOutlet weak var toggleActivationMenuItem:NSMenuItem!
     @IBOutlet weak var activateAllWdgTurnsMenuItem:NSMenuItem!
     @IBOutlet weak var deactivateAllWdgTurnsMenuItem:NSMenuItem!
+    @IBOutlet weak var moveWdgRadiallyMenuItem:NSMenuItem!
+    @IBOutlet weak var moveWdgAxiallyMenuItem:NSMenuItem!
+    @IBOutlet weak var splitSegmentMenuItem:NSMenuItem!
     
     // MARK: Draw function override
     override func draw(_ dirtyRect: NSRect) {
@@ -306,6 +309,26 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         appCtrl.doReverseCurrentDirection(winding: winding)
     }
     
+    @IBAction func handleMoveWdgRadially(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, self.currentSegment != nil else
+        {
+            return
+        }
+        
+        appCtrl.handleMoveWindingRadially(self)
+    }
+    
+    @IBAction func handleMoveWdgAxially(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, self.currentSegment != nil else
+        {
+            return
+        }
+        
+        appCtrl.handleMoveWindingAxially(self)
+    }
+    
     @IBAction func handleToggleActivation(_ sender: Any) {
         
         guard let appCtrl = self.appController, let currSeg = self.currentSegment else
@@ -334,6 +357,17 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
         }
         
         appCtrl.doSetActivation(winding: currSeg.segment.inLayer!.parentTerminal.winding!, activate: false)
+    }
+    
+    
+    @IBAction func handleSplitSegment(_ sender: Any) {
+        
+        guard let appCtrl = self.appController, self.currentSegment != nil else
+        {
+            return
+        }
+        
+        appCtrl.handleSplitSegment(self)
     }
     
     
@@ -389,7 +423,7 @@ class TransformerView: NSView, NSViewToolTipOwner, NSMenuItemValidation {
                 }
             }
         }
-        else if menuItem == self.activateAllWdgTurnsMenuItem
+        else if menuItem == self.activateAllWdgTurnsMenuItem || menuItem == self.moveWdgAxiallyMenuItem || menuItem == self.moveWdgRadiallyMenuItem || menuItem == self.splitSegmentMenuItem
         {
             return self.currentSegment != nil
         }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -677,7 +677,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="860" height="871"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="860" height="871"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -704,7 +704,10 @@
                                                         <outlet property="activateAllWdgTurnsMenuItem" destination="44K-HR-t3v" id="AZ2-GY-vFs"/>
                                                         <outlet property="contextualMenu" destination="PKF-ho-E86" id="fAa-zS-ECZ"/>
                                                         <outlet property="deactivateAllWdgTurnsMenuItem" destination="Lvc-yc-qYG" id="pCc-ym-nNf"/>
+                                                        <outlet property="moveWdgAxiallyMenuItem" destination="2Ae-iU-V8z" id="b5p-4a-lk7"/>
+                                                        <outlet property="moveWdgRadiallyMenuItem" destination="UyY-Aw-kPH" id="g7x-2h-0md"/>
                                                         <outlet property="reverseCurrentDirectionMenuItem" destination="e6b-PR-1Uc" id="9qW-bs-vdh"/>
+                                                        <outlet property="splitSegmentMenuItem" destination="jbA-hW-m0n" id="XdI-8T-iR1"/>
                                                         <outlet property="toggleActivationMenuItem" destination="vP2-z4-P39" id="PU2-qb-vy3"/>
                                                     </connections>
                                                 </customView>
@@ -854,6 +857,7 @@
                                     <outlet property="SetNIDistributionMenuItem" destination="5L4-cL-fka" id="QDP-UV-Rmx"/>
                                     <outlet property="SetRefMVAMenuItem" destination="VZH-bl-orK" id="Yqi-sr-Qjq"/>
                                     <outlet property="SetVpnRefTermMenuItem" destination="DOj-Px-Yk0" id="r62-Ss-5zx"/>
+                                    <outlet property="addTxfoToOutputListMenuItem" destination="jha-ht-IQw" id="ehl-Ux-Obq"/>
                                     <outlet property="contextualMenu" destination="9xV-35-2jM" id="4zf-rA-bcs"/>
                                 </connections>
                             </customView>
@@ -906,6 +910,13 @@
                         <action selector="handleSetNIDist:" target="-1" id="LxH-A5-gza"/>
                     </connections>
                 </menuItem>
+                <menuItem isSeparatorItem="YES" id="H3j-yW-TnJ"/>
+                <menuItem title="Add Transformer to Output List" id="jha-ht-IQw">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleAddTxfoToOutputList:" target="-1" id="Cz5-vf-FN9"/>
+                    </connections>
+                </menuItem>
             </items>
             <point key="canvasLocation" x="598" y="311"/>
         </menu>
@@ -922,6 +933,15 @@
                 </menuItem>
                 <menuItem title="Move Winding Radially" id="UyY-Aw-kPH">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleMoveWdgRadially:" target="-1" id="7kz-Xx-A1m"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Move Winding Axially" id="2Ae-iU-V8z">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleMoveWdgAxially:" target="-1" id="xUx-N3-ELq"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Change Winding Name" id="I41-Pp-M7t">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -944,6 +964,13 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="handleToggleActivation:" target="-1" id="2hV-pz-fjz"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="QyO-eh-oc7"/>
+                <menuItem title="Split Segment..." id="jbA-hW-m0n">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleSplitSegment:" target="-1" id="xkR-xM-Z7z"/>
                     </connections>
                 </menuItem>
             </items>

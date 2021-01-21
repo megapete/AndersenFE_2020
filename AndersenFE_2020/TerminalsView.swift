@@ -34,6 +34,7 @@ class TerminalsView: NSView, NSMenuItemValidation {
     @IBOutlet weak var SetAmpTurnRefTermMenuItem:NSMenuItem!
     @IBOutlet weak var SetRefMVAMenuItem:NSMenuItem!
     @IBOutlet weak var SetNIDistributionMenuItem:NSMenuItem!
+    @IBOutlet weak var addTxfoToOutputListMenuItem:NSMenuItem!
     
     func InitializeFields(appController:AppController)
     {
@@ -295,6 +296,17 @@ class TerminalsView: NSView, NSMenuItemValidation {
         
         appCtrl.handleSetAmpTurnDistribution(sender)
     }
+    
+    @IBAction func handleAddTxfoToOutputList(_ sender: Any) {
+        
+        guard let appCtrl = self.appController else
+        {
+            return
+        }
+        
+        appCtrl.handleAddTxfoOutput(self)
+    }
+    
     
     
     // MARK: Context Menu validation

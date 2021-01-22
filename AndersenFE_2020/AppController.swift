@@ -128,6 +128,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
     @IBOutlet weak var addTxfoOutputMenuItem: NSMenuItem!
     @IBOutlet weak var editOutputListMenuItem: NSMenuItem!
     @IBOutlet weak var saveOutputDataMenuItem: NSMenuItem!
+    @IBOutlet weak var saveSegmentForceDataMenuItem: NSMenuItem!
     
     
     // MARK: Preferences
@@ -1553,6 +1554,13 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         {
             return !self.outputDataArray.isEmpty
         }
+        else if menuItem == self.saveSegmentForceDataMenuItem
+        {
+            guard let txfo = currentTxfo, txfo.scResults != nil else
+            {
+                return false
+            }
+        }
         
         return true
     }
@@ -1652,6 +1660,62 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
     
     // MARK: Saving and Loading functions
     
+    @IBAction func handleSaveSegmentForceData(_ sender: Any) {
+        
+        guard let txfo = self.currentTxfo, let scResults = txfo.scResults else {
+            
+            return
+        }
+        
+        var outputString = ""
+        
+        for nextWdg in txfo.windings
+        {
+            for nextLayer in nextWdg.layers
+            {
+                outputString.append("Layer \(nextLayer.andersenLayerNum)\n")
+                outputString.append("Segment Number, Tension/Compression, Spacer Block Force, Combined Force\n")
+                
+                for nextSegment in nextLayer.segments
+                {
+                    guard let segData = scResults.SegmentData(andersenSegNum: nextSegment.andersenSegNum) else {
+                        
+                        continue
+                    }
+                    
+                    outputString.append("\(nextSegment.andersenSegNum),\(segData.scMaxTensionCompression),\(segData.scForceInSpacerBlocks),\(segData.scCombinedForce)\n")
+                }
+                
+                outputString.append("\n\n")
+            }
+        }
+        
+        do
+        {
+            let savePanel = NSSavePanel()
+            savePanel.title = "AndersenFE_2020 Segment Data File"
+            savePanel.message = "Save Segment Data File"
+            savePanel.allowedFileTypes = ["txt"]
+            savePanel.allowsOtherFileTypes = false
+            
+            if savePanel.runModal() == .OK
+            {
+                if let fileUrl = savePanel.url
+                {
+                    try outputString.write(to: fileUrl, atomically: false, encoding: .utf8)
+                }
+            }
+        }
+        catch
+        {
+            // An error occurred
+            let alert = NSAlert(error: error)
+            let _ = alert.runModal()
+            return
+        }
+    }
+    
+    
     @IBAction func handleSaveOutputData(_ sender: Any) {
         
         if self.outputDataArray.isEmpty
@@ -1669,8 +1733,6 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             outputString.append(",\(nextOutData.description)")
         }
         outputString.append("\n\n")
-        
-        
         
         // It is assumed that all of the saved results have the same terminal numbers
         let availableTerms = outputData[0].AvailableTerms()

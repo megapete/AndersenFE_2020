@@ -36,6 +36,7 @@
                 <outlet property="saveAndersenFileMenuItem" destination="pQd-DL-d0o" id="9R1-Bo-Fry"/>
                 <outlet property="saveMenuItem" destination="pxx-59-PXV" id="xum-Le-7jc"/>
                 <outlet property="saveOutputDataMenuItem" destination="zXS-Q3-tnS" id="Ngx-IH-uBJ"/>
+                <outlet property="saveSegmentForceDataMenuItem" destination="QKQ-ZK-V49" id="Mzh-Bd-RsY"/>
                 <outlet property="setImpForForcesMenuItem" destination="LAC-vu-kjE" id="gwV-FG-JIs"/>
                 <outlet property="setMVAMenuItem" destination="SUT-qo-38h" id="CbZ-H9-4Wy"/>
                 <outlet property="setNIdistMenuItem" destination="5gM-0S-Fyc" id="YdI-Gu-quX"/>
@@ -622,6 +623,9 @@
                             <menuItem isSeparatorItem="YES" id="v1m-ap-ceZ"/>
                             <menuItem title="Save Segment Force Data for Current Txfo..." id="QKQ-ZK-V49">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSaveSegmentForceData:" target="6yZ-bT-Gps" id="pQv-93-Wbj"/>
+                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="czD-VP-vmX"/>
                             <menuItem title="Save Andersen Output File for Current Txfo..." id="MZo-Xo-m12">

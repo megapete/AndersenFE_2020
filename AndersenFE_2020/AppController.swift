@@ -199,7 +199,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
     func InitializeAppController()
     {
         self.fluxLinesAreHidden = true
-        self.outputDataArray = []
+        // self.outputDataArray = []
         self.undoStack = []
         self.redoStack = []
     }
@@ -2220,6 +2220,9 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         {
             self.askToSaveOutputData()
         }
+        
+        self.outputDataArray = []
+        self.outputDataIsDirty = false
         
         if fileURL.pathExtension == AFE2020_EXTENSION
         {

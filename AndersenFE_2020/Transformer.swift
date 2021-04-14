@@ -1758,7 +1758,7 @@ class Transformer:Codable {
                 // Algorithm to ascertain the winding type
                 var wdgType:Winding.WindingType = .disc
                 
-                if !isSpiral && numAxialSections <= 4 && numRadialSections == 1
+                if !isSpiral && !isMultistart && numAxialSections <= 4 && numRadialSections == 1
                 {
                     wdgType = .sheet
                     

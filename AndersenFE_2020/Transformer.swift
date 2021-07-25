@@ -1370,6 +1370,8 @@ class Transformer:Codable {
         var maxVA = -1.0
         var maxVAtermnum = 2
         
+        var nameIndex = 1
+        
         while currIndex < 9
         {
             lineElements = lineArray[currIndex].components(separatedBy: .whitespaces)
@@ -1436,13 +1438,10 @@ class Transformer:Codable {
                 {
                     termName = "LV"
                 }
-                else if newTermNum > 2
-                {
-                    termName = "TV"
-                }
                 else if newTermNum != 0
                 {
-                    termName = "RV"
+                    termName = "V\(nameIndex)"
+                    nameIndex += 1
                 }
                 
                 if connString == "D"

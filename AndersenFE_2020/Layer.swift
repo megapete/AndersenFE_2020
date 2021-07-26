@@ -59,7 +59,8 @@ class Layer:Codable {
             
             let andCurrDir = self.parentTerminal.nominalAmps * Double(self.parentTerminal.currentDirection)
             
-            return andCurrDir < 0 ? -1 : 1
+            // Tapping windings often have nominal amps equal to zero, so use the parent terminal's currentDirection property
+            return andCurrDir == 0 ? Int32(self.parentTerminal.currentDirection) : andCurrDir < 0 ? -1 : 1
         }
     }
     

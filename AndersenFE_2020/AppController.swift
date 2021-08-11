@@ -2031,7 +2031,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
     
     @IBAction func handleSaveAndersenInputFile(_ sender: Any) {
         
-        guard let txfo = currentTxfo else
+        guard var txfo = currentTxfo else
         {
             return
         }
@@ -2039,6 +2039,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         if txfo.txfoDesc == ""
         {
             self.handleSetTxfoDesc(self)
+            txfo = currentTxfo!
         }
         
         let descString = txfo.txfoDesc == "" ? " " : String(txfo.txfoDesc.prefix(80))

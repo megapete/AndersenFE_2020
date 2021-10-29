@@ -16,8 +16,8 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
     let tagBase = 100
     
     // constants
-    let minValue = -100.0
-    let maxValue = 100.0
+    let minValue = -120.0
+    let maxValue = 120.0
 
     // Outlets into the view
     
@@ -225,8 +225,10 @@ class AmpTurnsDistributionDialog: PCH_DialogBox, NSTextFieldDelegate {
         
         // Set up a formatter to clamp the allowable values in the text fields to -100...+100
         let textFieldFormatter = NumberFormatter()
-        textFieldFormatter.minimum = NSNumber(floatLiteral: -100.0)
-        textFieldFormatter.maximum = NSNumber(floatLiteral: 100.0)
+        textFieldFormatter.numberStyle = .decimal
+        textFieldFormatter.maximumFractionDigits = 1
+        textFieldFormatter.minimum = NSNumber(floatLiteral: -120.0)
+        textFieldFormatter.maximum = NSNumber(floatLiteral: 120.0)
         
         for i in 0..<6
         {

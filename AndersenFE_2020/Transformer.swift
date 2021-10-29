@@ -1077,7 +1077,7 @@ class Transformer:Codable {
                 if nextWdg.CurrentCarryingTurns() != 0.0
                 {
                     let parallelFactor = nextWdg.isDoubleStack && nextWdg.wdgType != .sheet ? 2.0 : 1.0
-                    noloadVoltageSum += nextWdg.terminal.noloadLegVoltage * currDir / parallelFactor
+                    noloadVoltageSum += nextWdg.terminal.nominalLineVolts / nextWdg.terminal.connectionFactor * currDir / parallelFactor
                 }
             }
         }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -922,7 +922,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="598" y="311"/>
+            <point key="canvasLocation" x="523" y="384"/>
         </menu>
         <menu id="PKF-ho-E86">
             <items>
@@ -978,7 +978,7 @@
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="851" y="331"/>
+            <point key="canvasLocation" x="859" y="384"/>
         </menu>
         <menuItem title="Set Amp-Turn Distribution..." id="DHg-xC-1IE">
             <modifierMask key="keyEquivalentModifierMask"/>

@@ -100,6 +100,7 @@ class Transformer:Codable {
         // some constants used in this function (should really be part of a preferences file or something that the user can change - maybe one day)
         let endThrustWarningLimit = 100000.0 * newtonsPerlb
         let unworkedCopperLimit = 9000.0 * nmm2PerPsi
+        let workedCopperLimit = 20000 * nmm2PerPsi
         let spacerBlockWarningLimit = 3500.0 * nmm2PerPsi // based on my experience, anything over 3500 is a bitch to compress
         let spacerBlockMaxLimit = 80.0 // MPa, or N/mm2
         var result:[DataView.WarningData] = []
@@ -203,7 +204,8 @@ class Transformer:Codable {
             
             if fabs(nextWdg.axialCenter - idealCenter) > 0.1
             {
-                result.append(DataView.WarningData(string: "The axial center of winding '\(nextWdg.terminal.name)' is offset from the ideal center by \(fabs(nextWdg.axialCenter - idealCenter)) mm", level: .caution, wordsToHighlight: [13]))
+                let offset = String(format: "%0.1f", fabs(nextWdg.axialCenter - idealCenter))
+                result.append(DataView.WarningData(string: "The axial center of winding '\(nextWdg.terminal.name)' is offset from the ideal center by \(offset) mm", level: .caution, wordsToHighlight: [13]))
             }
         }
         
@@ -241,30 +243,64 @@ class Transformer:Codable {
                             let scHoopStress = segSCdata.scMaxTensionCompression
                             // These factors come from IEC 60076--5
                             let hoopFactor = scHoopStress > 0.0 ? 0.9 : nextWdg.turnDef.type == .CTC ? 0.6 : 0.35
-                            let maxHoopStressAllowed = unworkedCopperLimit * hoopFactor
+                            let maxHoopStressWarning = unworkedCopperLimit * hoopFactor
+                            let maxHoopStressCritical = workedCopperLimit * hoopFactor
                             
-                            if scHoopStress > maxHoopStressAllowed
+                            if abs(scHoopStress) > maxHoopStressCritical {
+                                
+                                let maxStress = String(format: "%0.2f", maxHoopStressCritical)
+                                let hoopStress = String(format: "%0.2f", scHoopStress)
+                                
+                                let stressType = scHoopStress < 0 ? "compressive" : "hoop"
+                                
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) radial \(stressType) stress is \(hoopStress) N/sq.mm. Allowed: \(maxStress)", level: .critical, wordsToHighlight: [8, 11]))
+                            }
+                            else if abs(scHoopStress) > maxHoopStressWarning
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) hoop stress is \(scHoopStress) N/sq.mm. Allowed: \(maxHoopStressAllowed)", level: .critical, wordsToHighlight: [7, 10]))
+                                let maxStress = String(format: "%0.2f", maxHoopStressWarning)
+                                let hoopStress = String(format: "%0.2f", scHoopStress)
+                                
+                                let stressType = scHoopStress < 0 ? "compressive" : "hoop"
+                                
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) radial \(stressType) stress is \(hoopStress) N/sq.mm. Allowed: \(maxStress)", level: .caution, wordsToHighlight: [8, 11]))
                             }
                             
                             let scCombinedStress = segSCdata.scCombinedForce
-                            let maxCombinedStressAllowed = unworkedCopperLimit * 0.9
+                            let maxCombinedStressWarning = unworkedCopperLimit * 0.9
+                            let maxCombinedStressCritical = workedCopperLimit * 0.9
                             
-                            if scCombinedStress > maxCombinedStressAllowed
+                            if scCombinedStress > maxCombinedStressCritical {
+                                
+                                let maxStress = String(format: "%0.2f", maxCombinedStressCritical)
+                                let combinedStress = String(format: "%0.2f", scCombinedStress)
+                                
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) combined stress is \(combinedStress) N/sq.mm. Allowed: \(maxStress)", level: .critical, wordsToHighlight: [7, 10]))
+                            }
+                            else if scCombinedStress > maxCombinedStressWarning
                             {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) combined stress is \(scCombinedStress) N/sq.mm. Allowed: \(maxCombinedStressAllowed)", level: .critical, wordsToHighlight: [7, 10]))
+                                let maxStress = String(format: "%0.2f", maxCombinedStressWarning)
+                                let combinedStress = String(format: "%0.2f", scCombinedStress)
+                                
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) combined stress is \(combinedStress) N/sq.mm. Allowed: \(maxStress)", level: .caution, wordsToHighlight: [7, 10]))
                             }
                             
                             let scSpacerBlockForce = segSCdata.scForceInSpacerBlocks
+                            let spacerBlockForce = String(format: "%0.2f", scSpacerBlockForce)
                             
-                            if scSpacerBlockForce > spacerBlockMaxLimit
-                            {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scSpacerBlockForce) N/sq.mm. (MUST be less than: \(spacerBlockMaxLimit) )", level: .critical, wordsToHighlight: [8, 14]))
-                            }
-                            else if scSpacerBlockForce > spacerBlockWarningLimit
-                            {
-                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(scSpacerBlockForce) N/sq.mm. (Difficult to compress over \(spacerBlockWarningLimit) )", level: .caution, wordsToHighlight: [8, 14]))
+                            var limitForce = String(format: "%0.2f", spacerBlockWarningLimit)
+                            var warningString = "Difficult to compress over:"
+                            var warningLevel = DataView.WarningLevel.caution
+                            
+                            if scSpacerBlockForce > spacerBlockWarningLimit {
+                                
+                                if scSpacerBlockForce > spacerBlockMaxLimit {
+                                    
+                                    limitForce = String(format: "%0.2f", spacerBlockMaxLimit)
+                                    warningLevel = .critical
+                                    warningString = "MUST be less than:"
+                                }
+                                
+                                result.append(DataView.WarningData(string: "Winding '\(nextWdg.terminal.name)' Segment #\(nextSegment.andersenSegNum) spacer block force is \(spacerBlockForce) N/sq.mm. (\(warningString) \(limitForce) )", level: warningLevel, wordsToHighlight: [8, 14]))
                             }
                         }
                     }
@@ -273,7 +309,10 @@ class Transformer:Codable {
             
             if currResults.totalThrustUpper >= endThrustWarningLimit || currResults.totalThrustLower >= endThrustWarningLimit
             {
-                result.append(DataView.WarningData(string: "End thrust greater than 50 tons. Confirm leg-plate strength.", level: .caution, wordsToHighlight: [6, 7, 8]))
+                let tonnes = max(currResults.totalThrustLower, currResults.totalThrustUpper) * kgPerlb * lbsPerNewton / 1000.0
+                let tonnage = String(format: "%0.2f", tonnes)
+                
+                result.append(DataView.WarningData(string: "End thrust at \(tonnage) tonnes. Confirm leg-plate strength.", level: .caution, wordsToHighlight: [3, 4]))
             }
         }
         

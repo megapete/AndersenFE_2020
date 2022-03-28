@@ -26,6 +26,7 @@ class ModifyReferenceVoltageDialog: PCH_DialogBox {
         
         // Set up a formatter to clamp the allowable values in the text fields to -100...+100
         let textFieldFormatter = NumberFormatter()
+        textFieldFormatter.minimumFractionDigits = 3
         textFieldFormatter.minimum = NSNumber(floatLiteral: 1.0)
         textFieldFormatter.maximum = NSNumber(floatLiteral: 500000.0)
         

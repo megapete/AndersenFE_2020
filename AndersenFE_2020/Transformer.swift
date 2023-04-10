@@ -1833,7 +1833,9 @@ class Transformer:Codable {
                 {
                     let theTerm = wdgTerminals[termIndex - 1]!
                     let legV = theTerm.noloadLegVoltage
-                    theTerm.SetVoltsAndAmps(legVolts: legV / 2.0)
+                    if wdgType != .sheet {
+                        theTerm.SetVoltsAndAmps(legVolts: legV / 2.0)
+                    }
                     // terminals[termIndex - 1]!.nominalLineVolts /= 2.0
                 }
                 

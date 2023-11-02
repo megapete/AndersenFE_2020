@@ -575,7 +575,7 @@ class Winding:Codable {
                 zList.append((minLayerZ, bottomZmax))
                 zList.append((topZmin, maxLayerZ))
                 
-                if self.wdgType == .sheet
+                if self.wdgType == .sheet && self.isDoubleStack
                 {
                     segmentTurns = [turnsPerLayer, turnsPerLayer]
                 }

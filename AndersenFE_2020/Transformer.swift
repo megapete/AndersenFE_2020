@@ -1801,9 +1801,12 @@ class Transformer:Codable {
                 {
                     wdgType = .sheet
                     
-                    let axialSections = 1.0 + (axialGapCenter > 0 ? 1.0 : 0.0) + (axialGapLower > 0 ? 1.0 : 0.0) + (axialGapUpper > 0 ? 1.0 : 0.0)
-                    
-                    strandAxialDimn = strandAxialDimn / axialSections
+                    if numAxialSections == 1 {
+                        
+                        let axialSections = 1.0 + (axialGapCenter > 0 ? 1.0 : 0.0) + (axialGapLower > 0 ? 1.0 : 0.0) + (axialGapUpper > 0 ? 1.0 : 0.0)
+                        
+                        strandAxialDimn = strandAxialDimn / axialSections
+                    }
                 }
                 else if isMultistart
                 {

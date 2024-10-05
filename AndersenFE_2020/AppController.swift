@@ -1695,7 +1695,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             let savePanel = NSSavePanel()
             savePanel.title = "AndersenFE_2020 Segment Data File"
             savePanel.message = "Save Segment Data File"
-            savePanel.allowedFileTypes = ["txt"]
+            savePanel.allowedFileTypes = ["csv"]
             savePanel.allowsOtherFileTypes = false
             
             if savePanel.runModal() == .OK
@@ -1933,7 +1933,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         // Show warnings
         outputString.append("Warnings")
         
-        let maxWarningCharsPerLine = 40
+        // let maxWarningCharsPerLine = 40
         var warningStrings:[[String]] = []
         var maxNumWarnings = 0
         for nextOutData in outputData
@@ -1950,11 +1950,12 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
                 outputString.append(",")
                 if warningIndex < nextWarning.count
                 {
+                    outputString.append(nextWarning[warningIndex])
                     let warningWords = nextWarning[warningIndex].components(separatedBy: .whitespaces)
                 }
             }
             
-            outputString.append("\n\n")
+            outputString.append("\n")
         }
         
         do
@@ -1962,7 +1963,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             let savePanel = NSSavePanel()
             savePanel.title = "AndersenFE_2020 Output file"
             savePanel.message = "Save Output File"
-            savePanel.allowedFileTypes = ["txt"]
+            savePanel.allowedFileTypes = ["csv"]
             savePanel.allowsOtherFileTypes = false
             
             if savePanel.runModal() == .OK

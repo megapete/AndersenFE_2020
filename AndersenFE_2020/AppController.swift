@@ -1945,6 +1945,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         
         for warningIndex in 0..<maxNumWarnings
         {
+            outputString.append(",")
             for nextWarning in warningStrings
             {
                 outputString.append(",")

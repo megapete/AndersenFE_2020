@@ -41,6 +41,7 @@
 		F529EDAF252A5F1D00B32CC3 /* PeakFactorDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F529EDAE252A5F1D00B32CC3 /* PeakFactorDialog.swift */; };
 		F529EDB2252A5F2800B32CC3 /* PeakFactor.xib in Resources */ = {isa = PBXBuildFile; fileRef = F529EDB1252A5F2800B32CC3 /* PeakFactor.xib */; };
 		F5486E5624F04CC300D6CD46 /* libPCH_FLD12_Library.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */; };
+		F57149CE2EC3BE3E000F08F2 /* libxlsxwriter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F57149CD2EC3BE3E000F08F2 /* libxlsxwriter.a */; };
 		F5A0F05F24C6203800C4CFE8 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A0F05E24C6203800C4CFE8 /* AppController.swift */; };
 		F5BC371024DB0A2A000CEED3 /* DataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BC370F24DB0A2A000CEED3 /* DataView.swift */; };
 		F5D9DC4224DF429200D11103 /* AmpTurnsDistributionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9DC4124DF429200D11103 /* AmpTurnsDistributionDialog.swift */; };
@@ -93,6 +94,7 @@
 		F529EDAE252A5F1D00B32CC3 /* PeakFactorDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakFactorDialog.swift; sourceTree = "<group>"; };
 		F529EDB1252A5F2800B32CC3 /* PeakFactor.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PeakFactor.xib; sourceTree = "<group>"; };
 		F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPCH_FLD12_Library.a; path = ../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a; sourceTree = "<group>"; };
+		F57149CD2EC3BE3E000F08F2 /* libxlsxwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxlsxwriter.a; sourceTree = "<group>"; };
 		F5A0F05E24C6203800C4CFE8 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		F5A0F06324C6236400C4CFE8 /* AndersenFE_2020-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AndersenFE_2020-Bridging-Header.h"; sourceTree = "<group>"; };
 		F5BC370F24DB0A2A000CEED3 /* DataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataView.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5486E5624F04CC300D6CD46 /* libPCH_FLD12_Library.a in Frameworks */,
+				F57149CE2EC3BE3E000F08F2 /* libxlsxwriter.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +198,7 @@
 		F5A0F06024C6231000C4CFE8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F57149CD2EC3BE3E000F08F2 /* libxlsxwriter.a */,
 				F5486E5524F04CC300D6CD46 /* libPCH_FLD12_Library.a */,
 			);
 			name = Frameworks;
@@ -387,10 +391,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = " $(SRCROOT)/xlsxwriter/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -446,10 +452,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = " $(SRCROOT)/xlsxwriter/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -466,7 +474,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2EC3B2E9;
+				CURRENT_PROJECT_VERSION = 2EC4BC96;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = x86_64;
@@ -483,9 +491,10 @@
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					"\"$(SRCROOT)/../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a\"",
+					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";
@@ -505,7 +514,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2EC3B2E9;
+				CURRENT_PROJECT_VERSION = 2EC4BC96;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = x86_64;
@@ -523,9 +532,10 @@
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib,
 					"\"$(SRCROOT)/../../../Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/lib/libPCH_FLD12_Library.a\"",
+					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberistech.AndersenFE-2020";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AndersenFE_2020/AndersenFE_2020-Bridging-Header.h";

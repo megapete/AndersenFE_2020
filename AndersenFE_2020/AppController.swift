@@ -1715,11 +1715,18 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         }
     }
     
+    let useExcelDirectly: Bool = true
     
     @IBAction func handleSaveOutputData(_ sender: Any) {
         
         if self.outputDataArray.isEmpty
         {
+            return
+        }
+        
+        if useExcelDirectly {
+            
+            doDirectExcelOutput()
             return
         }
         
@@ -1964,13 +1971,21 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             let savePanel = NSSavePanel()
             savePanel.title = "AndersenFE_2020 Output file"
             savePanel.message = "Save Output File"
-            savePanel.allowedFileTypes = ["csv"]
+            savePanel.allowedContentTypes = [.init(filenameExtension: "xlsx")!, .init(filenameExtension: "csv")!]
             savePanel.allowsOtherFileTypes = false
             
             if savePanel.runModal() == .OK
             {
                 if let fileUrl = savePanel.url
                 {
+                    if fileUrl.pathExtension == "xlsx" {
+                        let testWorkbook = workbook_new(fileUrl.path)
+                        let testWorksheet = workbook_add_worksheet(testWorkbook, nil)
+                        worksheet_write_string(testWorksheet, 0, 0, "Hello from Swift!", nil)
+                        workbook_close(testWorkbook)
+                        return
+                    }
+                    
                     try outputString.write(to: fileUrl, atomically: false, encoding: .utf8)
                     self.outputDataIsDirty = false
                 }
@@ -1984,6 +1999,347 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             return
         }
         
+    }
+    
+    private func doDirectExcelOutput() {
+        
+        // This routine is completely written by Claude.ai
+        
+        let outputData = self.outputDataArray
+
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.init(filenameExtension: "xlsx")!]
+        savePanel.nameFieldStringValue = "output.xlsx"
+
+        guard savePanel.runModal() == .OK, let url = savePanel.url else { return }
+
+        let workbook = workbook_new(url.path)
+        guard let worksheet = workbook_add_worksheet(workbook, nil) else {
+            workbook_close(workbook)
+            return
+        }
+
+        // Create format for centered text (for columns 1 and beyond)
+        let centerFormat = workbook_add_format(workbook)
+        format_set_align(centerFormat, UInt8(LXW_ALIGN_CENTER.rawValue))
+
+        // Create format for centered text with yellow background
+        let centerYellowFormat = workbook_add_format(workbook)
+        format_set_align(centerYellowFormat, UInt8(LXW_ALIGN_CENTER.rawValue))
+        format_set_bg_color(centerYellowFormat, 0xFFFF00)  // Yellow
+
+        var currentRow: UInt32 = 0
+
+        // Track maximum width for each column
+        var columnWidths: [UInt16: Double] = [:]
+
+        // Helper function to update column width tracking
+        func updateColumnWidth(_ col: UInt16, text: String) {
+            let estimatedWidth = max(8.0, Double(text.count) * 1.2)
+            columnWidths[col] = max(columnWidths[col] ?? 0, estimatedWidth)
+        }
+
+        // Modified helper function to write a row with centered values and track widths
+        func writeRow(_ label: String, values: [String]) {
+            worksheet_write_string(worksheet, currentRow, 0, label, nil)
+            updateColumnWidth(0, text: label)
+            
+            for (index, value) in values.enumerated() {
+                let col = UInt16(index + 1)
+                worksheet_write_string(worksheet, currentRow, col, value, centerFormat)
+                updateColumnWidth(col, text: value)
+            }
+            currentRow += 1
+        }
+
+        // Description row
+        var descriptions = outputData.map { $0.description }
+        writeRow("Description", values: descriptions)
+        currentRow += 1 // Empty row
+
+        // Terminal data
+        let availableTerms = outputData[0].AvailableTerms()
+
+        for nextTermNum in availableTerms {
+            var termValues: [String] = []
+            
+            for nextOutData in outputData {
+                if let nextData = nextOutData.DataForTerm(number: nextTermNum) {
+                    let formattedMVA = String(format: "%0.3f", nextData.mva)
+                    let formattedKV = String(format: "%0.3f", nextData.kv)
+                    termValues.append("MVA: \(formattedMVA) kV: \(formattedKV)")
+                } else {
+                    termValues.append("")
+                }
+            }
+            
+            writeRow("Terminal #\(nextTermNum)", values: termValues)
+            currentRow += 1 // Empty row
+        }
+
+        // Transformer Impedance
+        var impValues = outputData.map {
+            String(format: "%0.2f%% @ %0.3f MVA", $0.impedance * 100.0, $0.MVA)
+        }
+        writeRow("Transformer Impedance", values: impValues)
+
+        // Force Impedance
+        var forceImpValues = outputData.map {
+            String(format: "%0.2f%% @ %0.3f MVA", $0.impedanceForForces * 100.0, $0.MVA)
+        }
+        writeRow("Force Impedance", values: forceImpValues)
+
+        // Peak Factor
+        var pkFactorValues = outputData.map {
+            String(format: "%0.3f", $0.pkFactor * sqrt(2.0))
+        }
+        writeRow("Peak Factor", values: pkFactorValues)
+
+        // Zero-sequence impedance (if available)
+        if outputData[0].z0 != nil {
+            var z0Values = outputData.map {
+                String(format: "%0.2f Ω/ph", $0.z0!)
+            }
+            writeRow("Zero-sequence impedance", values: z0Values)
+        }
+        currentRow += 1 // Empty row
+
+        // Upper Thrust
+        var upperThrustValues = outputData.map {
+            let newtons = String(format: "%0.1f N", $0.upperThrust)
+            let pounds = String(format: "%0.1f lbs", $0.upperThrust * lbsPerNewton)
+            return "\(newtons) (\(pounds))"
+        }
+        writeRow("Upper Thrust", values: upperThrustValues)
+
+        // Lower Thrust
+        var lowerThrustValues = outputData.map {
+            let newtons = String(format: "%0.1f N", $0.lowerThrust)
+            let pounds = String(format: "%0.1f lbs", $0.lowerThrust * lbsPerNewton)
+            return "\(newtons) (\(pounds))"
+        }
+        writeRow("Lower Thrust", values: lowerThrustValues)
+        currentRow += 1 // Empty row
+
+        // Layer data section
+        worksheet_write_string(worksheet, currentRow, 0, "LAYER DATA", nil)
+        updateColumnWidth(0, text: "LAYER DATA")
+        currentRow += 1
+
+        for layerIndex in 0..<outputData[0].layers.count {
+            // For each layer, collect the values first to find maxima
+            var minRadialValues: [Double] = []
+            var maxRadialValues: [Double] = []
+            var maxSpacerblockValues: [Double] = []
+            var maxCombinedValues: [Double] = []
+            
+            for nextOutData in outputData {
+                let minRad = nextOutData.layers[layerIndex].minimumSpacerBars
+                minRadialValues.append(minRad < 0.1 ? -1.0 : minRad)
+                
+                maxRadialValues.append(nextOutData.layers[layerIndex].maxRadialForce * psiPerNmm2)
+                maxSpacerblockValues.append(nextOutData.layers[layerIndex].maxSpacerBlockForce * psiPerNmm2)
+                maxCombinedValues.append(nextOutData.layers[layerIndex].maxCombinedForce * psiPerNmm2)
+            }
+            
+            // Find the maximum ABSOLUTE value for this layer (across all columns)
+            // Filter out zeros and negative values (N/A) before finding max
+            let validMinRadial = minRadialValues.filter { $0 > 0 }
+            let maxMinRadialAbs = validMinRadial.map { abs($0) }.max() ?? -1.0
+            
+            let validMaxRadial = maxRadialValues.filter { $0 != 0 }
+            let maxMaxRadialAbs = validMaxRadial.map { abs($0) }.max() ?? 0.0
+            
+            let validMaxSpacerblock = maxSpacerblockValues.filter { $0 != 0 }
+            let maxMaxSpacerblockAbs = validMaxSpacerblock.map { abs($0) }.max() ?? 0.0
+            
+            let validMaxCombined = maxCombinedValues.filter { $0 != 0 }
+            let maxMaxCombinedAbs = validMaxCombined.map { abs($0) }.max() ?? 0.0
+            
+            // Layer header
+            let layerHeader = "Layer \(layerIndex + 1)"
+            worksheet_write_string(worksheet, currentRow, 0, layerHeader, nil)
+            updateColumnWidth(0, text: layerHeader)
+            currentRow += 1
+            
+            // Winding
+            var windingValues = outputData.map { $0.layers[layerIndex].windingDesc }
+            writeRow("Winding:", values: windingValues)
+            
+            // Terminal #
+            var termValues = outputData.map { String($0.layers[layerIndex].parentTerminal) }
+            writeRow("Terminal #", values: termValues)
+            
+            // Current direction
+            var currentDirValues = outputData.map { String($0.layers[layerIndex].currentDirection) }
+            writeRow("Current direction:", values: currentDirValues)
+            
+            // ID/OD
+            var idOdValues = outputData.map {
+                let mmDims = String(format: "%0.1fmm/%0.1fmm", $0.layers[layerIndex].ID, $0.layers[layerIndex].OD)
+                let inchDims = String(format: "%0.3f\"/%0.3f\"", $0.layers[layerIndex].ID / 25.4, $0.layers[layerIndex].OD / 25.4)
+                return "\(mmDims) (\(inchDims))"
+            }
+            writeRow("ID/OD:", values: idOdValues)
+            
+            // Min radial supports - WITH HIGHLIGHTING
+            worksheet_write_string(worksheet, currentRow, 0, "Min radial supports:", nil)
+            updateColumnWidth(0, text: "Min radial supports:")
+            
+            for (index, nextOutData) in outputData.enumerated() {
+                let col = UInt16(index + 1)
+                let minRadSupts = nextOutData.layers[layerIndex].minimumSpacerBars
+                let minRadString = minRadSupts < 0.1 ? "N/A" : String(format: "%0.1f", minRadSupts)
+                
+                // Highlight if: value > 0 AND abs(value) == max abs value
+                let shouldHighlight = minRadialValues[index] > 0 && abs(minRadialValues[index]) == maxMinRadialAbs
+                let format = shouldHighlight ? centerYellowFormat : centerFormat
+                worksheet_write_string(worksheet, currentRow, col, minRadString, format)
+                updateColumnWidth(col, text: minRadString)
+            }
+            currentRow += 1
+            
+            // Max Radial Force - WITH HIGHLIGHTING
+            worksheet_write_string(worksheet, currentRow, 0, "Max. Radial Force:", nil)
+            updateColumnWidth(0, text: "Max. Radial Force:")
+            
+            for (index, nextOutData) in outputData.enumerated() {
+                let col = UInt16(index + 1)
+                let psiValue = nextOutData.layers[layerIndex].maxRadialForce * psiPerNmm2
+                
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxRadialForce)
+                let psi = String(format: "%0.1f psi", psiValue)
+                let valueString = "\(nPerMm2) (\(psi))"
+                
+                // Highlight if: value != 0 AND abs(value) == max abs value
+                let shouldHighlight = psiValue != 0 && abs(psiValue) == maxMaxRadialAbs
+                let format = shouldHighlight ? centerYellowFormat : centerFormat
+                worksheet_write_string(worksheet, currentRow, col, valueString, format)
+                updateColumnWidth(col, text: valueString)
+            }
+            currentRow += 1
+            
+            // Max Spacerblock Force - WITH HIGHLIGHTING
+            worksheet_write_string(worksheet, currentRow, 0, "Max. Spacerblock Force:", nil)
+            updateColumnWidth(0, text: "Max. Spacerblock Force:")
+            
+            for (index, nextOutData) in outputData.enumerated() {
+                let col = UInt16(index + 1)
+                let psiValue = nextOutData.layers[layerIndex].maxSpacerBlockForce * psiPerNmm2
+                
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxSpacerBlockForce)
+                let psi = String(format: "%0.1f psi", psiValue)
+                let valueString = "\(nPerMm2) (\(psi))"
+                
+                // Highlight if: value != 0 AND abs(value) == max abs value
+                let shouldHighlight = psiValue != 0 && abs(psiValue) == maxMaxSpacerblockAbs
+                let format = shouldHighlight ? centerYellowFormat : centerFormat
+                worksheet_write_string(worksheet, currentRow, col, valueString, format)
+                updateColumnWidth(col, text: valueString)
+            }
+            currentRow += 1
+            
+            // Max Combined Force - WITH HIGHLIGHTING
+            worksheet_write_string(worksheet, currentRow, 0, "Max. Combined Force:", nil)
+            updateColumnWidth(0, text: "Max. Combined Force:")
+            
+            for (index, nextOutData) in outputData.enumerated() {
+                let col = UInt16(index + 1)
+                let psiValue = nextOutData.layers[layerIndex].maxCombinedForce * psiPerNmm2
+                
+                let nPerMm2 = String(format: "%0.1f N/mm2", nextOutData.layers[layerIndex].maxCombinedForce)
+                let psi = String(format: "%0.1f psi", psiValue)
+                let valueString = "\(nPerMm2) (\(psi))"
+                
+                // Highlight if: value != 0 AND abs(value) == max abs value
+                let shouldHighlight = psiValue != 0 && abs(psiValue) == maxMaxCombinedAbs
+                let format = shouldHighlight ? centerYellowFormat : centerFormat
+                worksheet_write_string(worksheet, currentRow, col, valueString, format)
+                updateColumnWidth(col, text: valueString)
+            }
+            currentRow += 1
+            
+            // DC Loss
+            var dcLossValues = outputData.map {
+                let dc75 = String(format: "%0.1fW @75C", $0.layers[layerIndex].dcLoss(temp: 75.0))
+                let dc85 = String(format: "%0.1fW @85C", $0.layers[layerIndex].dcLoss(temp: 85.0))
+                return "\(dc75) (\(dc85))"
+            }
+            writeRow("DC Loss:", values: dcLossValues)
+            
+            // Average Eddy Loss
+            var aveEddyValues = outputData.map {
+                let aveEddy75 = String(format: "%0.1f%% @75C", $0.layers[layerIndex].aveEddyPU(temp: 75.0) * 100.0)
+                let aveEddy85 = String(format: "%0.1f%% @85C", $0.layers[layerIndex].aveEddyPU(temp: 85.0) * 100.0)
+                return "\(aveEddy75) (\(aveEddy85))"
+            }
+            writeRow("Average Eddy Loss:", values: aveEddyValues)
+            
+            // Maximum Eddy Loss
+            var maxEddyValues = outputData.map {
+                let maxEddy75 = String(format: "%0.1f%% @75C", $0.layers[layerIndex].maxEddyPU(temp: 75.0) * 100.0)
+                let maxEddy85 = String(format: "%0.1f%% @85C", $0.layers[layerIndex].maxEddyPU(temp: 85.0) * 100.0)
+                return "\(maxEddy75) (\(maxEddy85))"
+            }
+            writeRow("Maximum Eddy Loss:", values: maxEddyValues)
+            
+            // Maximum Eddy Rectangle
+            var rectValues = outputData.map {
+                let rect = $0.layers[layerIndex].maxEddyLossRect
+                return String(format: "X:%0.1f Y:%0.1f W:%0.1f H:%0.1f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
+            }
+            writeRow("Maximum Eddy Rectangle:", values: rectValues)
+            
+            currentRow += 1 // Empty row between layers
+        }
+
+        // Apply the calculated column widths
+        for (col, width) in columnWidths {
+            worksheet_set_column(worksheet, col, col, width, nil)
+        }
+
+        // Warnings section
+        worksheet_write_string(worksheet, currentRow, 0, "Warnings", nil)
+        currentRow += 1
+
+        var warningStrings: [[String]] = []
+        var maxNumWarnings = 0
+        for nextOutData in outputData {
+            warningStrings.append(nextOutData.warnings)
+            maxNumWarnings = max(maxNumWarnings, nextOutData.warnings.count)
+        }
+
+        // Create a text wrap format for warnings
+        let wrapFormat = workbook_add_format(workbook)
+        format_set_text_wrap(wrapFormat)
+
+        for warningIndex in 0..<maxNumWarnings {
+            worksheet_write_string(worksheet, currentRow, 0, "", nil)
+            
+            // Track the maximum number of lines needed in this row
+            var maxLines = 1
+            
+            for (dataIndex, nextWarning) in warningStrings.enumerated() {
+                if warningIndex < nextWarning.count {
+                    let col = UInt16(dataIndex + 1)
+                    worksheet_write_string(worksheet, currentRow, col, nextWarning[warningIndex], wrapFormat)
+                    
+                    // Calculate number of lines needed based on column width and text length
+                    let columnWidth = columnWidths[col] ?? 25.0
+                    let charsPerLine = Int(columnWidth / 1.2)
+                    let numLines = max(1, (nextWarning[warningIndex].count + charsPerLine - 1) / charsPerLine)
+                    maxLines = max(maxLines, numLines)
+                }
+            }
+            
+            // Set row height based on number of lines (15 points per line is standard)
+            let rowHeight = Double(maxLines) * 15.0
+            worksheet_set_row(worksheet, currentRow, rowHeight, nil)
+            
+            currentRow += 1
+        }
+
+        workbook_close(workbook)
     }
     
     @IBAction func handleSaveAndersenOutputFile(_ sender: Any) {

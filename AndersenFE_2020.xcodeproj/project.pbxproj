@@ -232,7 +232,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1160;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2610;
 				ORGANIZATIONNAME = "Peter Huber";
 				TargetAttributes = {
 					D314455424C2209E0084DEC5 = {
@@ -398,6 +398,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -459,6 +460,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -474,9 +476,11 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2EC4BC96;
+				CURRENT_PROJECT_VERSION = 2EC60F2E;
 				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				EXCLUDED_ARCHS = x86_64;
 				HEADER_SEARCH_PATHS = (
 					/Users/peterhub/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include,
@@ -514,9 +518,11 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2EC4BC96;
+				CURRENT_PROJECT_VERSION = 2EC60F2E;
 				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				EXCLUDED_ARCHS = x86_64;
 				HEADER_SEARCH_PATHS = (
 					/Users/peterhuber/Documents/MyProjects/PCH_FLD12_Library_Release/Products/usr/local/include,

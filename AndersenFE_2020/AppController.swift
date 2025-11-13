@@ -2009,7 +2009,13 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.allowedContentTypes = [.init(filenameExtension: "xlsx")!]
-        savePanel.nameFieldStringValue = "output.xlsx"
+        
+        let targetCharacter: Character = "_"
+        let defaultNamePrefix:Substring = self.mainWindow.title.prefix(while: { character in
+            return character != targetCharacter
+        })
+        
+        savePanel.nameFieldStringValue = String(defaultNamePrefix) + "_OutputData.xlsx"
 
         guard savePanel.runModal() == .OK, let url = savePanel.url else { return }
 
@@ -2032,10 +2038,13 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
 
         // Track maximum width for each column
         var columnWidths: [UInt16: Double] = [:]
+        
+        // The width factor to make sure everything fits without being too tight
+        let widthFactor = 1.1
 
         // Helper function to update column width tracking
         func updateColumnWidth(_ col: UInt16, text: String) {
-            let estimatedWidth = max(8.0, Double(text.count) * 1.2)
+            let estimatedWidth = max(8.0, Double(text.count) * widthFactor)
             columnWidths[col] = max(columnWidths[col] ?? 0, estimatedWidth)
         }
 
@@ -2053,7 +2062,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         }
 
         // Description row
-        var descriptions = outputData.map { $0.description }
+        let descriptions = outputData.map { $0.description }
         writeRow("Description", values: descriptions)
         currentRow += 1 // Empty row
 
@@ -2078,26 +2087,26 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         }
 
         // Transformer Impedance
-        var impValues = outputData.map {
+        let impValues = outputData.map {
             String(format: "%0.2f%% @ %0.3f MVA", $0.impedance * 100.0, $0.MVA)
         }
         writeRow("Transformer Impedance", values: impValues)
 
         // Force Impedance
-        var forceImpValues = outputData.map {
+        let forceImpValues = outputData.map {
             String(format: "%0.2f%% @ %0.3f MVA", $0.impedanceForForces * 100.0, $0.MVA)
         }
         writeRow("Force Impedance", values: forceImpValues)
 
         // Peak Factor
-        var pkFactorValues = outputData.map {
+        let pkFactorValues = outputData.map {
             String(format: "%0.3f", $0.pkFactor * sqrt(2.0))
         }
         writeRow("Peak Factor", values: pkFactorValues)
 
         // Zero-sequence impedance (if available)
         if outputData[0].z0 != nil {
-            var z0Values = outputData.map {
+            let z0Values = outputData.map {
                 String(format: "%0.2f Ω/ph", $0.z0!)
             }
             writeRow("Zero-sequence impedance", values: z0Values)
@@ -2105,7 +2114,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         currentRow += 1 // Empty row
 
         // Upper Thrust
-        var upperThrustValues = outputData.map {
+        let upperThrustValues = outputData.map {
             let newtons = String(format: "%0.1f N", $0.upperThrust)
             let pounds = String(format: "%0.1f lbs", $0.upperThrust * lbsPerNewton)
             return "\(newtons) (\(pounds))"
@@ -2113,7 +2122,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
         writeRow("Upper Thrust", values: upperThrustValues)
 
         // Lower Thrust
-        var lowerThrustValues = outputData.map {
+        let lowerThrustValues = outputData.map {
             let newtons = String(format: "%0.1f N", $0.lowerThrust)
             let pounds = String(format: "%0.1f lbs", $0.lowerThrust * lbsPerNewton)
             return "\(newtons) (\(pounds))"
@@ -2163,19 +2172,19 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             currentRow += 1
             
             // Winding
-            var windingValues = outputData.map { $0.layers[layerIndex].windingDesc }
+            let windingValues = outputData.map { $0.layers[layerIndex].windingDesc }
             writeRow("Winding:", values: windingValues)
             
             // Terminal #
-            var termValues = outputData.map { String($0.layers[layerIndex].parentTerminal) }
+            let termValues = outputData.map { String($0.layers[layerIndex].parentTerminal) }
             writeRow("Terminal #", values: termValues)
             
             // Current direction
-            var currentDirValues = outputData.map { String($0.layers[layerIndex].currentDirection) }
+            let currentDirValues = outputData.map { String($0.layers[layerIndex].currentDirection) }
             writeRow("Current direction:", values: currentDirValues)
             
             // ID/OD
-            var idOdValues = outputData.map {
+            let idOdValues = outputData.map {
                 let mmDims = String(format: "%0.1fmm/%0.1fmm", $0.layers[layerIndex].ID, $0.layers[layerIndex].OD)
                 let inchDims = String(format: "%0.3f\"/%0.3f\"", $0.layers[layerIndex].ID / 25.4, $0.layers[layerIndex].OD / 25.4)
                 return "\(mmDims) (\(inchDims))"
@@ -2260,7 +2269,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             currentRow += 1
             
             // DC Loss
-            var dcLossValues = outputData.map {
+            let dcLossValues = outputData.map {
                 let dc75 = String(format: "%0.1fW @75C", $0.layers[layerIndex].dcLoss(temp: 75.0))
                 let dc85 = String(format: "%0.1fW @85C", $0.layers[layerIndex].dcLoss(temp: 85.0))
                 return "\(dc75) (\(dc85))"
@@ -2268,7 +2277,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             writeRow("DC Loss:", values: dcLossValues)
             
             // Average Eddy Loss
-            var aveEddyValues = outputData.map {
+            let aveEddyValues = outputData.map {
                 let aveEddy75 = String(format: "%0.1f%% @75C", $0.layers[layerIndex].aveEddyPU(temp: 75.0) * 100.0)
                 let aveEddy85 = String(format: "%0.1f%% @85C", $0.layers[layerIndex].aveEddyPU(temp: 85.0) * 100.0)
                 return "\(aveEddy75) (\(aveEddy85))"
@@ -2276,7 +2285,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             writeRow("Average Eddy Loss:", values: aveEddyValues)
             
             // Maximum Eddy Loss
-            var maxEddyValues = outputData.map {
+            let maxEddyValues = outputData.map {
                 let maxEddy75 = String(format: "%0.1f%% @75C", $0.layers[layerIndex].maxEddyPU(temp: 75.0) * 100.0)
                 let maxEddy85 = String(format: "%0.1f%% @85C", $0.layers[layerIndex].maxEddyPU(temp: 85.0) * 100.0)
                 return "\(maxEddy75) (\(maxEddy85))"
@@ -2284,7 +2293,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             writeRow("Maximum Eddy Loss:", values: maxEddyValues)
             
             // Maximum Eddy Rectangle
-            var rectValues = outputData.map {
+            let rectValues = outputData.map {
                 let rect = $0.layers[layerIndex].maxEddyLossRect
                 return String(format: "X:%0.1f Y:%0.1f W:%0.1f H:%0.1f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
             }
@@ -2326,7 +2335,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
                     
                     // Calculate number of lines needed based on column width and text length
                     let columnWidth = columnWidths[col] ?? 25.0
-                    let charsPerLine = Int(columnWidth / 1.2)
+                    let charsPerLine = Int(columnWidth / widthFactor)
                     let numLines = max(1, (nextWarning[warningIndex].count + charsPerLine - 1) / charsPerLine)
                     maxLines = max(maxLines, numLines)
                 }
@@ -2339,6 +2348,7 @@ class AppController: NSObject, NSMenuItemValidation, NSWindowDelegate {
             currentRow += 1
         }
 
+        self.outputDataIsDirty = false
         workbook_close(workbook)
     }
     
